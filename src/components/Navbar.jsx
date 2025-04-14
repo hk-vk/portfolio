@@ -118,12 +118,12 @@ const Navbar = () => {
               className="flex items-center"
             >
               <span className="font-bold tracking-tighter text-2xl relative">
-                PORT
+                HARI
                 <span className="text-primary absolute -top-1 -right-3 rotate-12">
                   <SparkleIllustration size={16} />
                 </span>
                 <br />
-                FOLIO
+                KRISHNAN
                 <span className="text-primary text-xs align-top ml-1">©</span>
               </span>
             </motion.div>
@@ -134,9 +134,7 @@ const Navbar = () => {
               whileHover={{ y: -2 }}
               className="relative"
             >
-              <span className="text-muted-foreground">ANNÉE</span>
-              {' '}
-              <span className="font-bold">2024</span>
+              <span className="font-bold">PORTFOLIO</span>
               <motion.div
                 className="absolute -top-2 -right-5 opacity-70"
                 animate={{
@@ -155,7 +153,7 @@ const Navbar = () => {
               whileHover={{ y: -2 }}
               className="text-primary font-medium"
             >
-              DÉVELOPPEUR FULL STACK
+              WEB DEVELOPER
             </motion.div>
             
             {/* Theme Toggle */}

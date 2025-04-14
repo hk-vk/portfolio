@@ -114,10 +114,10 @@ const Home = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <span className="text-gradient">PORT</span>
+                    <span className="text-gradient">HARI</span>
                     <br />
                     <span className="relative">
-                      FOLIO
+                      KRISHNAN
                       <motion.div
                         className="absolute -right-6 -bottom-2"
                         initial={{ opacity: 0, scale: 0 }}
