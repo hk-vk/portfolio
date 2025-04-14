@@ -110,12 +110,19 @@ const Navbar = () => {
                 >
                   {location.pathname === link.path && (
                     <motion.div 
-                      className="absolute -left-4 top-1/2 -translate-y-1/2"
+                      className="absolute -left-5 top-1/2 -translate-y-1/2"
                       initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        transition: { 
+                          repeat: Infinity, 
+                          duration: 1.5,
+                          ease: "easeInOut"
+                        }
+                      }}
                       transition={{ type: "spring", stiffness: 500 }}
                     >
-                      <SparkleIllustration className="text-primary" size={12} />
+                      <SparkleIllustration className="text-primary" size={16} />
                     </motion.div>
                   )}
                   {link.name}
