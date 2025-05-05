@@ -49,13 +49,15 @@ function BadgeContent() {
   const badgeDepth = 0.15;
   const badgeRadius = 0.15;
 
-  // Joints - Use FixedJoint for the last connection
+  // Joints - Use FixedJoint with [x, y, z] anchor format
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.1]); 
   const joint = useFixedJoint(j3, card, [
-    [0, 0, 0, 1], 
-    [0, badgeHeight * 0.45, 0, 1], 
+    // Anchor point on j3 body (local)
+    [0, 0, 0], 
+    // Anchor point on card body (local)
+    [0, badgeHeight * 0.45, 0], 
   ]);
 
   useEffect(() => {
