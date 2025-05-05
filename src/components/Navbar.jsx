@@ -97,7 +97,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {mainLinks.map((link) => (
-              <motion.div 
+            <motion.div
                 key={link.path}
                 whileHover="hover"
                 variants={navItemVariants}
@@ -109,19 +109,19 @@ const Navbar = () => {
                   }`}
                 >
                   {location.pathname === link.path && (
-                    <motion.div 
+              <motion.div
                       className="absolute -left-5 top-1/2 -translate-y-1/2"
                       initial={{ scale: 0 }}
-                      animate={{
+                animate={{
                         scale: [1, 1.2, 1],
                         transition: { 
-                          repeat: Infinity, 
+                  repeat: Infinity,
                           duration: 1.5,
                           ease: "easeInOut"
                         }
-                      }}
+                }}
                       transition={{ type: "spring", stiffness: 500 }}
-                    >
+              >
                       <SparkleIllustration className="text-primary" size={16} />
                     </motion.div>
                   )}
@@ -145,47 +145,48 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden relative z-10 p-2 flex items-center"
-            aria-label="Toggle menu"
-          >
+          <div className="md:hidden relative z-10 p-2 flex items-center">
             {/* Theme Toggle - Mobile */}
             <div className="mr-4">
               <ThemeToggle />
             </div>
             
-            <div className="w-6 flex flex-col items-end justify-center">
-              <motion.span
-                animate={{
-                  rotate: isMobileMenuOpen ? 45 : 0,
-                  y: isMobileMenuOpen ? 7 : 0,
-                  width: isMobileMenuOpen ? 24 : 24
-                }}
-                transition={{ duration: 0.3 }}
-                className="block h-0.5 bg-foreground mb-1.5"
-              />
-              <motion.span
-                animate={{
-                  opacity: isMobileMenuOpen ? 0 : 1,
-                  width: isMobileMenuOpen ? 0 : 16
-                }}
-                transition={{ duration: 0.3 }}
-                className="block h-0.5 bg-foreground mb-1.5"
-              />
-              <motion.span
-                animate={{
-                  rotate: isMobileMenuOpen ? -45 : 0,
-                  y: isMobileMenuOpen ? -7 : 0,
-                  width: isMobileMenuOpen ? 24 : 20
-                }}
-                transition={{ duration: 0.3 }}
-                className="block h-0.5 bg-foreground"
-              />
-            </div>
-          </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <div className="w-6 flex flex-col items-end justify-center">
+                <motion.span
+                  animate={{
+                    rotate: isMobileMenuOpen ? 45 : 0,
+                    y: isMobileMenuOpen ? 7 : 0,
+                    width: isMobileMenuOpen ? 24 : 24
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="block h-0.5 bg-foreground mb-1.5"
+                />
+                <motion.span
+                  animate={{
+                    opacity: isMobileMenuOpen ? 0 : 1,
+                    width: isMobileMenuOpen ? 0 : 16
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="block h-0.5 bg-foreground mb-1.5"
+                />
+                <motion.span
+                  animate={{
+                    rotate: isMobileMenuOpen ? -45 : 0,
+                    y: isMobileMenuOpen ? -7 : 0,
+                    width: isMobileMenuOpen ? 24 : 20
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="block h-0.5 bg-foreground"
+                />
+              </div>
+            </motion.button>
+          </div>
         </div>
       </div>
 
