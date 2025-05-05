@@ -254,7 +254,7 @@ export const AboutPageBadge = () => {
   if (!isMounted) return null;
   
   return (
-    <div className="absolute top-[120px] right-[10%] w-[280px] h-[350px] z-10 pointer-events-auto">
+    <div className="absolute top-[120px] left-[10%] w-[280px] h-[350px] z-10 pointer-events-auto">
       <Canvas
         shadows
         camera={{ position: [0, 0, 7], fov: 25 }}
