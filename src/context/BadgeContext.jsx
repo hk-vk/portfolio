@@ -53,12 +53,29 @@ function BadgeContent() {
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.1]); 
-  const joint = useFixedJoint(j3, card, [
-    // Anchor point on j3 body (local)
-    [0, 0, 0], 
-    // Anchor point on card body (local)
-    [0, badgeHeight * 0.45, 0], 
-  ]);
+  
+  // Defer FixedJoint creation until refs are ready
+  // const joint = useFixedJoint(j3, card, ... ); // Remove this line
+
+  // Effect to create the FixedJoint once refs are available
+  useEffect(() => {
+    if (j3.current && card.current) {
+      // Create the joint imperatively using the API
+      const rapierWorld = card.current.context.world; // Access the Rapier world instance
+      const joint = rapierWorld.createImpulseJoint(
+        rapierWorld.createJointConnector(
+          rapierWorld.createJointAnchor(j3.current.handle, [0, 0, 0]), // Anchor on j3
+          rapierWorld.createJointAnchor(card.current.handle, [0, badgeHeight * 0.45, 0]) // Anchor on card
+        )
+      );
+      // Clean up the joint when the component unmounts or refs change
+      return () => {
+        if (rapierWorld && rapierWorld.getImpulseJoint(joint.handle)) {
+           rapierWorld.removeImpulseJoint(joint.handle, true);
+        }
+      };
+    }
+  }, [j3, card, badgeHeight]); // Re-run if refs or badgeHeight changes
 
   useEffect(() => {
     document.body.style.cursor = hovered ? (dragged ? 'grabbing' : 'grab') : 'auto';
