@@ -54,7 +54,14 @@ const About = () => {
   ];
 
   return (
-    <div className="pt-32 pb-20">
+    <div className="pt-32 pb-20 relative">
+      {/* --- Positioned Interactive Badge --- */}
+      <div className="absolute top-[-100px] right-[-50px] w-[400px] h-[600px] z-10 pointer-events-none">
+        {/* Adjust top/right/width/height as needed */}
+        {/* pointer-events-none on container, auto on mesh allows interaction */}
+        <InteractiveBadge />
+      </div>
+
       {/* Hero Section */}
       <section className="content-container">
         <AnimatedSection animation="fadeUp">
@@ -63,9 +70,9 @@ const About = () => {
         </AnimatedSection>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10 items-center">
-          <AnimatedSection animation="slideInLeft">
-            <InteractiveBadge />
-          </AnimatedSection>
+          {/* --- Empty div placeholder where the badge used to be --- */}
+          {/* We might need this empty div or adjust grid layout if badge removal breaks it */}
+          <div></div>
 
           <AnimatedSection animation="slideInRight" className="space-y-6">
             <h2 className="text-2xl font-bold">

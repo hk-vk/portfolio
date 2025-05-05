@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
+import { Environment, Text } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 
@@ -11,14 +11,22 @@ extend({ MeshLineGeometry, MeshLineMaterial });
 // Main component containing the Canvas and Physics world
 const InteractiveBadge = () => {
   return (
-    <div style={{ height: '400px', width: '100%', background: 'transparent' }}>
-      <Canvas camera={{ position: [0, 0, 13], fov: 25 }}>
-        <ambientLight intensity={Math.PI * 0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-        <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
+    <div style={{ height: '600px', width: '100%', background: 'transparent', pointerEvents: 'none' }}>
+      <Canvas camera={{ position: [0, 0, 15], fov: 35 }}>
+        <ambientLight intensity={Math.PI * 0.6} />
+        <spotLight 
+          position={[10, 15, 10]} 
+          angle={0.2} 
+          penumbra={1} 
+          intensity={1.5} 
+          castShadow 
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+        />
+        <Physics interpolate gravity={[0, -50, 0]} timeStep={1 / 60}>
           <Band />
         </Physics>
-        <Environment preset="studio" background={false} />
+        <Environment preset="studio" background={false} blur={0.5}/>
       </Canvas>
     </div>
   );
@@ -65,17 +73,15 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
   const [hovered, hover] = useState(false);
 
   // Define physics joints between bodies (lanyard segments)
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
-  useSphericalJoint(j3, card, [[0, 0, 0], [0, 1.45, 0]]);
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.1]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.1]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.1]);
+  useSphericalJoint(j3, card, [[0, 0, 0], [0, 2.2, 0]]);
 
   // Update cursor style when hovering/dragging
   useEffect(() => {
-    if (hovered) {
-      document.body.style.cursor = dragged ? 'grabbing' : 'grab';
-      return () => void (document.body.style.cursor = 'auto');
-    }
+    document.body.style.cursor = hovered ? (dragged ? 'grabbing' : 'grab') : 'auto';
+    return () => void (document.body.style.cursor = 'auto');
   }, [hovered, dragged]);
 
   // Physics simulation and animation loop
@@ -132,14 +138,16 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
   });
 
   // Badge dimensions
-  const badgeWidth = 1.6;
-  const badgeHeight = 2.25;
-  const badgeDepth = 0.1;
+  const badgeHeight = 4.5;
+  const badgeWidth = badgeHeight * (1.6 / 2.25);
+  const badgeDepth = 0.15;
 
   // Get theme colors for light/dark mode from CSS variables
   const [colors, setColors] = useState({ 
-    primary: '#9984C7',  // Default purple color (from the Hand illustration)
-    card: '#fafafa'      // Default card color
+    primary: 'hsl(349, 75%, 44%)',
+    card: 'hsl(60, 9%, 98%)',
+    foreground: 'hsl(240, 10%, 10%)',
+    muted: 'hsl(240, 5%, 90%)'
   });
 
   // Read CSS variables for theme-aware colors
@@ -149,12 +157,11 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
         const styles = getComputedStyle(document.documentElement);
         
         // Try to read CSS variables or use defaults
-        const primaryRaw = styles.getPropertyValue('--primary').trim();
-        const cardRaw = styles.getPropertyValue('--card').trim();
-        
         setColors({
-          primary: primaryRaw || '#9984C7',
-          card: cardRaw || '#fafafa'
+          primary: styles.getPropertyValue('--primary').trim() || 'hsl(349, 75%, 44%)',
+          card: styles.getPropertyValue('--card').trim() || 'hsl(60, 9%, 98%)',
+          foreground: styles.getPropertyValue('--foreground').trim() || 'hsl(240, 10%, 10%)',
+          muted: styles.getPropertyValue('--muted').trim() || 'hsl(240, 5%, 90%)'
         });
       }
     };
@@ -197,13 +204,11 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
           <mesh
             castShadow
             receiveShadow
-            onPointerOver={() => hover(true)}
+            onPointerOver={(e) => { e.stopPropagation(); hover(true); }}
             onPointerOut={() => hover(false)}
-            onPointerUp={(e) => {
-              e.target.releasePointerCapture(e.pointerId);
-              drag(false);
-            }}
+            onPointerUp={(e) => { e.stopPropagation(); e.target.releasePointerCapture(e.pointerId); drag(false); }}
             onPointerDown={(e) => {
+              e.stopPropagation();
               if (!card.current) return;
               e.target.setPointerCapture(e.pointerId);
               
@@ -211,18 +216,34 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
               const cardPos = card.current.translation();
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(cardPos)));
             }}
+            style={{ pointerEvents: 'auto' }}
           >
             <boxGeometry args={[badgeWidth, badgeHeight, badgeDepth]} />
             <meshPhysicalMaterial
               color={colors.card}
-              roughness={0.3}
-              metalness={0.5}
-              clearcoat={1}
-              clearcoatRoughness={0.15}
+              roughness={0.2}
+              metalness={0.1}
+              clearcoat={0.8}
+              clearcoatRoughness={0.1}
             />
             
-            {/* Optional: Add a name/text to the front of the card */}
-            {/* This would require Text from drei or a texture approach */}
+            {/* Photo Placeholder */}
+            <mesh position={[0, 0.5, badgeDepth / 2 + 0.01]}>
+              <planeGeometry args={[badgeWidth * 0.5, badgeWidth * 0.5]} />
+              <meshStandardMaterial color={colors.muted} roughness={0.8} metalness={0} />
+            </mesh>
+
+            {/* Name Text */}
+            <Text
+              position={[0, badgeHeight * 0.35, badgeDepth / 2 + 0.01]}
+              fontSize={badgeWidth * 0.1}
+              color={colors.foreground}
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={badgeWidth * 0.8}
+            >
+              Harikrishnan V K
+            </Text>
           </mesh>
         </RigidBody>
       </group>
@@ -234,9 +255,9 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
           color={colors.primary}
           depthTest={false}
           resolution={[width, height]}
-          lineWidth={2}
+          lineWidth={3}
           transparent
-          opacity={0.8}
+          opacity={0.9}
         />
       </mesh>
     </>
