@@ -50,11 +50,12 @@ function BadgeContent() {
   const badgeDepth = 0.15;
   const badgeRadius = 0.15;
 
-  // Joints with better constraints
+  // Joints - slightly shorten the last rope segment
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.1]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.1]);
-  useSphericalJoint(j3, card, [[0, 0, 0], [0, badgeHeight * 0.48, 0]]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.0]); // Shortened from 1.1
+  // Use a slightly lower anchor point on the card for the spherical joint
+  useSphericalJoint(j3, card, [[0, 0, 0], [0, badgeHeight * 0.45, 0]]); // Lowered from 0.48
 
   useEffect(() => {
     document.body.style.cursor = hovered ? (dragged ? 'grabbing' : 'grab') : 'auto';
@@ -95,13 +96,13 @@ function BadgeContent() {
     }
 
     if (fixed.current && j1.current && j2.current && j3.current && card.current && band.current) {
-      // Apply stronger damping to the last joint (j3) and the card itself
-      j3.current?.setAngularDamping(6);
-      j3.current?.setLinearDamping(6);
-      card.current?.setAngularDamping(6);
-      card.current?.setLinearDamping(6);
+      // Apply VERY strong damping ONLY to the last joint (j3) and the card
+      j3.current?.setAngularDamping(10); // Significantly increased
+      j3.current?.setLinearDamping(10);  // Significantly increased
+      card.current?.setAngularDamping(10); // Significantly increased
+      card.current?.setLinearDamping(10); // Significantly increased
       
-      const maxSpeed = 15, minSpeed = 4;
+      const maxSpeed = 15, minSpeed = 4; 
       
       // Smoothing for joints
       [j1, j2].forEach((ref) => {
@@ -110,11 +111,11 @@ function BadgeContent() {
         ref.current.lerped.lerp(ref.current.translation(), delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed)));
       });
 
-      // Apply slightly more aggressive lerp to j3 to catch up but stay smooth
       if (j3.current) {
           if (!j3.current.lerped) j3.current.lerped = new THREE.Vector3().copy(j3.current.translation());
           const clampedDistanceJ3 = Math.max(0.04, Math.min(0.4, j3.current.lerped.distanceTo(j3.current.translation())));
-          j3.current.lerped.lerp(j3.current.translation(), delta * (minSpeed * 1.1 + clampedDistanceJ3 * (maxSpeed - minSpeed)));
+          // Use a slightly gentler lerp for j3 to prevent abruptness with high damping
+          j3.current.lerped.lerp(j3.current.translation(), delta * (minSpeed + clampedDistanceJ3 * (maxSpeed - minSpeed)) * 0.9); 
       }
 
       // Update the curve with lerped points
@@ -267,10 +268,10 @@ export const AboutPageBadge = () => {
   if (!isMounted) return null;
   
   return (
-    <div className="absolute top-[120px] left-[10%] w-[280px] h-[350px] z-10 pointer-events-auto">
+    <div className="absolute top-[120px] left-[10%] w-[280px] h-[450px] z-10 pointer-events-auto">
       <Canvas
         shadows
-        camera={{ position: [0, 0, 7], fov: 25 }}
+        camera={{ position: [0, 0, 10], fov: 30 }}
         dpr={[1, 1.5]}
       >
         <ambientLight intensity={Math.PI * 0.7} />
