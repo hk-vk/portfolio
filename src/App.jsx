@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import '@fontsource-variable/space-grotesk';
 import '@fontsource/dm-serif-display';
 import './index.css';
+import { motion } from 'framer-motion';
 
 // Components
 import Navbar from './components/Navbar';
@@ -76,12 +77,38 @@ function App() {
         <div className="blob-bg" style={{ bottom: '10%', right: '10%', animationDelay: '2s' }}></div>
         
         <div className="text-center relative z-10">
-          {/* Name animation - Reveal Effect */}
-          <div className="mb-4">
-            <span className="loading-name-reveal">
-              HARIKRISHNAN
-            </span>
-          </div>
+          {/* Name animation with Framer Motion */}
+          <motion.div 
+            className="mb-4" 
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { 
+                opacity: 1,
+                transition: { staggerChildren: 0.08, delayChildren: 0.2 }
+              }
+            }}
+            initial="hidden"
+            animate="visible"
+          >
+            {'HARIKRISHNAN'.split('').map((letter, index) => (
+              <motion.span 
+                key={index} 
+                variants={{
+                  hidden: { opacity: 0, y: 20, scale: 0.8, rotate: -5 },
+                  visible: {
+                    opacity: 1, 
+                    y: 0, 
+                    scale: 1, 
+                    rotate: 0,
+                    transition: { type: "spring", damping: 15, stiffness: 100 }
+                  }
+                }}
+                className="inline-block text-5xl md:text-7xl font-serif loading-letter-fm" // Using a new class
+              >
+                {letter === ' ' ? '\u00A0' : letter} {/* Handle spaces if any */}
+              </motion.span>
+            ))}
+          </motion.div>
           
           {/* Progress bar */}
           <div className="w-48 md:w-64 h-2 bg-muted mx-auto mt-6 rounded-full overflow-hidden shadow-inner">

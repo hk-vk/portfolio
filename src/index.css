@@ -531,7 +531,8 @@ html {
   );
 }
 
-/* Loading screen text reveal animation */
+/* Remove or comment out reveal styles */
+/*
 @keyframes reveal-text {
   from { width: 100%; }
   to { width: 0%; }
@@ -539,13 +540,13 @@ html {
 
 .loading-name-reveal {
   position: relative;
-  font-family: 'DM Serif Display', serif; /* Using theme font */
-  font-size: clamp(3rem, 10vw, 6rem); /* Responsive font size */
+  font-family: 'DM Serif Display', serif; 
+  font-size: clamp(3rem, 10vw, 6rem); 
   font-weight: bold;
-  color: hsl(var(--primary)); /* Use primary color for text */
-  background-color: hsl(var(--background)); /* Use background for blend */
-  mix-blend-mode: multiply; /* Key effect */
-  display: inline-block; /* Needed for pseudo-element positioning */
+  color: hsl(var(--primary)); 
+  background-color: hsl(var(--background)); 
+  mix-blend-mode: multiply; 
+  display: inline-block; 
   line-height: 1.1;
 }
 
@@ -553,18 +554,30 @@ html {
   content: '';
   position: absolute;
   top: 0;
-  right: 0; /* Animate from right to left */
+  right: 0; 
   bottom: 0;
   width: 100%;
-  background-color: hsl(var(--foreground)); /* Use foreground color for overlay */
-  mix-blend-mode: screen; /* Key effect */
-  animation: reveal-text 2s ease-in-out forwards; /* Apply animation */
-  animation-delay: 0.2s; /* Small delay before starting */
+  background-color: hsl(var(--foreground)); 
+  mix-blend-mode: screen; 
+  animation: reveal-text 2s ease-in-out forwards; 
+  animation-delay: 0.2s; 
+}
+*/
+
+/* Ensure old letter animation styles are inactive */
+.loading-letter {
+  /* Deprecated - animation handled by Framer Motion now */
+  animation: none !important;
+  display: none !important; /* Hide if still rendered somehow */
 }
 
-/* Remove old letter animation styles if they exist */
-.loading-letter {
-  /* Deprecated - styles replaced by .loading-name-reveal */
-  animation: none !important;
-  display: none; /* Hide elements if they are still rendered */
+/* Basic style for Framer Motion loading letters */
+.loading-letter-fm {
+  color: hsl(var(--primary));
+  font-weight: bold;
+  /* Add slight text stroke for definition */
+  -webkit-text-stroke: 0.5px hsla(var(--foreground), 0.1);
+  text-shadow: 0 2px 5px hsla(var(--primary), 0.3); /* Subtle glow */
+  /* Remove any conflicting animation properties if they exist */
+  animation: none;
 }
