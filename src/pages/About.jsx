@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
+import InteractiveBadge from '../components/InteractiveBadge';
 
 const About = () => {
   // Skills with progress levels
@@ -63,14 +64,7 @@ const About = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10 items-center">
           <AnimatedSection animation="slideInLeft">
-            <div className="relative overflow-hidden rounded-2xl aspect-[4/5] bg-accent/20">
-              <img
-                src="https://avatars.githubusercontent.com/u/64376135?v=4"
-                alt="Profile"
-                className="object-cover w-full h-full"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-40"></div>
-            </div>
+            <InteractiveBadge />
           </AnimatedSection>
 
           <AnimatedSection animation="slideInRight" className="space-y-6">
