@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Canvas, extend, useFrame } from "@react-three/fiber";
 import {
-  useGLTF,
   useTexture,
   Environment,
   Lightformer,
+  Text
 } from "@react-three/drei";
 import {
   BallCollider,
@@ -17,9 +17,6 @@ import {
   useSphericalJoint,
 } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
-
-import cardGLB from "./card.glb";
-import lanyard from "./lanyard.png";
 
 import * as THREE from "three";
 
@@ -96,7 +93,6 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
     angularDamping: 4,
     linearDamping: 4,
   };
-  const { nodes, materials } = useGLTF(cardGLB);
   const texture = useTexture(lanyard);
   const [curve] = useState(
     () =>
@@ -216,22 +212,24 @@ function Band({ maxSpeed = 50, minSpeed = 0 }) {
               )
             )}
           >
-            <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial
-                map={materials.base.map}
-                map-anisotropy={16}
-                clearcoat={1}
-                clearcoatRoughness={0.15}
-                roughness={0.9}
-                metalness={0.8}
-              />
-            </mesh>
-            <mesh
-              geometry={nodes.clip.geometry}
-              material={materials.metal}
-              material-roughness={0.3}
-            />
-            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+            <Text
+              position={[0, 0, 0]}
+              fontSize={0.3}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Your Name
+            </Text>
+            <Text
+              position={[0, -0.4, 0]}
+              fontSize={0.2}
+              color="gray"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Portfolio Details
+            </Text>
           </group>
         </RigidBody>
       </group>
