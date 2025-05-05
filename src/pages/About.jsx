@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
-import Lanyard from '../components/Lanyard/Lanyard';
 const About = () => {
   // Skills with progress levels
   const skills = [
@@ -54,7 +53,6 @@ const About = () => {
 
   return (
     <div className="pt-32 pb-20 relative">
-      <Lanyard position={[0, 0, 15]} gravity={[0, -25, 0]} transparent={false} />
       
       <section className="content-container relative z-10">
         <AnimatedSection animation="fadeUp">
