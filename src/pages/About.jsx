@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
-import Lanyard from '../components/Lanyard';
-
+import Lanyard from '../components/Lanyard/Lanyard';
 const About = () => {
   // Skills with progress levels
   const skills = [

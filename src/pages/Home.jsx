@@ -5,6 +5,7 @@ import HandIllustration from '../components/HandIllustration';
 import FlowerIllustration from '../components/FlowerIllustration';
 import LeafIllustration from '../components/LeafIllustration';
 import SparkleIllustration from '../components/SparkleIllustration';
+import HeroHighlightLine from '../components/HeroHighlightLine';
 
 const Home = () => {
   // Animation variants
@@ -90,7 +91,9 @@ const Home = () => {
           <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
           <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
-          <div className="fancy-border p-2 mb-16">
+          <div className="fancy-border p-2 mb-16 relative">
+            <HeroHighlightLine />
+
             <div className="border border-border flex flex-col md:flex-row items-center justify-between">
               <div className="p-8 md:p-12 flex-1">
                 <div className="relative mb-12">
