@@ -15,7 +15,7 @@ const BadgeContext = createContext({});
 // Custom hook to use the context
 export const useBadge = () => useContext(BadgeContext);
 
-// --- Badge Physics and Visual Component ---
+// --- Interactive Badge Component ---
 function BadgeContent() {
   const band = useRef();
   const fixed = useRef();
@@ -27,7 +27,16 @@ function BadgeContent() {
   const ang = new THREE.Vector3();
   const rot = new THREE.Vector3();
   const dir = new THREE.Vector3();
-  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
+  
+  // Physics props
+  const segmentProps = { 
+    type: 'dynamic', 
+    canSleep: true, 
+    colliders: false, 
+    angularDamping: 4,
+    linearDamping: 4
+  };
+  
   const { width, height } = useThree((state) => state.size);
   const [curve] = useState(() => new THREE.CatmullRomCurve3([
     new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()
@@ -36,37 +45,19 @@ function BadgeContent() {
   const [hovered, hover] = useState(false);
 
   // Badge dimensions
-  const badgeHeight = 5.5;
+  const badgeHeight = 3.0;
   const badgeWidth = badgeHeight * (1.6 / 2.25);
   const badgeDepth = 0.15;
   const badgeRadius = 0.15;
 
-  // Joints
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.3]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.3]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.3]);
+  // Joints with better constraints
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.1]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.1]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.1]);
   useSphericalJoint(j3, card, [[0, 0, 0], [0, badgeHeight * 0.48, 0]]);
-
-  // Add a ref for initial position to reset when not dragged
-  const initialPos = useRef(new THREE.Vector3(2, 0, 0));
 
   useEffect(() => {
     document.body.style.cursor = hovered ? (dragged ? 'grabbing' : 'grab') : 'auto';
-    
-    // Set up reset position when drag ends
-    if (!dragged && card.current) {
-      const currentPos = card.current.translation();
-      // Only apply a gentle reset force if the card has moved far from its original position
-      if (Math.abs(currentPos.x - initialPos.current.x) > 3 || 
-          Math.abs(currentPos.y - initialPos.current.y) > 3) {
-        card.current.applyImpulse({
-          x: (initialPos.current.x - currentPos.x) * 0.1,
-          y: (initialPos.current.y - currentPos.y) * 0.1,
-          z: 0
-        });
-      }
-    }
-    
     return () => void (document.body.style.cursor = 'auto');
   }, [hovered, dragged]);
 
@@ -106,12 +97,14 @@ function BadgeContent() {
     if (fixed.current && j1.current && j2.current && j3.current && card.current && band.current) {
       const maxSpeed = 20, minSpeed = 5;
       
+      // Smoothing for joints
       [j1, j2, j3].forEach((ref) => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
         const clampedDistance = Math.max(0.05, Math.min(0.5, ref.current.lerped.distanceTo(ref.current.translation())));
         ref.current.lerped.lerp(ref.current.translation(), delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed)));
       });
 
+      // Update the curve with lerped points
       curve.points[0].copy(j3.current.lerped || j3.current.translation());
       curve.points[1].copy(j2.current.lerped || j2.current.translation());
       curve.points[2].copy(j1.current.lerped || j1.current.translation());
@@ -123,6 +116,7 @@ function BadgeContent() {
         console.warn("Error updating lanyard points:", error);
       }
 
+      // Stabilize the card's rotation
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
       card.current.setAngvel({ 
@@ -130,13 +124,10 @@ function BadgeContent() {
         y: ang.y - rot.y * 0.15,
         z: ang.z * 0.9
       });
-
-      // Add small stabilizing force to reduce wobble
+      
+      // Add damping
       if (!dragged) {
-        const currentPos = card.current.translation();
         const currentVel = card.current.linvel();
-        
-        // Only dampen if moving too fast
         if (Math.abs(currentVel.x) > 1 || Math.abs(currentVel.y) > 1) {
           card.current.setLinvel({
             x: currentVel.x * 0.95,
@@ -150,7 +141,7 @@ function BadgeContent() {
 
   return (
     <>
-      <group position={[0, 4, 0]} >
+      <group position={[0, 3, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}><BallCollider args={[0.1]} /></RigidBody>
         <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}><BallCollider args={[0.1]} /></RigidBody>
@@ -249,68 +240,58 @@ function BadgeContent() {
   );
 }
 
-// --- Badge Provider Component ---
-export const BadgeProvider = ({ children }) => {
+// --- About page badge component (used only on About page) ---
+export const AboutPageBadge = () => {
   const [isMounted, setIsMounted] = useState(false);
-  const location = useLocation();
-  const isAboutPage = location.pathname === '/about';
   
   useEffect(() => {
-    // Only mount on About page
-    if (isAboutPage) {
-      const timer = setTimeout(() => {
-        setIsMounted(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    } else {
-      setIsMounted(false);
-    }
-  }, [isAboutPage]);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (!isMounted) return null;
+  
+  return (
+    <div className="absolute top-[120px] right-[10%] w-[280px] h-[350px] z-10 pointer-events-auto">
+      <Canvas
+        shadows
+        camera={{ position: [0, 0, 7], fov: 25 }}
+        dpr={[1, 1.5]}
+      >
+        <ambientLight intensity={Math.PI * 0.7} />
+        <spotLight
+          position={[10, 15, 15]}
+          angle={0.25}
+          penumbra={1}
+          intensity={1.5}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        <directionalLight position={[-10, 10, 5]} intensity={0.5} /> 
+        <Physics 
+          interpolate 
+          gravity={[0, -20, 0]}
+          timeStep={1/60}
+        >
+          <BadgeContent />
+        </Physics>
+        <Environment preset="city" background={false} blur={0.6} />
+      </Canvas>
+    </div>
+  );
+};
+
+// --- Badge Context Provider ---
+export const BadgeProvider = ({ children }) => {
+  const location = useLocation();
+  const showBadge = location.pathname === '/about';
 
   return (
-    <BadgeContext.Provider value={{ isVisible: isAboutPage }}>
+    <BadgeContext.Provider value={{ showBadge }}>
       {children}
-
-      {isMounted && isAboutPage && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100vh',
-          zIndex: 10,
-          pointerEvents: 'none'
-        }}>
-          <Canvas 
-            shadows
-            camera={{ position: [0, 0, 20], fov: 25 }}
-            style={{ pointerEvents: 'none' }}
-            dpr={[1, 1.5]}
-          >
-            <ambientLight intensity={Math.PI * 0.7} />
-            <spotLight
-              position={[10, 15, 15]}
-              angle={0.25}
-              penumbra={1}
-              intensity={1.5}
-              castShadow
-              shadow-mapSize-width={1024}
-              shadow-mapSize-height={1024}
-            />
-            <directionalLight position={[-10, 10, 5]} intensity={0.5} /> 
-            <Physics 
-              interpolate 
-              gravity={[0, -40, 0]}
-              timeStep={1/60}
-            >
-              <group position={[-5, 8, 0]}>
-                <BadgeContent />
-              </group>
-            </Physics>
-            <Environment preset="city" background={false} blur={0.6} />
-          </Canvas>
-        </div>
-      )}
     </BadgeContext.Provider>
   );
 }; 
