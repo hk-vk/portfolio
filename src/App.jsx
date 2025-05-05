@@ -50,15 +50,16 @@ function App() {
     if (loading) {
       interval = setInterval(() => {
         setLoadProgress(prev => {
-          const newProgress = prev + Math.random() * 10;
+          // Increase progress faster
+          const newProgress = prev + Math.random() * 25; // Increased random step
           if (newProgress >= 100) {
             clearInterval(interval);
-            setTimeout(() => setLoading(false), 300); // Small delay after reaching 100%
+            setLoading(false); // Remove the setTimeout delay
             return 100;
           }
           return newProgress;
         });
-      }, 200);
+      }, 100); // Decreased interval time
     }
     
     return () => {
@@ -75,19 +76,11 @@ function App() {
         <div className="blob-bg" style={{ bottom: '10%', right: '10%', animationDelay: '2s' }}></div>
         
         <div className="text-center relative z-10">
-          {/* Name animation with staggered letters */}
-          <div className="name-container">
-            {'HARIKRISHNAN'.split('').map((letter, index) => (
-              <span 
-                key={index} 
-                className="inline-block text-5xl md:text-7xl font-serif loading-letter"
-                style={{ 
-                  animationDelay: `${index * 0.1}s`,
-                }}
-              >
-                {letter}
-              </span>
-            ))}
+          {/* Name animation - Reveal Effect */}
+          <div className="mb-4">
+            <span className="loading-name-reveal">
+              HARIKRISHNAN
+            </span>
           </div>
           
           {/* Progress bar */}

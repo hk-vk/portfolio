@@ -530,3 +530,41 @@ html {
     transparent
   );
 }
+
+/* Loading screen text reveal animation */
+@keyframes reveal-text {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.loading-name-reveal {
+  position: relative;
+  font-family: 'DM Serif Display', serif; /* Using theme font */
+  font-size: clamp(3rem, 10vw, 6rem); /* Responsive font size */
+  font-weight: bold;
+  color: hsl(var(--primary)); /* Use primary color for text */
+  background-color: hsl(var(--background)); /* Use background for blend */
+  mix-blend-mode: multiply; /* Key effect */
+  display: inline-block; /* Needed for pseudo-element positioning */
+  line-height: 1.1;
+}
+
+.loading-name-reveal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0; /* Animate from right to left */
+  bottom: 0;
+  width: 100%;
+  background-color: hsl(var(--foreground)); /* Use foreground color for overlay */
+  mix-blend-mode: screen; /* Key effect */
+  animation: reveal-text 2s ease-in-out forwards; /* Apply animation */
+  animation-delay: 0.2s; /* Small delay before starting */
+}
+
+/* Remove old letter animation styles if they exist */
+.loading-letter {
+  /* Deprecated - styles replaced by .loading-name-reveal */
+  animation: none !important;
+  display: none; /* Hide elements if they are still rendered */
+}
