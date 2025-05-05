@@ -95,19 +95,32 @@ function BadgeContent() {
     }
 
     if (fixed.current && j1.current && j2.current && j3.current && card.current && band.current) {
-      const maxSpeed = 20, minSpeed = 5;
+      // Apply stronger damping to the last joint (j3) and the card itself
+      j3.current?.setAngularDamping(6);
+      j3.current?.setLinearDamping(6);
+      card.current?.setAngularDamping(6);
+      card.current?.setLinearDamping(6);
+      
+      const maxSpeed = 15, minSpeed = 4;
       
       // Smoothing for joints
-      [j1, j2, j3].forEach((ref) => {
+      [j1, j2].forEach((ref) => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
         const clampedDistance = Math.max(0.05, Math.min(0.5, ref.current.lerped.distanceTo(ref.current.translation())));
         ref.current.lerped.lerp(ref.current.translation(), delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed)));
       });
 
+      // Apply slightly more aggressive lerp to j3 to catch up but stay smooth
+      if (j3.current) {
+          if (!j3.current.lerped) j3.current.lerped = new THREE.Vector3().copy(j3.current.translation());
+          const clampedDistanceJ3 = Math.max(0.04, Math.min(0.4, j3.current.lerped.distanceTo(j3.current.translation())));
+          j3.current.lerped.lerp(j3.current.translation(), delta * (minSpeed * 1.1 + clampedDistanceJ3 * (maxSpeed - minSpeed)));
+      }
+
       // Update the curve with lerped points
-      curve.points[0].copy(j3.current.lerped || j3.current.translation());
-      curve.points[1].copy(j2.current.lerped || j2.current.translation());
-      curve.points[2].copy(j1.current.lerped || j1.current.translation());
+      curve.points[0].copy(j3.current?.lerped || j3.current.translation());
+      curve.points[1].copy(j2.current?.lerped || j2.current.translation());
+      curve.points[2].copy(j1.current?.lerped || j1.current.translation());
       curve.points[3].copy(fixed.current.translation());
       
       try {
@@ -128,11 +141,11 @@ function BadgeContent() {
       // Add damping
       if (!dragged) {
         const currentVel = card.current.linvel();
-        if (Math.abs(currentVel.x) > 1 || Math.abs(currentVel.y) > 1) {
+        if (Math.abs(currentVel.x) > 0.5 || Math.abs(currentVel.y) > 0.5) {
           card.current.setLinvel({
-            x: currentVel.x * 0.95,
-            y: currentVel.y * 0.95,
-            z: currentVel.z * 0.95
+            x: currentVel.x * 0.92,
+            y: currentVel.y * 0.92,
+            z: currentVel.z * 0.92
           });
         }
       }
