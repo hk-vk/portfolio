@@ -4,6 +4,7 @@ import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
 import { Environment, RoundedBox, Text } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
+import { useLocation } from 'react-router-dom';
 
 // Extend R3F for MeshLine
 extend({ MeshLineGeometry, MeshLineMaterial });
@@ -35,7 +36,7 @@ function BadgeContent() {
   const [hovered, hover] = useState(false);
 
   // Badge dimensions
-  const badgeHeight = 4.5;
+  const badgeHeight = 5.5;
   const badgeWidth = badgeHeight * (1.6 / 2.25);
   const badgeDepth = 0.15;
   const badgeRadius = 0.15;
@@ -251,52 +252,58 @@ function BadgeContent() {
 // --- Badge Provider Component ---
 export const BadgeProvider = ({ children }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const location = useLocation();
+  const isAboutPage = location.pathname === '/about';
   
   useEffect(() => {
-    // Delay mounting slightly to ensure DOM is ready
-    const timer = setTimeout(() => {
-      setIsMounted(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+    // Only mount on About page
+    if (isAboutPage) {
+      const timer = setTimeout(() => {
+        setIsMounted(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsMounted(false);
+    }
+  }, [isAboutPage]);
 
   return (
-    <BadgeContext.Provider value={{}}>
+    <BadgeContext.Provider value={{ isVisible: isAboutPage }}>
       {children}
 
-      {isMounted && (
+      {isMounted && isAboutPage && (
         <div style={{
           position: 'fixed',
           top: 0,
-          right: 0,
-          width: '100vw',
+          left: 0,
+          width: '100%',
           height: '100vh',
-          zIndex: 40, // Lower zIndex to prevent overlapping with navigation
+          zIndex: 10,
           pointerEvents: 'none'
         }}>
           <Canvas 
             shadows
-            camera={{ position: [0, 0, 18], fov: 30 }}
+            camera={{ position: [0, 0, 20], fov: 25 }}
             style={{ pointerEvents: 'none' }}
-            dpr={[1, 1.5]} // Limit pixel ratio for better performance
+            dpr={[1, 1.5]}
           >
             <ambientLight intensity={Math.PI * 0.7} />
             <spotLight
               position={[10, 15, 15]}
               angle={0.25}
               penumbra={1}
-              intensity={1.5} // Reduced intensity
+              intensity={1.5}
               castShadow
-              shadow-mapSize-width={1024} // Reduced for performance
+              shadow-mapSize-width={1024}
               shadow-mapSize-height={1024}
             />
             <directionalLight position={[-10, 10, 5]} intensity={0.5} /> 
             <Physics 
               interpolate 
-              gravity={[0, -40, 0]} // Reduced gravity from -50 to -40
+              gravity={[0, -40, 0]}
               timeStep={1/60}
             >
-              <group position={[-2.5, 1, 0]}> {/* Offset position to right side */}
+              <group position={[-5, 8, 0]}>
                 <BadgeContent />
               </group>
             </Physics>
