@@ -1,0 +1,18 @@
+.lanyard-wrapper {
+  position: relative;
+  z-index: 0; /* Keep it behind page content by default if needed */
+  width: 100%;
+  height: 100vh; /* Make it viewport height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(1);
+  transform-origin: center;
+  /* Ensure it allows clicks through if positioned absolutely */
+  /* pointer-events: none; */ 
+}
+
+/* Optional: If you want the canvas itself to ignore pointer events */
+/* .lanyard-wrapper canvas {
+  pointer-events: none;
+} */ 
