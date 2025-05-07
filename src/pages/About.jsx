@@ -76,14 +76,10 @@ const About = () => {
               Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary">Harikrishnan V K</span>
             </h2>
             <p className="text-secondary">
-              I'm an Information Technology student at Government Engineering College, Idukki with a 
-              passion for building cool web apps and exploring machine learning. I love taking on 
-              challenges that push my coding skills to new levels.
+              I build digital experiences that combine clean code with intuitive design. Currently pursuing B.Tech in Information Technology at GEC Idukki, I specialize in full-stack development with React, Next.js, and FastAPI.
             </p>
             <p className="text-secondary">
-              When I'm not busy coding full-stack applications or tinkering with PyTorch models, 
-              you can find me organizing tech events as a GDG On Campus Organizer or coordinating 
-              activities with IEEE SB GECI.
+              My projects range from Malayalam fake news detection platforms to medical image systems with unique compression algorithms. I'm passionate about creating tech that solves real problems while delivering exceptional user experiences.
             </p>
             <div className="grid grid-cols-2 gap-4 mt-8">
               <div>
@@ -192,60 +188,8 @@ const About = () => {
       {/* Experience & Education Section */}
       <section className="py-20 mt-10">
         <div className="content-container">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Community Involvement */}
-            <div>
-              <AnimatedSection animation="fadeUp">
-                <h2 className="text-2xl font-bold mb-8">Community Involvement</h2>
-              </AnimatedSection>
-
-              <div className="space-y-8">
-                <AnimatedSection
-                  animation="fadeUp"
-                  delay={0.1}
-                  className="relative pl-6 border-l-2 border-accent/20"
-                >
-                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
-                  <h3 className="text-xl font-semibold">GDG On Campus Organizer</h3>
-                  <div className="flex items-center text-secondary mb-2">
-                    <span>Google Developer Group, GEC Idukki</span>
-                    <span className="mx-2">•</span>
-                    <span>Sep 2024 - Present</span>
-                  </div>
-                  <p className="text-secondary">Organizing tech events and building a vibrant developer community at our campus.</p>
-                </AnimatedSection>
-
-                <AnimatedSection
-                  animation="fadeUp"
-                  delay={0.2}
-                  className="relative pl-6 border-l-2 border-accent/20"
-                >
-                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
-                  <h3 className="text-xl font-semibold">Technical Coordinator</h3>
-                  <div className="flex items-center text-secondary mb-2">
-                    <span>IEEE SB GECI</span>
-                    <span className="mx-2">•</span>
-                    <span>Feb 2024 - Jan 2025</span>
-                  </div>
-                  <p className="text-secondary">Coordinating workshops, managing technical projects, and helping fellow students level up their skills.</p>
-                </AnimatedSection>
-
-                <AnimatedSection
-                  animation="fadeUp"
-                  delay={0.3}
-                  className="relative pl-6 border-l-2 border-accent/20"
-                >
-                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
-                  <h3 className="text-xl font-semibold">Operations Lead</h3>
-                  <div className="flex items-center text-secondary mb-2">
-                    <span>Aug 2023 - May 2024</span>
-                  </div>
-                  <p className="text-secondary">Led event operations and team management for various technical activities on campus.</p>
-                </AnimatedSection>
-              </div>
-            </div>
-
-            {/* Education */}
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-12">
+            {/* Education - Now full width since Community Involvement is removed */}
             <div>
               <AnimatedSection animation="fadeUp">
                 <h2 className="text-2xl font-bold mb-8">Education</h2>
