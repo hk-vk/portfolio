@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
+import InteractiveBadge from '../components/InteractiveBadge';
+
 const About = () => {
   // Skills with progress levels
   const skills = [
@@ -61,8 +63,14 @@ const About = () => {
         </AnimatedSection>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10 items-center">
-          <div></div>
+          {/* Left Column: Interactive Badge */}
+          <AnimatedSection animation="slideInLeft">
+            <div className="flex justify-center items-center h-full">
+              <InteractiveBadge />
+            </div>
+          </AnimatedSection>
 
+          {/* Right Column: About Me Content */}
           <AnimatedSection animation="slideInRight" className="space-y-6">
             <h2 className="text-2xl font-bold">
               Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary">Harikrishnan V K</span>
