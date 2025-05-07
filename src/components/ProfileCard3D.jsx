@@ -12,11 +12,6 @@ import {
   useTexture,
   RoundedBox
 } from '@react-three/drei';
-import { 
-  EffectComposer, 
-  Bloom, 
-  ChromaticAberration
-} from '@react-three/postprocessing';
 import { easing } from 'maath';
 
 // Main component wrapper
@@ -98,16 +93,6 @@ const ProfileCard3D = () => {
           blur={1.5}
           far={1.8}
         />
-        
-        <EffectComposer>
-          <Bloom 
-            luminanceThreshold={0.2} 
-            luminanceSmoothing={0.9} 
-            height={300} 
-            intensity={0.8} 
-          />
-          <ChromaticAberration offset={[0.0005, 0.0005]} />
-        </EffectComposer>
       </Canvas>
     </div>
   );
