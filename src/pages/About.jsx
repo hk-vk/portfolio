@@ -76,31 +76,31 @@ const About = () => {
               Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary">Harikrishnan V K</span>
             </h2>
             <p className="text-secondary">
-              I'm a passionate developer and designer with over 5 years of experience creating
-              modern digital solutions. My expertise spans frontend and backend development,
-              with a particular focus on creating intuitive, user-friendly interfaces.
+              I'm an Information Technology student at Government Engineering College, Idukki with a 
+              passion for building cool web apps and exploring machine learning. I love taking on 
+              challenges that push my coding skills to new levels.
             </p>
             <p className="text-secondary">
-              I approach each project with a blend of technical expertise and creative thinking,
-              ensuring that the end result not only meets but exceeds expectations. My goal is
-              to create digital experiences that are both functional and visually stunning.
+              When I'm not busy coding full-stack applications or tinkering with PyTorch models, 
+              you can find me organizing tech events as a GDG On Campus Organizer or coordinating 
+              activities with IEEE SB GECI.
             </p>
             <div className="grid grid-cols-2 gap-4 mt-8">
               <div>
                 <h3 className="text-lg font-semibold">Location</h3>
-                <p className="text-secondary">San Francisco, CA</p>
+                <p className="text-secondary">Kerala, India</p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Email</h3>
-                <p className="text-secondary">contact@portfolio.com</p>
+                <p className="text-secondary">vkharikrishnan45@gmail.com</p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold">Freelance</h3>
                 <p className="text-primary">Available</p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Languages</h3>
-                <p className="text-secondary">English, Spanish</p>
+                <h3 className="text-lg font-semibold">Student</h3>
+                <p className="text-secondary">B.Tech (2021-Present)</p>
               </div>
             </div>
           </AnimatedSection>
@@ -112,12 +112,21 @@ const About = () => {
         <AnimatedSection animation="fadeUp">
           <h2 className="section-heading text-center">My Skills</h2>
           <p className="text-secondary text-center mt-4 max-w-2xl mx-auto">
-            A collection of my technical skills and proficiency levels.
+            Here's what I work with to bring ideas to life
           </p>
         </AnimatedSection>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-          {skills.map((skill, index) => (
+          {[
+            { name: "React/Next.js", level: 92 },
+            { name: "JavaScript/TypeScript", level: 90 },
+            { name: "HTML/CSS/Tailwind", level: 95 },
+            { name: "Node.js/FastAPI", level: 85 },
+            { name: "PostgreSQL/MongoDB", level: 78 },
+            { name: "Python/PyTorch", level: 82 },
+            { name: "Git/GitHub", level: 88 },
+            { name: "Docker", level: 75 },
+          ].map((skill, index) => (
             <AnimatedSection
               key={index}
               animation="fadeUp"
@@ -141,34 +150,98 @@ const About = () => {
         </div>
       </section>
 
+      {/* Projects Section */}
+      <section className="content-container mt-20">
+        <AnimatedSection animation="fadeUp">
+          <h2 className="section-heading text-center">Featured Projects</h2>
+          <p className="text-secondary text-center mt-4 max-w-2xl mx-auto">
+            Some cool stuff I've been working on lately
+          </p>
+        </AnimatedSection>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          <AnimatedSection animation="fadeUp" delay={0.1} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+            <h3 className="text-xl font-bold mb-2">YEAH</h3>
+            <p className="text-sm text-muted-foreground mb-4">React • FastAPI • PyTorch</p>
+            <p className="text-secondary">
+              A Malayalam fake news detection platform that uses ML to analyze text, URLs, and images.
+              Handles 1000+ queries daily with a slick React frontend and robust FastAPI backend.
+            </p>
+          </AnimatedSection>
+          
+          <AnimatedSection animation="fadeUp" delay={0.2} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+            <h3 className="text-xl font-bold mb-2">MedVault</h3>
+            <p className="text-sm text-muted-foreground mb-4">Next.js • MongoDB • Clerk</p>
+            <p className="text-secondary">
+              Secure medical image management platform with role-based access control and HIPAA-compliant
+              data protection. Includes custom LZW compression that cuts storage needs by 60%.
+            </p>
+          </AnimatedSection>
+          
+          <AnimatedSection animation="fadeUp" delay={0.3} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+            <h3 className="text-xl font-bold mb-2">Commit Story Gen</h3>
+            <p className="text-sm text-muted-foreground mb-4">React • Next.js • Gemini API</p>
+            <p className="text-secondary">
+              Transforms boring GitHub commit histories into fun narratives using the Gemini API.
+              Features a responsive UI with server-side rendering that's 40% faster than client-side alternatives.
+            </p>
+          </AnimatedSection>
+        </div>
+      </section>
+
       {/* Experience & Education Section */}
       <section className="py-20 mt-10">
         <div className="content-container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Experience */}
+            {/* Community Involvement */}
             <div>
               <AnimatedSection animation="fadeUp">
-                <h2 className="text-2xl font-bold mb-8">Work Experience</h2>
+                <h2 className="text-2xl font-bold mb-8">Community Involvement</h2>
               </AnimatedSection>
 
               <div className="space-y-8">
-                {experience.map((job, index) => (
-                  <AnimatedSection
-                    key={index}
-                    animation="fadeUp"
-                    delay={index * 0.1}
-                    className="relative pl-6 border-l-2 border-accent/20"
-                  >
-                    <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
-                    <h3 className="text-xl font-semibold">{job.position}</h3>
-                    <div className="flex items-center text-secondary mb-2">
-                      <span>{job.company}</span>
-                      <span className="mx-2">•</span>
-                      <span>{job.period}</span>
-                    </div>
-                    <p className="text-secondary">{job.description}</p>
-                  </AnimatedSection>
-                ))}
+                <AnimatedSection
+                  animation="fadeUp"
+                  delay={0.1}
+                  className="relative pl-6 border-l-2 border-accent/20"
+                >
+                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
+                  <h3 className="text-xl font-semibold">GDG On Campus Organizer</h3>
+                  <div className="flex items-center text-secondary mb-2">
+                    <span>Google Developer Group, GEC Idukki</span>
+                    <span className="mx-2">•</span>
+                    <span>Sep 2024 - Present</span>
+                  </div>
+                  <p className="text-secondary">Organizing tech events and building a vibrant developer community at our campus.</p>
+                </AnimatedSection>
+
+                <AnimatedSection
+                  animation="fadeUp"
+                  delay={0.2}
+                  className="relative pl-6 border-l-2 border-accent/20"
+                >
+                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
+                  <h3 className="text-xl font-semibold">Technical Coordinator</h3>
+                  <div className="flex items-center text-secondary mb-2">
+                    <span>IEEE SB GECI</span>
+                    <span className="mx-2">•</span>
+                    <span>Feb 2024 - Jan 2025</span>
+                  </div>
+                  <p className="text-secondary">Coordinating workshops, managing technical projects, and helping fellow students level up their skills.</p>
+                </AnimatedSection>
+
+                <AnimatedSection
+                  animation="fadeUp"
+                  delay={0.3}
+                  className="relative pl-6 border-l-2 border-accent/20"
+                >
+                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
+                  <h3 className="text-xl font-semibold">Operations Lead</h3>
+                  <div className="flex items-center text-secondary mb-2">
+                    <span>Aug 2023 - May 2024</span>
+                  </div>
+                  <p className="text-secondary">Led event operations and team management for various technical activities on campus.</p>
+                </AnimatedSection>
               </div>
             </div>
 
@@ -179,23 +252,50 @@ const About = () => {
               </AnimatedSection>
 
               <div className="space-y-8">
-                {education.map((edu, index) => (
-                  <AnimatedSection
-                    key={index}
-                    animation="fadeUp"
-                    delay={index * 0.1}
-                    className="relative pl-6 border-l-2 border-accent/20"
-                  >
-                    <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
-                    <h3 className="text-xl font-semibold">{edu.degree}</h3>
-                    <div className="flex items-center text-secondary mb-2">
-                      <span>{edu.institution}</span>
-                      <span className="mx-2">•</span>
-                      <span>{edu.year}</span>
-                    </div>
-                    <p className="text-secondary">{edu.description}</p>
-                  </AnimatedSection>
-                ))}
+                <AnimatedSection
+                  animation="fadeUp"
+                  delay={0.1}
+                  className="relative pl-6 border-l-2 border-accent/20"
+                >
+                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
+                  <h3 className="text-xl font-semibold">B.Tech in Information Technology</h3>
+                  <div className="flex items-center text-secondary mb-2">
+                    <span>Government Engineering College, Idukki</span>
+                    <span className="mx-2">•</span>
+                    <span>2021 - Present</span>
+                  </div>
+                  <p className="text-secondary">CGPA: 7.9 | Focusing on web technologies and machine learning applications.</p>
+                </AnimatedSection>
+
+                <AnimatedSection
+                  animation="fadeUp"
+                  delay={0.2}
+                  className="relative pl-6 border-l-2 border-accent/20"
+                >
+                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
+                  <h3 className="text-xl font-semibold">Class 12</h3>
+                  <div className="flex items-center text-secondary mb-2">
+                    <span>MKM HSS, Piravom</span>
+                    <span className="mx-2">•</span>
+                    <span>2021</span>
+                  </div>
+                  <p className="text-secondary">Score: 99% | Higher Secondary Education</p>
+                </AnimatedSection>
+
+                <AnimatedSection
+                  animation="fadeUp"
+                  delay={0.3}
+                  className="relative pl-6 border-l-2 border-accent/20"
+                >
+                  <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
+                  <h3 className="text-xl font-semibold">Published Research</h3>
+                  <div className="flex items-center text-secondary mb-2">
+                    <span>FOSS-CIL T25 International Conference</span>
+                    <span className="mx-2">•</span>
+                    <span>Jan 2024</span>
+                  </div>
+                  <p className="text-secondary">A Survey of Encryption, Compression, and Segmentation Techniques for Medical Image Processing</p>
+                </AnimatedSection>
               </div>
             </div>
           </div>
@@ -205,9 +305,9 @@ const About = () => {
       {/* Personal Interests */}
       <section className="content-container py-16 bg-accent/5 rounded-3xl">
         <AnimatedSection animation="fadeUp">
-          <h2 className="section-heading text-center">Personal Interests</h2>
+          <h2 className="section-heading text-center">When I'm Not Coding</h2>
           <p className="text-secondary text-center mt-4 max-w-2xl mx-auto">
-            When I'm not coding or designing, here's what you can find me doing.
+            Stepping away from the keyboard, you'll find me exploring these interests
           </p>
         </AnimatedSection>
 
@@ -216,7 +316,7 @@ const About = () => {
           stagger={0.1}
           columns={{ sm: 2, md: 4 }}
         >
-          {['Photography', 'Hiking', 'Reading', 'Cooking'].map((interest, index) => (
+          {['Photography', 'Hiking', 'Reading', 'Tech Meetups'].map((interest, index) => (
             <div
               key={index}
               className="text-center p-6"
@@ -225,7 +325,7 @@ const About = () => {
                 {index === 0 && '📷'}
                 {index === 1 && '🏔️'}
                 {index === 2 && '📚'}
-                {index === 3 && '🍳'}
+                {index === 3 && '👥'}
               </div>
               <h3 className="font-medium">{interest}</h3>
             </div>
