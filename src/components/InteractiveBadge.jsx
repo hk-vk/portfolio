@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
-import { Environment, Text } from '@react-three/drei';
+import { Environment, Text, useTexture } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 
 // Extend R3F to recognize MeshLine components
 extend({ MeshLineGeometry, MeshLineMaterial });
+
+// Placeholder for lanyard texture path - TO BE PROVIDED BY USER
+const lanyardTexturePath = '/path/to/your/lanyard-texture.png'; // Replace with actual path
 
 // Main component containing the Canvas and Physics world
 const InteractiveBadge = () => {
@@ -24,7 +27,8 @@ const InteractiveBadge = () => {
           shadow-mapSize-height={2048}
         />
         <Physics interpolate gravity={[0, -50, 0]} timeStep={1 / 60}>
-          <Band />
+          {/* Pass texture path to Band component if available */}
+          <Band lanyardTexturePath={lanyardTexturePath} />
         </Physics>
         <Environment preset="studio" background={false} blur={0.5}/>
       </Canvas>
@@ -33,7 +37,7 @@ const InteractiveBadge = () => {
 };
 
 // Component handling the lanyard (band) and the card physics
-function Band({ maxSpeed = 50, minSpeed = 10 }) {
+function Band({ maxSpeed = 50, minSpeed = 10, lanyardTexturePath }) { // Added lanyardTexturePath prop
   // References to physics bodies
   const band = useRef();
   const fixed = useRef();
@@ -59,6 +63,21 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
   
   // Canvas size for meshline
   const { width, height } = useThree((state) => state.size);
+  const [isSmallScreen, setIsSmallScreen] = useState(false); // For resolution adjustment like in Lanyard.jsx
+
+  // Load texture if path is valid
+  const texture = lanyardTexturePath && lanyardTexturePath !== '/path/to/your/lanyard-texture.png' ? useTexture(lanyardTexturePath) : null;
+  
+  useEffect(() => {
+    if (texture) {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    }
+    // Adjust resolution based on screen size, similar to Lanyard.jsx
+    const checkScreenSize = () => setIsSmallScreen(window.innerWidth < 1024);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, [texture]);
   
   // Create curve for the lanyard
   const [curve] = useState(() => new THREE.CatmullRomCurve3([
@@ -76,7 +95,7 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1.1]);
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1.1]);
-  useSphericalJoint(j3, card, [[0, 0, 0], [0, 2.2, 0]]);
+  useSphericalJoint(j3, card, [[0, 0, 0], [0, 2.2, 0]]); // Using badgeHeight (4.5 / 2 = 2.25 approx)
 
   // Update cursor style when hovering/dragging
   useEffect(() => {
@@ -137,17 +156,17 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
     }
   });
 
-  // Badge dimensions
-  const badgeHeight = 4.5;
-  const badgeWidth = badgeHeight * (1.6 / 2.25);
+  // Badge dimensions (can be adjusted if needed)
+  const badgeHeight = 4.5; // Original InteractiveBadge height
+  const badgeWidth = badgeHeight * (1.6 / 2.25); // Aspect ratio from original
   const badgeDepth = 0.15;
 
   // Get theme colors for light/dark mode from CSS variables
   const [colors, setColors] = useState({ 
-    primary: 'hsl(349, 75%, 44%)',
-    card: 'hsl(60, 9%, 98%)',
-    foreground: 'hsl(240, 10%, 10%)',
-    muted: 'hsl(240, 5%, 90%)'
+    primary: 'hsl(349, 75%, 44%)', // Will be overridden by CSS var
+    card: 'hsl(60, 9%, 98%)',    // Will be overridden by CSS var
+    foreground: 'hsl(240, 10%, 10%)', // Will be overridden by CSS var
+    muted: 'hsl(240, 5%, 90%)'    // Will be overridden by CSS var
   });
 
   // Read CSS variables for theme-aware colors
@@ -155,11 +174,9 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
     const getThemeColors = () => {
       if (typeof window !== 'undefined') {
         const styles = getComputedStyle(document.documentElement);
-        
-        // Try to read CSS variables or use defaults
         setColors({
           primary: styles.getPropertyValue('--primary').trim() || 'hsl(349, 75%, 44%)',
-          card: styles.getPropertyValue('--card').trim() || 'hsl(60, 9%, 98%)',
+          card: styles.getPropertyValue('--card').trim() || 'hsl(60, 9%, 98%)', // Keep card color light
           foreground: styles.getPropertyValue('--foreground').trim() || 'hsl(240, 10%, 10%)',
           muted: styles.getPropertyValue('--muted').trim() || 'hsl(240, 5%, 90%)'
         });
@@ -167,6 +184,9 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
     };
 
     getThemeColors();
+    // Optional: Listen for theme changes if your app supports dynamic theme switching without a page reload
+    // window.addEventListener('themeChanged', getThemeColors);
+    // return () => window.removeEventListener('themeChanged', getThemeColors);
   }, []);
 
   return (
@@ -198,12 +218,17 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
           type={dragged ? 'kinematicPosition' : 'dynamic'}
         >
           {/* Card collider */}
+          {/* Adjusted CuboidCollider args based on Lanyard.jsx card proportions (0.8, 1.125, 0.01) relative to its scale */}
+          {/* Lanyard.jsx card has group scale 2.25. Collider args [0.8, 1.125, 0.01] */}
+          {/* InteractiveBadge uses badgeWidth, badgeHeight. For consistency, adjust text positions rather than collider too much unless physics issues. */}
           <CuboidCollider args={[badgeWidth / 2, badgeHeight / 2, badgeDepth / 2]} />
           
-          {/* Card mesh with interactions */}
-          <mesh
-            castShadow
-            receiveShadow
+          {/* Card mesh with interactions - Group like in Lanyard.jsx for easier text positioning relative to card */}
+          <group
+            // scale={2.25} // Lanyard.jsx uses scale 2.25, InteractiveBadge sets fontSize based on badgeWidth.
+                         // If we use Lanyard's scale, text fontSize needs to be Lanyard's direct values.
+                         // For now, keep text relative to InteractiveBadge's dynamic sizing.
+            // position={[0, -1.2, -0.05]} // Lanyard.jsx position. Text positions below are relative to this.
             onPointerOver={(e) => { e.stopPropagation(); hover(true); }}
             onPointerOut={() => hover(false)}
             onPointerUp={(e) => { e.stopPropagation(); e.target.releasePointerCapture(e.pointerId); drag(false); }}
@@ -211,40 +236,54 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
               e.stopPropagation();
               if (!card.current) return;
               e.target.setPointerCapture(e.pointerId);
-              
-              // Calculate offset relative to the card's center
               const cardPos = card.current.translation();
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(cardPos)));
             }}
-            style={{ pointerEvents: 'auto' }}
           >
-            <boxGeometry args={[badgeWidth, badgeHeight, badgeDepth]} />
-            <meshPhysicalMaterial
-              color={colors.card}
-              roughness={0.2}
-              metalness={0.1}
-              clearcoat={0.8}
-              clearcoatRoughness={0.1}
-            />
-            
-            {/* Photo Placeholder */}
-            <mesh position={[0, 0.5, badgeDepth / 2 + 0.01]}>
-              <planeGeometry args={[badgeWidth * 0.5, badgeWidth * 0.5]} />
-              <meshStandardMaterial color={colors.muted} roughness={0.8} metalness={0} />
-            </mesh>
-
-            {/* Name Text */}
-            <Text
-              position={[0, badgeHeight * 0.35, badgeDepth / 2 + 0.01]}
-              fontSize={badgeWidth * 0.1}
-              color={colors.foreground}
-              anchorX="center"
-              anchorY="middle"
-              maxWidth={badgeWidth * 0.8}
+            <mesh
+              castShadow
+              receiveShadow
+              // style={{ pointerEvents: 'auto' }} // Already on parent div of canvas in About.jsx if needed
             >
-              Harikrishnan V K
-            </Text>
-          </mesh>
+              <boxGeometry args={[badgeWidth, badgeHeight, badgeDepth]} />
+              <meshPhysicalMaterial
+                color={colors.card} // Keep card color light, from theme
+                roughness={0.2}
+                metalness={0.1}
+                clearcoat={0.8}
+                clearcoatRoughness={0.1}
+              />
+              
+              {/* Photo Placeholder - can be kept or removed based on Lanyard similarity */}
+              <mesh position={[0, badgeHeight * 0.15, badgeDepth / 2 + 0.01]}> {/* Adjusted Y position for two text lines */}
+                <planeGeometry args={[badgeWidth * 0.5, badgeWidth * 0.5]} />
+                <meshStandardMaterial color={colors.muted} roughness={0.8} metalness={0} />
+              </mesh>
+
+              {/* Text 1: "Your Name" */}
+              <Text
+                position={[0, badgeHeight * 0.3, badgeDepth / 2 + 0.02]} // Adjusted Y for main name
+                fontSize={0.3} // From Lanyard.jsx
+                color={"white"} // From Lanyard.jsx
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={badgeWidth * 0.9}
+              >
+                Your Name
+              </Text>
+              {/* Text 2: "Portfolio Details" */}
+              <Text
+                position={[0, badgeHeight * 0.05, badgeDepth / 2 + 0.02]} // Positioned below "Your Name"
+                fontSize={0.2} // From Lanyard.jsx
+                color={"gray"}  // From Lanyard.jsx
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={badgeWidth * 0.9}
+              >
+                Portfolio Details
+              </Text>
+            </mesh>
+          </group>
         </RigidBody>
       </group>
 
@@ -252,12 +291,15 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial
-          color={colors.primary}
-          depthTest={false}
-          resolution={[width, height]}
-          lineWidth={3}
-          transparent
-          opacity={0.9}
+          color={"white"} // Changed from colors.primary
+          depthTest={false} // From Lanyard.jsx
+          resolution={isSmallScreen ? [width / 2, height / 2] : [width, height]} // Adjusted resolution like Lanyard
+          useMap={!!texture} // Enable useMap only if texture is loaded
+          map={texture}     // Apply texture
+          repeat={texture ? [-4, 1] : [1,1]} // From Lanyard.jsx, conditional
+          lineWidth={1}     // Changed from 3
+          // transparent={false} // Lanyard.jsx doesn't explicitly set transparent here, implies default or false
+          // opacity={1.0} // Lanyard.jsx doesn't explicitly set opacity
         />
       </mesh>
     </>
