@@ -91,11 +91,11 @@ const Home = () => {
           <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
           <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
-          <div className="fancy-border p-2 mb-16 relative">
+          <div className="fancy-border p-4 md:p-8 mb-16 relative">
             <HeroHighlightLine />
 
             <div className="border border-border flex flex-col md:flex-row items-center justify-between">
-              <div className="p-8 md:p-12 flex-1">
+              <div className="p-6 md:p-10 flex-1">
                 <div className="relative mb-12">
                   <motion.div
                     initial={{ opacity: 0, scale: 0 }}
@@ -148,7 +148,7 @@ const Home = () => {
                 </motion.div>
               </div>
 
-              <div className="p-8 md:p-12 flex-1 md:border-l border-border">
+              <div className="p-6 md:p-10 flex-1 md:border-l border-border">
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
@@ -305,72 +305,62 @@ const Home = () => {
         </div>
       </AnimatedSection>
 
-      {/* Experience Section */}
+      {/* Hire Me Section */}
       <AnimatedSection>
-        <div className="content-container relative">
-          <div className="pattern-dots w-40 h-40 top-0 -left-20 hidden md:block"></div>
-
+        <div className="content-container relative py-16 text-center">
           <motion.div
-            className="mb-12 flex items-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            className="absolute -top-8 left-1/2 -translate-x-1/2 transform-gpu"
+            animate={{ y: [0, -10, 0], rotate: [-5, 5, -5] }}
+            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
           >
-            <SparkleIllustration className="text-primary mr-2" size={16} />
-            <h2 className="text-3xl font-bold">EXPERIENCES</h2>
+            <SparkleIllustration className="text-primary" size={48} />
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            {experienceItems.map((item, index) => (
-              <motion.div
-                key={index}
-                className="fancy-border p-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 * index, duration: 0.5 }}
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.2 }
-                }}
-              >
-                <div className="experience-date">{item.date}</div>
-                <div className="experience-title">{item.title}</div>
-                <div className="experience-company">{item.company}</div>
-                <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
-
-                <motion.div
-                  className="w-0 h-0.5 bg-primary/30 mt-4"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: "30%" }}
-                  transition={{ delay: 0.3 + (0.1 * index), duration: 0.5 }}
-                />
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="mt-16 text-center"
+          
+          <motion.h2
+            className="text-4xl md:text-5xl font-bold mb-6 text-gradient"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5, duration: 0.5 }}
+            transition={{ duration: 0.6 }}
+          >
+            Ready to Add Some Sparkle to Your Team?
+          </motion.h2>
+          
+          <motion.p
+            className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            My code is clean, my jokes are... well, they exist!
+            I build cool things and occasionally talk to my rubber duck.
+            Let's create something awesome together! (The project, not more jokes... unless you want to?)
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4, type: "spring", stiffness: 150 }}
           >
             <Link
-              to="/about"
-              className="button-secondary inline-flex items-center"
+              to="/contact"
+              className="button-primary text-lg font-medium px-8 py-4 inline-flex items-center group"
             >
-              More About Me
-              <svg
-                className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+              HIRE ME!
+              <span className="ml-2 text-2xl transform transition-transform duration-300 group-hover:rotate-[360deg] group-hover:scale-125">🚀</span>
             </Link>
+          </motion.div>
+
+          <motion.div
+            className="mt-12 text-muted-foreground text-sm"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            <p>(Warning: May spontaneously burst into creative solutions or dad jokes. You've been warned.)</p>
           </motion.div>
         </div>
       </AnimatedSection>

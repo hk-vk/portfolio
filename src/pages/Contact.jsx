@@ -90,7 +90,7 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
           {/* Contact Form */}
           <AnimatedSection animation="slideInLeft" className="lg:order-2">
-            <div className="bg-card border border-accent/10 rounded-xl p-6 md:p-8">
+            <div className="bg-card border border-accent/10 rounded-xl p-8 md:p-10">
               <h2 className="text-2xl font-bold mb-6">Send a Message</h2>
 
               {isSubmitted ? (
@@ -199,7 +199,7 @@ const Contact = () => {
 
           {/* Contact Information */}
           <AnimatedSection animation="slideInRight" className="lg:order-1">
-            <div className="bg-accent/5 rounded-xl p-6 md:p-8 h-full">
+            <div className="bg-accent/5 rounded-xl p-8 md:p-10 h-full">
               <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
               <p className="text-secondary mb-8">
                 Feel free to reach out through any of the following channels. I'm always open to discussing new projects, creative ideas or opportunities to be part of your vision.

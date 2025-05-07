@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
-import InteractiveBadge from '../components/InteractiveBadge';
+import ProfileCard3D from '../components/ProfileCard3D';
 
 const About = () => {
   // Skills with progress levels
@@ -63,10 +63,10 @@ const About = () => {
         </AnimatedSection>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10 items-center">
-          {/* Left Column: Interactive Badge */}
+          {/* Left Column: Profile Card 3D */}
           <AnimatedSection animation="slideInLeft">
             <div className="flex justify-center items-center h-full">
-              <InteractiveBadge />
+              <ProfileCard3D />
             </div>
           </AnimatedSection>
 

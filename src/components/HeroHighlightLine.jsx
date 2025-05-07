@@ -10,17 +10,17 @@ const HeroHighlightLine = () => {
   // Define the SVG path based on the layout in Home.jsx
   // This path is an estimation and might need fine-tuning based on exact element positions and responsiveness
   const linePath = `
-    M 50 130  // Start near 'HARI'
-    L 150 130 // Across 'HARI'
-    L 150 200 // Down towards 'KRISHNAN'
-    L 300 200 // Across 'KRISHNAN'
-    L 350 180 // Angle up towards right column
-    L 550 180 // Across top of right column (near HELLO!)
-    L 550 250 // Down past description
-    L 600 300 // Angled towards buttons
-    L 500 350 // Across buttons area
-    L 500 400 // Down towards skills
-    L 650 420 // Across skills area
+    M 50 130
+    L 150 130
+    L 150 200
+    L 300 200
+    L 350 180
+    L 550 180
+    L 550 250
+    L 600 300
+    L 500 350
+    L 500 400
+    L 650 420
   `;
 
   useEffect(() => {
