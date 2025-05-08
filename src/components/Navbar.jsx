@@ -6,7 +6,6 @@ import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -22,11 +21,6 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setIsMobileMenuOpen(false);
-  }, [location]);
 
   const mainLinks = [
     { name: 'Home', path: '/' },
@@ -64,30 +58,6 @@ const Navbar = () => {
       }
     }
   };
-
-  // New variants for mobile menu overlay and items
-  const mobileMenuOverlayVariants = {
-    open: {
-      clipPath: `circle(150% at 50% 50%)`,
-      transition: { type: "spring", stiffness: 120, damping: 20, duration: 0.7 }
-    },
-    closed: {
-      clipPath: `circle(0% at 90% 10%)`,
-      transition: { type: "spring", stiffness: 120, damping: 20, duration: 0.3, delay: 0.3 }
-    }
-  };
-
-  const mobileMenuItemContainerVariants = {
-    open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
-    closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
-  };
-
-  const mobileMenuItemVariants = {
-    open: { y: 0, opacity: 1, transition: { y: { stiffness: 1000, velocity: -100 } } },
-    closed: { y: 50, opacity: 0, transition: { y: { stiffness: 1000 } } }
-  };
-
-  const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
     <motion.header
@@ -157,70 +127,34 @@ const Navbar = () => {
             </motion.div>
           </div>
 
-          {/* Mobile Menu Button - New Design */}
-          <div className="md:hidden relative z-[60]">
-            <motion.button
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-              className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center relative"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <motion.span
-                animate={{ 
-                  rotate: isMobileMenuOpen ? 45 : 0,
-                  y: isMobileMenuOpen ? 0 : -3,
-                }}
-                transition={{ duration: 0.3, ease: "circOut" }}
-                className="block absolute h-0.5 w-5 bg-primary rounded-full"
-              />
-              <motion.span
-                animate={{ 
-                  rotate: isMobileMenuOpen ? -45 : 0,
-                  y: isMobileMenuOpen ? 0 : 3,
-                }}
-                transition={{ duration: 0.3, ease: "circOut" }}
-                className="block absolute h-0.5 w-5 bg-primary rounded-full"
-              />
-            </motion.button>
+          {/* Mobile Navigation - Scrollable Inline */}
+          <div className="md:hidden flex-1 overflow-hidden ml-4">
+            <div className="flex items-center space-x-5 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 pr-4">
+              {mainLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`font-medium text-sm flex-shrink-0 transition-colors relative pb-1 ${ // Added pb-1 for bottom border spacing
+                    location.pathname === link.path ? 'text-primary' : 'text-foreground hover:text-primary'
+                  }`}
+                >
+                  {link.name}
+                  {location.pathname === link.path && (
+                    <motion.div 
+                      className="h-0.5 bg-primary w-full absolute bottom-0 left-0"
+                      layoutId="mobile-active-link" // layoutId for smooth animation
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    />
+                  )}
+                </Link>
+              ))}
+              <div className="flex-shrink-0 pl-2">
+                <ThemeToggle />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu Overlay - New Design */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            variants={mobileMenuOverlayVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-            className="fixed inset-0 bg-background/80 backdrop-blur-lg md:hidden z-50 flex flex-col items-center justify-center space-y-10 p-8"
-          >
-            <motion.nav 
-              variants={mobileMenuItemContainerVariants}
-              className="flex flex-col space-y-8 text-center"
-            >
-              {mainLinks.map((link) => (
-                <motion.div key={link.path} variants={mobileMenuItemVariants}>
-                  <Link
-                    to={link.path}
-                    onClick={() => setIsMobileMenuOpen(false)} // Ensure menu closes on click
-                    className={`text-4xl font-semibold transition-colors hover:text-primary ${
-                      location.pathname === link.path ? 'text-primary' : 'text-foreground'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </motion.nav>
-            <motion.div variants={mobileMenuItemVariants} className="pt-8">
-              <ThemeToggle />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.header>
   );
 };
