@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import SparkleIllustration from './SparkleIllustration';
 import ThemeToggle from './ThemeToggle';
 
@@ -65,6 +65,30 @@ const Navbar = () => {
     }
   };
 
+  // New variants for mobile menu overlay and items
+  const mobileMenuOverlayVariants = {
+    open: {
+      clipPath: `circle(150% at 50% 50%)`,
+      transition: { type: "spring", stiffness: 120, damping: 20, duration: 0.7 }
+    },
+    closed: {
+      clipPath: `circle(0% at 90% 10%)`,
+      transition: { type: "spring", stiffness: 120, damping: 20, duration: 0.3, delay: 0.3 }
+    }
+  };
+
+  const mobileMenuItemContainerVariants = {
+    open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
+    closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+  };
+
+  const mobileMenuItemVariants = {
+    open: { y: 0, opacity: 1, transition: { y: { stiffness: 1000, velocity: -100 } } },
+    closed: { y: 50, opacity: 0, transition: { y: { stiffness: 1000 } } }
+  };
+
+  const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
   return (
     <motion.header
       initial="hidden"
@@ -77,7 +101,7 @@ const Navbar = () => {
       <div className="content-container">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="relative z-10">
+          <Link to="/" className="relative z-[60]">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -97,11 +121,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {mainLinks.map((link) => (
-            <motion.div
-                key={link.path}
-                whileHover="hover"
-                variants={navItemVariants}
-              >
+              <motion.div key={link.path} whileHover="hover" variants={navItemVariants}>
                 <Link
                   to={link.path}
                   className={`font-medium text-sm transition-colors relative ${
@@ -109,19 +129,12 @@ const Navbar = () => {
                   }`}
                 >
                   {location.pathname === link.path && (
-              <motion.div
+                    <motion.div
                       className="absolute -left-5 top-1/2 -translate-y-1/2"
                       initial={{ scale: 0 }}
-                animate={{
-                        scale: [1, 1.2, 1],
-                        transition: { 
-                  repeat: Infinity,
-                          duration: 1.5,
-                          ease: "easeInOut"
-                        }
-                }}
+                      animate={{ scale: [1, 1.2, 1], transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" } }}
                       transition={{ type: "spring", stiffness: 500 }}
-              >
+                    >
                       <SparkleIllustration className="text-primary" size={16} />
                     </motion.div>
                   )}
@@ -139,92 +152,75 @@ const Navbar = () => {
             ))}
             
             {/* Theme Toggle */}
-            <motion.div whileHover={{ y: -2 }}>
+            <motion.div whileHover={{ y: -2 }} className="z-[60]">
               <ThemeToggle />
             </motion.div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden relative z-10 p-2 flex items-center">
-            {/* Theme Toggle - Mobile */}
-            <div className="mr-4">
-              <ThemeToggle />
-            </div>
-            
+          {/* Mobile Menu Button - New Design */}
+          <div className="md:hidden relative z-[60]">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={toggleMenu}
               aria-label="Toggle menu"
+              className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center relative"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
-              <div className="w-6 flex flex-col items-end justify-center">
-                <motion.span
-                  animate={{
-                    rotate: isMobileMenuOpen ? 45 : 0,
-                    y: isMobileMenuOpen ? 7 : 0,
-                    width: isMobileMenuOpen ? 24 : 24
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="block h-0.5 bg-foreground mb-1.5"
-                />
-                <motion.span
-                  animate={{
-                    opacity: isMobileMenuOpen ? 0 : 1,
-                    width: isMobileMenuOpen ? 0 : 16
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="block h-0.5 bg-foreground mb-1.5"
-                />
-                <motion.span
-                  animate={{
-                    rotate: isMobileMenuOpen ? -45 : 0,
-                    y: isMobileMenuOpen ? -7 : 0,
-                    width: isMobileMenuOpen ? 24 : 20
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="block h-0.5 bg-foreground"
-                />
-              </div>
+              <motion.span
+                animate={{ 
+                  rotate: isMobileMenuOpen ? 45 : 0,
+                  y: isMobileMenuOpen ? 0 : -3,
+                }}
+                transition={{ duration: 0.3, ease: "circOut" }}
+                className="block absolute h-0.5 w-5 bg-primary rounded-full"
+              />
+              <motion.span
+                animate={{ 
+                  rotate: isMobileMenuOpen ? -45 : 0,
+                  y: isMobileMenuOpen ? 0 : 3,
+                }}
+                transition={{ duration: 0.3, ease: "circOut" }}
+                className="block absolute h-0.5 w-5 bg-primary rounded-full"
+              />
             </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed inset-0 bg-background/95 md:hidden z-0 flex flex-col items-center justify-center"
-        >
-          <nav className="flex flex-col space-y-6 items-center">
-            {mainLinks.map((link, index) => (
-              <motion.div
-                key={link.path}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link
-                  to={link.path}
-                  className={`text-2xl font-medium flex items-center ${
-                    location.pathname === link.path
-                      ? 'text-primary'
-                      : 'text-foreground hover:text-primary'
-                  }`}
-                >
-                  {location.pathname === link.path && (
-                    <SparkleIllustration className="text-primary mr-2" size={16} />
-                  )}
-                  {link.name}
-                </Link>
-              </motion.div>
-            ))}
-          </nav>
-        </motion.div>
-      )}
+      {/* Mobile Menu Overlay - New Design */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            variants={mobileMenuOverlayVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            className="fixed inset-0 bg-background/80 backdrop-blur-lg md:hidden z-50 flex flex-col items-center justify-center space-y-10 p-8"
+          >
+            <motion.nav 
+              variants={mobileMenuItemContainerVariants}
+              className="flex flex-col space-y-8 text-center"
+            >
+              {mainLinks.map((link) => (
+                <motion.div key={link.path} variants={mobileMenuItemVariants}>
+                  <Link
+                    to={link.path}
+                    onClick={() => setIsMobileMenuOpen(false)} // Ensure menu closes on click
+                    className={`text-4xl font-semibold transition-colors hover:text-primary ${
+                      location.pathname === link.path ? 'text-primary' : 'text-foreground'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.nav>
+            <motion.div variants={mobileMenuItemVariants} className="pt-8">
+              <ThemeToggle />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 };
