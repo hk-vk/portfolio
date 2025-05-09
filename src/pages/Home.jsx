@@ -2,10 +2,9 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 import HandIllustration from '../components/HandIllustration';
-import FlowerIllustration from '../components/FlowerIllustration';
-import LeafIllustration from '../components/LeafIllustration';
 import SparkleIllustration from '../components/SparkleIllustration';
 import HeroHighlightLine from '../components/HeroHighlightLine';
+import MagnetLines from '../components/MagnetLines';
 
 const Home = () => {
   // Animation variants
@@ -47,18 +46,6 @@ const Home = () => {
     }
   };
 
-  const rotateVariants = {
-    animate: {
-      rotate: [0, 10, -5, 10, 0],
-      transition: {
-        duration: 8,
-        repeat: Infinity,
-        repeatType: "mirror",
-        ease: "easeInOut"
-      }
-    }
-  };
-
   return (
     <div className="pt-32 pb-20">
       {/* Hero Section */}
@@ -74,18 +61,7 @@ const Home = () => {
             whileInView="animate"
             viewport={{ once: false }}
           >
-            <FlowerIllustration className="transform rotate-12" />
-          </motion.div>
-
-          <motion.div
-            className="absolute left-10 bottom-20 opacity-80 z-10 hidden md:block"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.8, scale: 1 }}
-            transition={{ delay: 0.9, duration: 0.5 }}
-            variants={rotateVariants}
-            whileInView="animate"
-          >
-            <LeafIllustration className="transform -rotate-12" fill="#2E7D32" />
+            <SparkleIllustration className="transform rotate-12" size={24} />
           </motion.div>
 
           <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
@@ -95,7 +71,20 @@ const Home = () => {
             <HeroHighlightLine />
 
             <div className="border border-border flex flex-col md:flex-row items-center justify-between">
-              <div className="p-6 md:p-10 flex-1">
+              <div className="p-6 md:p-10 flex-1 relative">
+                {/* MagnetLines Component */}
+                <div className="absolute inset-0 -left-10 -top-10 -z-10 overflow-hidden opacity-75">
+                  <MagnetLines 
+                    rows={7} 
+                    columns={7} 
+                    containerSize="100%" 
+                    lineColor="hsl(var(--primary) / 0.3)" 
+                    lineWidth="0.5vmin" 
+                    lineHeight="4vmin" 
+                    baseAngle={-5} 
+                  />
+                </div>
+                
                 <div className="relative mb-12">
                   <motion.div
                     initial={{ opacity: 0, scale: 0 }}
