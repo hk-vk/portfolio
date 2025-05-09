@@ -110,7 +110,7 @@ const Navbar = () => {
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1, transition: { delay: 0.1 } }}
                       exit={{ scale: 0, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      transition={{ type: "spring", stiffness: 120, damping: 20 }}
                     >
                       <SparkleIllustration className="text-primary" size={16} />
                     </motion.div>
@@ -120,7 +120,7 @@ const Navbar = () => {
                     layoutId="desktop-active-underline"
                     initial={false} 
                     animate={{ width: isActive ? "100%" : "0%" }}
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   />
                 </motion.div>
               );
@@ -151,7 +151,7 @@ const Navbar = () => {
                     <motion.div 
                       className="h-1 bg-gradient-to-r from-primary to-accent w-full absolute bottom-0 left-0 rounded-t-md"
                       layoutId="mobile-active-link"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      transition={{ type: "spring", stiffness: 120, damping: 20 }}
                     />
                   )}
                 </Link>
