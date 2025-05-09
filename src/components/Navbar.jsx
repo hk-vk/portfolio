@@ -90,35 +90,41 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10">
-            {mainLinks.map((link) => (
-              <motion.div key={link.path} whileHover="hover" variants={navItemVariants}>
-                <Link
-                  to={link.path}
-                  className={`font-medium text-sm uppercase tracking-wide transition-colors relative group ${
-                    location.pathname === link.path ? 'text-primary font-semibold' : 'text-foreground hover:text-primary'
-                  }`}
-                >
-                  {location.pathname === link.path && (
+          <div className="hidden md:flex items-center space-x-10 relative">
+            {mainLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <motion.div key={link.path} whileHover="hover" variants={navItemVariants} className="relative">
+                  <Link
+                    to={link.path}
+                    className={`font-medium text-sm uppercase tracking-wide transition-colors relative group py-2 ${
+                      isActive ? 'text-primary font-semibold' : 'text-foreground hover:text-primary'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                  {isActive && (
                     <motion.div
                       className="absolute -left-5 top-1/2 -translate-y-1/2"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0], transition: { repeat: Infinity, duration: 1.5, ease: "easeInOut" } }}
-                      transition={{ type: "spring", stiffness: 500 }}
+                      layoutId="desktop-active-sparkle"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1, transition: { delay: 0.1 } }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
                     >
                       <SparkleIllustration className="text-primary" size={16} />
                     </motion.div>
                   )}
-                  {link.name}
                   <motion.div 
-                    className={`h-0.5 bg-gradient-to-r from-primary to-accent absolute -bottom-1.5 left-0 ${location.pathname === link.path ? 'w-full' : 'w-0 group-hover:w-full'}`}
-                    initial={{ width: location.pathname === link.path ? "100%" : "0%" }}
-                    animate={{ width: location.pathname === link.path ? "100%" : "0%" }}
-                    transition={{ duration: 0.3 }}
+                    className={`h-0.5 bg-gradient-to-r from-primary to-accent absolute -bottom-0 left-0 right-0`}
+                    layoutId="desktop-active-underline"
+                    initial={false} 
+                    animate={{ width: isActive ? "100%" : "0%" }}
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
-                </Link>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
             
             {/* Theme Toggle */}
             <motion.div 
@@ -145,7 +151,7 @@ const Navbar = () => {
                     <motion.div 
                       className="h-1 bg-gradient-to-r from-primary to-accent w-full absolute bottom-0 left-0 rounded-t-md"
                       layoutId="mobile-active-link"
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
                 </Link>
