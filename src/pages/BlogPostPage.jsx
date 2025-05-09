@@ -44,13 +44,15 @@ const SpeedReaderControls = ({
   wordsPerMinute, 
   setWordsPerMinute,
   chunkSize,
-  setChunkSize
+  setChunkSize,
+  readerMode,
+  setReaderMode
 }) => (
-  <div className="flex flex-col items-start gap-4 p-4 bg-muted/30 rounded-lg mb-6">
-    <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+  <div className="flex flex-col gap-3 p-3 bg-muted/30 rounded-lg mb-6">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
       <button 
         onClick={() => setIsActive(!isActive)}
-        className={`button-primary px-4 py-2 rounded-md flex items-center justify-center min-w-[150px] ${isActive ? 'bg-red-500 hover:bg-red-600' : ''}`}
+        className={`button-primary px-4 py-2 rounded-md flex items-center justify-center min-w-[150px] text-sm ${isActive ? 'bg-red-500 hover:bg-red-600' : ''}`}
       >
         {isActive ? (
           <>
@@ -70,32 +72,58 @@ const SpeedReaderControls = ({
         )}
       </button>
       
-      <div className="flex items-center gap-2 flex-grow">
-        <span className="text-sm text-muted-foreground whitespace-nowrap">WPM:</span>
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground">Mode:</span>
+        <div className="flex rounded-md border border-border bg-background p-0.5">
+          <button 
+            onClick={() => setReaderMode('rsvp')} 
+            className={`px-2 py-1 text-xs rounded-sm transition-colors ${readerMode === 'rsvp' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+          >
+            RSVP
+          </button>
+          <button 
+            onClick={() => setReaderMode('guided')} 
+            className={`px-2 py-1 text-xs rounded-sm transition-colors ${readerMode === 'guided' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+          >
+            Guided Scroll
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex flex-col xs:flex-row items-center gap-x-4 gap-y-2 w-full">
+      <div className="flex items-center gap-2 w-full xs:w-auto flex-1">
+        <label htmlFor="wpm-slider" className="text-xs text-muted-foreground whitespace-nowrap">WPM:</label>
         <input 
+          id="wpm-slider"
           type="range" 
           min="100" 
           max="1000" 
           step="50" 
           value={wordsPerMinute} 
           onChange={(e) => setWordsPerMinute(parseInt(e.target.value))} 
-          className="w-full sm:w-32 accent-primary"
+          className="w-full accent-primary h-4"
         />
-        <span className="text-xs font-mono bg-background px-2 py-1 rounded border border-border min-w-[60px] text-center">{wordsPerMinute}</span>
+        <span className="text-xs font-mono bg-background px-1.5 py-0.5 rounded border border-border min-w-[45px] text-center">{wordsPerMinute}</span>
       </div>
-    </div>
-    <div className="flex items-center gap-2 w-full">
-      <span className="text-sm text-muted-foreground whitespace-nowrap">Words/Flash:</span>
-      <input 
-        type="range" 
-        min="1" 
-        max="5" 
-        step="1" 
-        value={chunkSize} 
-        onChange={(e) => setChunkSize(parseInt(e.target.value))} 
-        className="w-full sm:w-32 accent-primary"
-      />
-      <span className="text-xs font-mono bg-background px-2 py-1 rounded border border-border min-w-[60px] text-center">{chunkSize}</span>
+
+      {readerMode === 'rsvp' && (
+        <div className="flex items-center gap-2 w-full xs:w-auto flex-1">
+          <label htmlFor="chunk-slider" className="text-xs text-muted-foreground whitespace-nowrap">Words/Flash:</label>
+          <input 
+            id="chunk-slider"
+            type="range" 
+            min="1" 
+            max="5" 
+            step="1" 
+            value={chunkSize} 
+            onChange={(e) => setChunkSize(parseInt(e.target.value))} 
+            className="w-full accent-primary h-4"
+          />
+          <span className="text-xs font-mono bg-background px-1.5 py-0.5 rounded border border-border min-w-[45px] text-center">{chunkSize}</span>
+        </div>
+      )}
+      {readerMode === 'guided' && <div className="flex-1"></div>} 
     </div>
   </div>
 );
@@ -213,13 +241,97 @@ const SpeedReader = ({ content, isActive, wordsPerMinute, chunkSize }) => {
   );
 };
 
+const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
+  const [wordsData, setWordsData] = useState([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(-1);
+  const wordRefs = useRef({});
+  const intervalRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const paragraphs = content.split('\n').filter(p => p.trim() !== '');
+    let wordCounter = 0;
+    const processedWords = paragraphs.map((paragraph, pIndex) => {
+      const words = paragraph.trim().split(/\s+/).filter(w => w.length > 0);
+      return words.map((word, wIndex) => {
+        const id = `word-${pIndex}-${wIndex}-${wordCounter++}`;
+        wordRefs.current[id] = React.createRef();
+        return { text: word, id, paragraphIndex: pIndex };
+      });
+    });
+    setWordsData(processedWords.flat());
+    setCurrentWordIndex(-1);
+  }, [content]);
+
+  useEffect(() => {
+    if (isActive && wordsData.length > 0) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setCurrentWordIndex(0);
+
+      const interval = 60000 / wordsPerMinute;
+      intervalRef.current = setInterval(() => {
+        setCurrentWordIndex(prevIndex => {
+          const nextIndex = prevIndex + 1;
+          if (nextIndex >= wordsData.length) {
+            clearInterval(intervalRef.current);
+            return prevIndex;
+          }
+          const wordId = wordsData[nextIndex].id;
+          const wordElement = wordRefs.current[wordId]?.current;
+          if (wordElement && containerRef.current) {
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const wordRect = wordElement.getBoundingClientRect();
+            
+            if (wordRect.top < containerRect.top + 50 || wordRect.bottom > containerRect.bottom - 50) {
+                 wordElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center' 
+                });
+            }
+          }
+          return nextIndex;
+        });
+      }, interval);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [isActive, wordsData, wordsPerMinute]);
+
+  if (!isActive) return null;
+  if (wordsData.length === 0) return <p className="text-muted-foreground">Preparing guided reading...</p>; 
+
+  let currentPIndex = -1;
+  return (
+    <div ref={containerRef} className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content mb-8 relative overflow-auto" style={{maxHeight: '50vh'}}>
+      {wordsData.reduce((acc, word, index) => {
+        if (word.paragraphIndex !== currentPIndex) {
+          if (currentPIndex !== -1) acc.push(<br key={`br-${word.paragraphIndex}`} />);
+          currentPIndex = word.paragraphIndex;
+        }
+        acc.push(
+          <motion.span 
+            key={word.id} 
+            ref={wordRefs.current[word.id]}
+            className={`transition-colors duration-100 ease-in-out ${index === currentWordIndex ? 'bg-primary/30 text-primary-foreground rounded px-0.5' : ''}`}
+          >
+            {word.text}{' '}
+          </motion.span>
+        );
+        return acc;
+      }, [])}
+    </div>
+  );
+};
+
 const BlogPostPage = () => {
   const { postId } = useParams();
   const post = blogPostsData.find(p => p.id === postId);
   
-  const [isSpeedReading, setIsSpeedReading] = useState(false);
+  const [isSpeedReadingActive, setIsSpeedReadingActive] = useState(false);
   const [wordsPerMinute, setWordsPerMinute] = useState(300);
   const [chunkSize, setChunkSize] = useState(1);
+  const [readerMode, setReaderMode] = useState('rsvp');
 
   if (!post) {
     return <Navigate to="/blog" replace />;
@@ -263,32 +375,46 @@ const BlogPostPage = () => {
             transition={{ delay: 0.4, duration: 0.5 }}
           >
             <SpeedReaderControls 
-              isActive={isSpeedReading}
-              setIsActive={setIsSpeedReading}
+              isActive={isSpeedReadingActive}
+              setIsActive={setIsSpeedReadingActive}
               wordsPerMinute={wordsPerMinute}
               setWordsPerMinute={setWordsPerMinute}
               chunkSize={chunkSize}
               setChunkSize={setChunkSize}
+              readerMode={readerMode}
+              setReaderMode={setReaderMode}
             />
           </motion.div>
           
-          <SpeedReader 
-            content={post.content}
-            isActive={isSpeedReading}
-            wordsPerMinute={wordsPerMinute}
-            chunkSize={chunkSize}
-          />
+          {readerMode === 'rsvp' && isSpeedReadingActive && (
+            <SpeedReader 
+              content={post.content}
+              isActive={isSpeedReadingActive}
+              wordsPerMinute={wordsPerMinute}
+              chunkSize={chunkSize}
+            />
+          )}
 
-          <motion.div
-            className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          >
-            {post.content.split('\n').map((paragraph, index) => (
-              paragraph.trim() && <p key={index}>{paragraph.trim()}</p>
-            ))}
-          </motion.div>
+          {readerMode === 'guided' && isSpeedReadingActive && (
+             <GuidedHighlighter
+              content={post.content}
+              isActive={isSpeedReadingActive}
+              wordsPerMinute={wordsPerMinute}
+            />
+          )}
+
+          { !(readerMode === 'guided' && isSpeedReadingActive) && (
+            <motion.div
+              className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              {post.content.split('\n').map((paragraph, index) => (
+                paragraph.trim() && <p key={index}>{paragraph.trim()}</p>
+              ))}
+            </motion.div>
+          )}
         </div>
       </AnimatedSection>
     </div>
