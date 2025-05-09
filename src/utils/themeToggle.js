@@ -15,7 +15,8 @@ export const themeToggle = () => {
       return savedTheme;
     }
     
-    return prefersDarkMode ? 'dark' : 'light';
+    // Default to light theme if no preference is saved
+    return 'light';
   };
   
   // Initialize theme
