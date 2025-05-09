@@ -1,8 +1,7 @@
 name = "portfolio"
 compatibility_date = "2025-05-10" # You can update this to a more current date
 
-[pages_build_output_dir]
-dir = "./dist"
+pages_build_output_dir = "dist"
 
 [build]
 command = "pnpm install && pnpm run build" 
