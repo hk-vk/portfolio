@@ -1,7 +1,12 @@
 name = "portfolio"
 compatibility_date = "2025-05-10" # You can update this to a more current date
 
+# Build output directory
 pages_build_output_dir = "dist"
 
-[build]
-command = "pnpm install && pnpm run build" 
+# Environment variables that control the build
+[vars]
+NPM_FLAGS = "--version"
+
+[env.production]
+# Specify the build command in the Cloudflare dashboard instead 
