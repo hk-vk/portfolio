@@ -1,0 +1,8 @@
+name = "sleek-portfolio"
+compatibility_date = "2024-05-10" # You can update this to a more current date
+
+[pages_build_output_dir]
+dir = "./dist"
+
+[build]
+command = "pnpm install && pnpm run build" 
