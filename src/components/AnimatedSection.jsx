@@ -1,95 +1,174 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
-const AnimatedSection = ({
-  children,
-  className = "",
-  delay = 0.2,
+const AnimatedSection = ({ 
+  children, 
+  className = "", 
+  animation = "fadeUp", 
+  delay = 0, 
+  once = true, 
   threshold = 0.1,
-  animation = "fadeUp", // options: fadeUp, fadeIn, slideInRight, slideInLeft, zoom
+  ...props 
 }) => {
-  const controls = useAnimation();
-  const [ref, inView] = useInView({ threshold: threshold, triggerOnce: true });
+  const [hasAnimated, setHasAnimated] = useState(false);
 
-  // Define animation variants
+  useEffect(() => {
+    // Reset animation state when animation type changes
+    setHasAnimated(false);
+  }, [animation]);
+
+  // Animation variants
   const variants = {
     fadeUp: {
-      hidden: { opacity: 0, y: 60 },
-      visible: { opacity: 1, y: 0 },
+      hidden: { y: 30, opacity: 0 },
+      visible: { 
+        y: 0, 
+        opacity: 1,
+        transition: { 
+          duration: 0.7, 
+          ease: [0.25, 0.1, 0.25, 1.0],
+          delay 
+        }
+      }
     },
     fadeIn: {
       hidden: { opacity: 0 },
-      visible: { opacity: 1 },
-    },
-    slideInRight: {
-      hidden: { opacity: 0, x: 100 },
-      visible: { opacity: 1, x: 0 },
+      visible: { 
+        opacity: 1,
+        transition: { 
+          duration: 0.5,
+          delay 
+        }
+      }
     },
     slideInLeft: {
-      hidden: { opacity: 0, x: -100 },
-      visible: { opacity: 1, x: 0 },
+      hidden: { x: -40, opacity: 0 },
+      visible: { 
+        x: 0, 
+        opacity: 1,
+        transition: { 
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          delay 
+        }
+      }
     },
-    zoom: {
-      hidden: { opacity: 0, scale: 0.8 },
-      visible: { opacity: 1, scale: 1 },
+    slideInRight: {
+      hidden: { x: 40, opacity: 0 },
+      visible: { 
+        x: 0, 
+        opacity: 1,
+        transition: { 
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          delay 
+        }
+      }
     },
-  };
-
-  useEffect(() => {
-    if (inView) {
-      controls.start("visible");
+    zoomIn: {
+      hidden: { scale: 0.95, opacity: 0 },
+      visible: { 
+        scale: 1, 
+        opacity: 1,
+        transition: { 
+          type: "spring",
+          stiffness: 300,
+          damping: 25,
+          delay 
+        }
+      }
+    },
+    scale: {
+      hidden: { scale: 0.8, opacity: 0 },
+      visible: { 
+        scale: 1, 
+        opacity: 1,
+        transition: { 
+          duration: 0.5,
+          delay 
+        }
+      }
     }
-  }, [controls, inView]);
+  };
 
   return (
     <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={controls}
-      variants={variants[animation]}
-      transition={{
-        duration: 0.8,
-        ease: [0.25, 0.1, 0.25, 1.0],
-        delay: delay,
-      }}
       className={className}
+      initial={hasAnimated && once ? false : "hidden"}
+      whileInView="visible"
+      viewport={{ once, threshold }}
+      variants={variants[animation]}
+      onAnimationComplete={() => setHasAnimated(true)}
+      {...props}
     >
       {children}
     </motion.div>
   );
 };
 
-// Composite component for creating a grid of animated items
-export const AnimatedGrid = ({
-  children,
-  className = "",
-  itemClassName = "",
-  columns = { sm: 1, md: 2, lg: 3 },
-  stagger = 0.1,
-  animation = "fadeUp",
+// Animated Grid Component
+export const AnimatedGrid = ({ 
+  children, 
+  className = "", 
+  columns = { sm: 1, md: 2, lg: 3 }, 
+  gap = 6,
+  stagger = 0.05,
+  once = true,
+  threshold = 0.1,
+  ...props 
 }) => {
-  const gridClass = `grid gap-6 ${className} ${
-    columns.sm === 1 ? 'grid-cols-1' : `grid-cols-${columns.sm}`
-  } ${columns.md ? `md:grid-cols-${columns.md}` : ''} ${
-    columns.lg ? `lg:grid-cols-${columns.lg}` : ''
-  }`;
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: stagger,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20
+      }
+    }
+  };
+
+  // Create grid classes based on columns prop
+  const gridClasses = [
+    `grid`,
+    `gap-${gap}`,
+    columns.sm && `grid-cols-${columns.sm}`,
+    columns.md && `md:grid-cols-${columns.md}`,
+    columns.lg && `lg:grid-cols-${columns.lg}`,
+    className
+  ].filter(Boolean).join(' ');
 
   return (
-    <div className={gridClass}>
-      {Array.isArray(children)
-        ? children.map((child, index) => (
-            <AnimatedSection
-              key={index}
-              delay={index * stagger}
-              animation={animation}
-              className={itemClassName}
-            >
-              {child}
-            </AnimatedSection>
-          ))
-        : children}
-    </div>
+    <motion.div
+      className={gridClasses}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once, threshold }}
+      variants={containerVariants}
+      {...props}
+    >
+      {Array.isArray(children) && children.map((child, index) => (
+        <motion.div key={index} variants={itemVariants}>
+          {child}
+        </motion.div>
+      ))}
+      {!Array.isArray(children) && children}
+    </motion.div>
   );
 };
 

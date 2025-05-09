@@ -308,6 +308,8 @@ const Home = () => {
       {/* Hire Me Section */}
       <AnimatedSection>
         <div className="content-container relative py-16 text-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/5 rounded-3xl -z-10"></div>
+          
           <motion.div
             className="absolute -top-8 left-1/2 -translate-x-1/2 transform-gpu"
             animate={{ y: [0, -10, 0], rotate: [-5, 5, -5] }}
@@ -327,7 +329,7 @@ const Home = () => {
           </motion.h2>
           
           <motion.p
-            className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto"
+            className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto font-medium"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -335,9 +337,9 @@ const Home = () => {
           >
             My code is clean, my jokes are... well, they exist!
             I build cool things and occasionally talk to my rubber duck.
-            Let's create something awesome together! (The project, not more jokes... unless you want to?)
+            Let's create something awesome together!
           </motion.p>
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -346,10 +348,10 @@ const Home = () => {
           >
             <Link
               to="/contact"
-              className="button-primary text-lg font-medium px-8 py-4 inline-flex items-center group"
+              className="button-primary text-lg font-semibold px-10 py-4 inline-flex items-center group rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300"
             >
               HIRE ME!
-              <span className="ml-2 text-2xl transform transition-transform duration-300 group-hover:rotate-[360deg] group-hover:scale-125">🚀</span>
+              <span className="ml-3 text-2xl transform transition-transform duration-300 group-hover:rotate-[360deg] group-hover:scale-125">🚀</span>
             </Link>
           </motion.div>
 
