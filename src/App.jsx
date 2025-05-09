@@ -153,11 +153,9 @@ function App() {
                 className="inline-block text-5xl md:text-7xl font-serif loading-letter-fm"
                 style={{
                   // Add gradient effect to match the screenshot
-                  background: index < 4 
-                    ? 'linear-gradient(90deg, #e94e77, #a393d8)' 
-                    : 'white',
+                  background: 'linear-gradient(90deg, #e94e77, #a393d8)',
                   WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: index < 4 ? 'transparent' : 'white'
+                  WebkitTextFillColor: 'transparent'
                 }}
               >
                 {letter === ' ' ? '\u00A0' : letter}
