@@ -75,13 +75,13 @@ const Home = () => {
                 {/* MagnetLines Component */}
                 <div className="absolute inset-0 -left-10 -top-10 -z-10 overflow-hidden opacity-75">
                   <MagnetLines 
-                    rows={7} 
-                    columns={7} 
-                    containerSize="100%" 
-                    lineColor="hsl(var(--primary) / 0.3)" 
-                    lineWidth="0.5vmin" 
-                    lineHeight="4vmin" 
-                    baseAngle={-5} 
+                    rows={12} 
+                    columns={12} 
+                    containerSize="120%" 
+                    lineColor="hsl(var(--primary) / 0.2)" 
+                    lineWidth="0.3vmin" 
+                    lineHeight="3vmin" 
+                    baseAngle={-15} 
                   />
                 </div>
                 

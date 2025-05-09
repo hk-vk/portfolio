@@ -8,11 +8,21 @@
 
   width: 80vmin;
   height: 80vmin;
+  position: relative;
+  z-index: 0;
 }
 
 .magnetLines-container span {
   display: block;
   transform-origin: center;
-  will-change: transform;
+  will-change: transform, opacity;
   transform: rotate(var(--rotate));
+  transition: transform 0.1s ease-out;
+  border-radius: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magnetLines-container span {
+    transition: none;
+  }
 } 
