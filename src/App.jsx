@@ -17,6 +17,7 @@ import About from './pages/About';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import Skills from './pages/Skills';
+import Blog from './pages/Blog';
 
 // Utilities
 import { initScrollAnimations } from './utils/scrollAnimations';
@@ -190,6 +191,7 @@ function App() {
             <Route path="/projects" element={<Projects />} />
             <Route path="/skills" element={<Skills />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/blog" element={<Blog />} />
           </Routes>
         </main>
         <Footer />
