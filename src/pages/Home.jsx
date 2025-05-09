@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
-import HandIllustration from '../components/HandIllustration';
 import SparkleIllustration from '../components/SparkleIllustration';
 import HeroHighlightLine from '../components/HeroHighlightLine';
 import MagnetLines from '../components/MagnetLines';
@@ -121,20 +120,6 @@ const Home = () => {
                     </span>
                   </motion.h1>
                 </div>
-
-                <motion.div
-                  className="hidden md:block"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                  whileHover={{
-                    scale: 1.05,
-                    rotate: 8,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  <HandIllustration className="w-40 mb-4 transform rotate-6" />
-                </motion.div>
               </div>
 
               <div className="p-6 md:p-10 flex-1 md:border-l border-border">
