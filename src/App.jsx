@@ -18,6 +18,7 @@ import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import Skills from './pages/Skills';
 import Blog from './pages/Blog';
+import BlogPostPage from './pages/BlogPostPage';
 
 // Utilities
 import { initScrollAnimations } from './utils/scrollAnimations';
@@ -190,8 +191,9 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/skills" element={<Skills />} />
-            <Route path="/contact" element={<Contact />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:postId" element={<BlogPostPage />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>
         <Footer />
