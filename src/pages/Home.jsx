@@ -279,67 +279,58 @@ const Home = () => {
         </div>
       </AnimatedSection>
 
-      {/* Hire Me Section */}
-      <AnimatedSection>
-        <div className="content-container relative py-16 text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/5 rounded-3xl -z-10"></div>
-          
+      {/* Experience Section */}
+      <AnimatedSection className="py-16 md:py-24 bg-background">
+        <div className="content-container text-center">
           <motion.div
-            className="absolute -top-8 left-1/2 -translate-x-1/2 transform-gpu"
-            animate={{ y: [0, -10, 0], rotate: [-5, 5, -5] }}
-            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+            className="mb-8 flex items-center justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <SparkleIllustration className="text-primary" size={48} />
+            <SparkleIllustration className="text-primary mr-3" size={20} />
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground">EXPERIENCE</h2>
+            <SparkleIllustration className="text-accent ml-3" size={20} />
           </motion.div>
-          
-          <motion.h2
-            className="text-4xl md:text-5xl font-bold mb-6 text-gradient"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            Ready to Add Some Sparkle to Your Team?
-          </motion.h2>
-          
+
           <motion.p
-            className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto font-medium"
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            My code is clean, my jokes are... well, they exist!
-            I build cool things and occasionally talk to my rubber duck.
-            Let's create something awesome together!
+            I am currently seeking opportunities to gain professional experience and apply my skills
+            in a real-world setting. If you have a project or an opening where I can contribute
+            and grow, please feel free to reach out. Let's build something great together!
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4, type: "spring", stiffness: 150 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Link
-              to="/contact"
-              className="button-primary text-lg font-semibold px-10 py-4 inline-flex items-center group rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300"
+            <a
+              href="mailto:your.email@example.com?subject=Portfolio Inquiry"
+              className="button-primary inline-flex items-center text-lg px-8 py-3 group"
             >
-              HIRE ME!
-              <span className="ml-3 text-2xl transform transition-transform duration-300 group-hover:rotate-[360deg] group-hover:scale-125">🚀</span>
-            </Link>
-          </motion.div>
-
-          <motion.div
-            className="mt-12 text-muted-foreground text-sm"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            <p>(Warning: May spontaneously burst into creative solutions or dad jokes. You've been warned.)</p>
+              Contact Me
+              <svg
+                className="ml-2 w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
           </motion.div>
         </div>
       </AnimatedSection>
+
+      
     </div>
   );
 };
@@ -348,22 +339,22 @@ const Home = () => {
 const featuredProjects = [
   {
     id: '01',
-    title: 'yeah yeah',
+    title: 'YEAH',
     tags: ['TypeScript', 'Fake News Detection', 'Web App'],
   },
   {
     id: '02',
-    title: 'commitstorygen',
+    title: 'YEAH',
     tags: ['JavaScript', 'GitHub API', 'Story Generation'],
   },
   {
     id: '03',
-    title: 'pdfX',
+    title: 'YEAH',
     tags: ['TypeScript', 'PDF Processing', 'Offline Tools'],
   },
   {
     id: '04',
-    title: 'Portfolio',
+    title: 'PORTFOLIO',
     tags: ['React', 'Framer Motion', 'Tailwind'],
   },
 ];
