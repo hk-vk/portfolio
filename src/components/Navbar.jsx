@@ -38,8 +38,8 @@ const Navbar = () => {
       opacity: 1,
       transition: {
         type: 'spring',
-        stiffness: 100,
-        damping: 20
+        stiffness: 150,
+        damping: 22
       }
     },
     hidden: {

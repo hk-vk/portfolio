@@ -25,7 +25,7 @@ const AnimatedSection = ({
         y: 0, 
         opacity: 1,
         transition: { 
-          duration: 0.7, 
+          duration: 0.45, 
           ease: [0.25, 0.1, 0.25, 1.0],
           delay 
         }
@@ -36,7 +36,7 @@ const AnimatedSection = ({
       visible: { 
         opacity: 1,
         transition: { 
-          duration: 0.5,
+          duration: 0.4,
           delay 
         }
       }
@@ -48,8 +48,8 @@ const AnimatedSection = ({
         opacity: 1,
         transition: { 
           type: "spring",
-          stiffness: 100,
-          damping: 15,
+          stiffness: 180,
+          damping: 25,
           delay 
         }
       }
@@ -61,8 +61,8 @@ const AnimatedSection = ({
         opacity: 1,
         transition: { 
           type: "spring",
-          stiffness: 100,
-          damping: 15,
+          stiffness: 180,
+          damping: 25,
           delay 
         }
       }
@@ -86,7 +86,7 @@ const AnimatedSection = ({
         scale: 1, 
         opacity: 1,
         transition: { 
-          duration: 0.5,
+          duration: 0.4,
           delay 
         }
       }
@@ -138,7 +138,7 @@ export const AnimatedGrid = ({
       transition: {
         type: "spring",
         stiffness: 300,
-        damping: 20
+        damping: 25
       }
     }
   };

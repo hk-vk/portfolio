@@ -48,11 +48,11 @@ const SpeedReaderControls = ({
   readerMode,
   setReaderMode
 }) => (
-  <div className="flex flex-col gap-3 p-3 bg-muted/30 rounded-lg mb-6">
+  <div className="flex flex-col gap-4 p-4 bg-muted/40 rounded-lg mb-8 shadow-sm">
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
       <button 
         onClick={() => setIsActive(!isActive)}
-        className={`button-primary px-4 py-2 rounded-md flex items-center justify-center min-w-[150px] text-sm ${isActive ? 'bg-red-500 hover:bg-red-600' : ''}`}
+        className={`button-primary px-4 py-2 rounded-md flex items-center justify-center min-w-[160px] text-base transition-colors ${isActive ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-primary/90'}`}
       >
         {isActive ? (
           <>
@@ -73,17 +73,17 @@ const SpeedReaderControls = ({
       </button>
       
       <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-muted-foreground">Mode:</span>
+        <span className="text-sm font-medium text-muted-foreground">Mode:</span>
         <div className="flex rounded-md border border-border bg-background p-0.5">
           <button 
             onClick={() => setReaderMode('rsvp')} 
-            className={`px-2 py-1 text-xs rounded-sm transition-colors ${readerMode === 'rsvp' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+            className={`px-3 py-1.5 text-sm rounded-sm transition-colors ${readerMode === 'rsvp' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             RSVP
           </button>
           <button 
             onClick={() => setReaderMode('guided')} 
-            className={`px-2 py-1 text-xs rounded-sm transition-colors ${readerMode === 'guided' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+            className={`px-3 py-1.5 text-sm rounded-sm transition-colors ${readerMode === 'guided' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
           >
             Guided Scroll
           </button>
@@ -91,9 +91,9 @@ const SpeedReaderControls = ({
       </div>
     </div>
 
-    <div className="flex flex-col xs:flex-row items-center gap-x-4 gap-y-2 w-full">
+    <div className="flex flex-col xs:flex-row items-center gap-x-4 gap-y-3 w-full">
       <div className="flex items-center gap-2 w-full xs:w-auto flex-1">
-        <label htmlFor="wpm-slider" className="text-xs text-muted-foreground whitespace-nowrap">WPM:</label>
+        <label htmlFor="wpm-slider" className="text-sm text-muted-foreground whitespace-nowrap">WPM:</label>
         <input 
           id="wpm-slider"
           type="range" 
@@ -109,7 +109,7 @@ const SpeedReaderControls = ({
 
       {readerMode === 'rsvp' && (
         <div className="flex items-center gap-2 w-full xs:w-auto flex-1">
-          <label htmlFor="chunk-slider" className="text-xs text-muted-foreground whitespace-nowrap">Words/Flash:</label>
+          <label htmlFor="chunk-slider" className="text-sm text-muted-foreground whitespace-nowrap">Words/Flash:</label>
           <input 
             id="chunk-slider"
             type="range" 
@@ -326,14 +326,46 @@ const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
 
 const BlogPostPage = () => {
   const { postId } = useParams();
-  const post = blogPostsData.find(p => p.id === postId);
-  
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [isSpeedReadingActive, setIsSpeedReadingActive] = useState(false);
   const [wordsPerMinute, setWordsPerMinute] = useState(300);
   const [chunkSize, setChunkSize] = useState(1);
   const [readerMode, setReaderMode] = useState('rsvp');
 
+  useEffect(() => {
+    // Simulate fetching post data
+    const foundPost = blogPostsData.find(p => p.id === postId);
+    if (foundPost) {
+      setPost(foundPost);
+    } else {
+      // If post not found, setPost to a specific state or handle as error
+      setPost(null); // Or some indicator for 'not found'
+    }
+    setLoading(false);
+  }, [postId]);
+
+  useEffect(() => {
+    if (post && post.title) {
+      const originalTitle = document.title;
+      document.title = post.title;
+      return () => {
+        document.title = originalTitle;
+      };
+    }
+  }, [post]);
+
+  if (loading) {
+    return (
+      <div className="pt-32 pb-20 flex justify-center items-center">
+        <p className="text-xl text-muted-foreground">Loading post...</p>
+      </div>
+    );
+  }
+
   if (!post) {
+    // Post not found after loading, redirect
     return <Navigate to="/blog" replace />;
   }
 
