@@ -344,12 +344,12 @@ const featuredProjects = [
   },
   {
     id: '02',
-    title: 'YEAH',
+    title: 'COMMITSTORYGEN',
     tags: ['JavaScript', 'GitHub API', 'Story Generation'],
   },
   {
     id: '03',
-    title: 'YEAH',
+    title: 'PDFX',
     tags: ['TypeScript', 'PDF Processing', 'Offline Tools'],
   },
   {
