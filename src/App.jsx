@@ -187,7 +187,7 @@ function App() {
       <ScrollToTop />
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-grow pt-36 md:pt-24">
+        <main className="flex-grow pt-32 md:pt-20">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
