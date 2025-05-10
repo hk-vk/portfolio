@@ -187,12 +187,12 @@ function App() {
       <ScrollToTop />
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-grow pt-32 md:pt-20">
+        <main className="flex-grow pt-10 md:pt-15">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/projects" element={<Projects />} />
-            <Route path="/skills" element={<Skills />} />
+            {/* <Route path="/skills" element={<Skills />} /> */}
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:postId" element={<BlogPostPage />} />
             <Route path="/contact" element={<Contact />} />
