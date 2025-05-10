@@ -66,10 +66,11 @@ const Navbar = () => {
       animate="visible"
       variants={headerVariants}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-background/98 backdrop-blur-md py-3 shadow-lg border-b border-border/50' : 'bg-background py-5'
-      }`}
+        isScrolled ? 'bg-background/98 backdrop-blur-md shadow-lg border-b border-border/50' : 'bg-background'
+      } ${isScrolled ? 'py-3' : 'py-5'} md:py-5`}
     >
       <div className="content-container">
+        {/* Top row: Logo and Desktop Nav/Mobile Theme Toggle */}
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="relative z-[60]">
@@ -115,10 +116,10 @@ const Navbar = () => {
                       <SparkleIllustration className="text-primary" size={16} />
                     </motion.div>
                   )}
-                  <motion.div 
+                  <motion.div
                     className={`h-0.5 bg-gradient-to-r from-primary to-accent absolute -bottom-0 left-0 right-0`}
                     layoutId="desktop-active-underline"
-                    initial={false} 
+                    initial={false}
                     animate={{ width: isActive ? "100%" : "0%" }}
                     transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   />
@@ -126,41 +127,41 @@ const Navbar = () => {
               );
             })}
             
-            {/* Theme Toggle */}
-            <motion.div 
-              whileHover={{ y: -2, rotate: 5 }} 
+            {/* Theme Toggle for Desktop */}
+            <motion.div
+              whileHover={{ y: -2, rotate: 5 }}
               className="z-[60] ml-2"
             >
               <ThemeToggle />
             </motion.div>
           </div>
 
-          {/* Mobile Navigation - Scrollable Inline */}
-          <div className="md:hidden flex-1 overflow-hidden ml-4">
-            <div className="flex items-center space-x-6 overflow-x-auto whitespace-nowrap scrollbar-hide py-2 pr-4">
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`font-medium text-sm uppercase tracking-wide flex-shrink-0 transition-colors relative pb-1 ${
-                    location.pathname === link.path ? 'text-primary font-bold' : 'text-foreground hover:text-primary'
-                  }`}
-                >
-                  {link.name}
-                  {location.pathname === link.path && (
-                    <motion.div 
-                      className="h-1 bg-gradient-to-r from-primary to-accent w-full absolute bottom-0 left-0 rounded-t-md"
-                      layoutId="mobile-active-link"
-                      transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                    />
-                  )}
-                </Link>
-              ))}
-              <div className="flex-shrink-0 pl-2">
-                <ThemeToggle />
-              </div>
-            </div>
+          {/* Mobile Theme Toggle (visible on mobile, part of the first row) */}
+          <div className="md:hidden z-[60]">
+            <ThemeToggle />
           </div>
+        </div>
+
+        {/* Mobile Navigation Links (Second Row - visible only on mobile) */}
+        <div className="md:hidden flex flex-wrap items-center justify-center space-x-4 pt-3 mt-2 border-t border-border/30">
+          {mainLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`font-medium text-xs uppercase tracking-wide transition-colors relative py-1.5 ${
+                location.pathname === link.path ? 'text-primary font-semibold' : 'text-foreground hover:text-primary'
+              }`}
+            >
+              {link.name}
+              {location.pathname === link.path && (
+                <motion.div
+                  className="h-0.5 bg-gradient-to-r from-primary to-accent w-full absolute bottom-0 left-0 rounded-t-sm"
+                  layoutId="mobile-active-link"
+                  transition={{ type: "spring", stiffness: 180, damping: 25 }}
+                />
+              )}
+            </Link>
+          ))}
         </div>
       </div>
     </motion.header>
