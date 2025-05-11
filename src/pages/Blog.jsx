@@ -2,6 +2,7 @@ import React from 'react';
 import AnimatedSection from '../components/AnimatedSection';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import SparkleIllustration from '../components/SparkleIllustration';
 
 // Placeholder for Blog Post Card component - will be created in a separate step
 const BlogPostCard = ({ post }) => (
@@ -16,11 +17,26 @@ const BlogPostCard = ({ post }) => (
         {post.imageUrl ? (
           <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover rounded-md mb-4" />
         ) : (
-          <div className="w-full h-48 bg-muted/50 flex flex-col items-center justify-center rounded-md mb-4 p-4 text-center">
-            <svg className="w-12 h-12 text-muted-foreground/50 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-            <h3 className="text-sm font-medium text-muted-foreground/70">{post.title}</h3>
+          <div className="w-full h-48 rounded-md mb-4 p-6 text-center relative overflow-hidden 
+                          flex flex-col items-center justify-center 
+                          bg-gradient-to-br from-primary/5 via-accent/5 to-card">
+            {/* Decorative Sparkles */}
+            <SparkleIllustration size={16} className="absolute top-4 left-4 text-primary/30 opacity-70" />
+            <SparkleIllustration size={12} className="absolute bottom-6 right-8 text-accent/30 opacity-60" />
+            <SparkleIllustration size={10} className="absolute top-12 right-16 text-primary/20 opacity-50" />
+            <SparkleIllustration size={8} className="absolute bottom-10 left-12 text-accent/20 opacity-40" />
+
+            {/* Subtle background pattern (optional, can be complex to implement without new components) */}
+            {/* <div className="absolute inset-0 pattern-dots opacity-5"></div> */}
+
+            <div className="relative z-10">
+              {/* You can add a more stylized icon here if desired, or remove the SVG altogether */}
+              {/* For example, a simpler, abstract icon or just text */}
+              <svg className="w-10 h-10 text-primary/40 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25M9 17.25h6M9 17.25a2.25 2.25 0 002.25 2.25h1.5A2.25 2.25 0 0015 17.25M9 17.25V9.75M15 17.25V9.75m0-4.5c0-3.941-3.403-6-7.5-6S0 1.309 0 5.25M22.5 9.75c0-3.941-3.403-6-7.5-6S7.5 1.309 7.5 5.25M15 9.75c0 .75-.25 1.5-.656 2.118M9 9.75c0 .75.25 1.5.656 2.118" />              
+              </svg>
+              <h3 className="text-base font-light text-foreground/80 leading-snug">{post.title}</h3>
+            </div>
           </div>
         )}
         <h2 className="text-xl font-bold mb-2 text-foreground">{post.title}</h2>
