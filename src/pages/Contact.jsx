@@ -81,7 +81,7 @@ const Contact = () => {
     <div className="pt-32 pb-20">
       <div className="content-container">
         <AnimatedSection animation="fadeUp">
-          <h1 className="section-heading text-center">Get in Touch</h1>
+          <h1 className="text-3xl md:text-4xl font-bold uppercase text-center mb-6">CONTACT</h1>
           <p className="text-secondary text-center mt-4 max-w-2xl mx-auto">
             Have a project in mind or want to discuss a collaboration? I'd love to hear from you.
           </p>

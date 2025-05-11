@@ -374,7 +374,7 @@ const BlogPostPage = () => {
       <AnimatedSection animation="fadeUp">
         <div className="content-container max-w-3xl mx-auto">
           <motion.h1
-            className="text-4xl md:text-5xl font-bold mb-3 text-primary font-serif"
+            className="text-3xl md:text-4xl font-bold uppercase mb-4 text-primary font-serif"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}

@@ -72,7 +72,7 @@ const Blog = () => {
       <AnimatedSection animation="fadeUp">
         <div className="content-container text-center mb-16">
           <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-4"
+            className="text-3xl md:text-4xl font-bold uppercase mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}

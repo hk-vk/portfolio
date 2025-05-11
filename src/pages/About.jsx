@@ -58,7 +58,7 @@ const About = () => {
       
       <section className="content-container relative z-10">
         <AnimatedSection animation="fadeUp">
-          <h1 className="section-heading text-center">About Me</h1>
+          <h1 className="text-3xl md:text-4xl font-bold uppercase text-center mb-6">ABOUT</h1>
           <div className="w-16 h-1 bg-primary mx-auto mt-4 mb-8"></div>
         </AnimatedSection>
 
@@ -106,7 +106,7 @@ const About = () => {
       {/* Skills Section */}
       <section className="content-container mt-20">
         <AnimatedSection animation="fadeUp">
-          <h2 className="section-heading text-center">My Skills</h2>
+          <h2 className="text-3xl md:text-4xl font-bold uppercase text-center mb-6">SKILLS</h2>
           <p className="text-secondary text-center mt-4 max-w-2xl mx-auto">
             Here's what I work with to bring ideas to life
           </p>
@@ -130,7 +130,19 @@ const About = () => {
               className="space-y-2"
             >
               <div className="flex justify-between items-center">
-                <h3 className="font-medium">{skill.name}</h3>
+                <h3 className="font-medium flex items-center">
+                  <span className="mr-2 text-xl leading-none">
+                    {skill.name === "React/Next.js" && "⚛️"}
+                    {skill.name === "JavaScript/TypeScript" && "💻"}
+                    {skill.name === "HTML/CSS/Tailwind" && "🎨"}
+                    {skill.name === "Node.js/FastAPI" && "⚙️"}
+                    {skill.name === "PostgreSQL/MongoDB" && "💾"}
+                    {skill.name === "Python/PyTorch" && "🐍"}
+                    {skill.name === "Git/GitHub" && "🔗"}
+                    {skill.name === "Docker" && "🐳"}
+                  </span>
+                  {skill.name}
+                </h3>
                 <span className="text-secondary text-sm">{skill.level}%</span>
               </div>
               <div className="w-full h-2 bg-accent/20 rounded-full overflow-hidden">

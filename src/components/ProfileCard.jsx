@@ -16,7 +16,7 @@ const ProfileCard = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="w-full max-w-md mx-auto"
+      className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto"
     >
       <div className="relative">
         {/* Decorative elements */}
@@ -25,151 +25,127 @@ const ProfileCard = () => {
         
         {/* Main card with fancy gradient border */}
         <div className="relative p-[2px] rounded-xl bg-gradient-to-br from-primary/50 via-border to-accent/50 shadow-xl z-10">
-          <div className="bg-card rounded-xl p-6 md:p-8 flex flex-col items-center text-center h-full backdrop-blur-sm">
-            {/* Top accent bar */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent rounded-t-xl"></div>
+          <div className="bg-card rounded-xl flex flex-col h-full backdrop-blur-sm overflow-hidden">
+            {/* Top accent bar - this can remain if desired, or be removed if it clashes with the new image header */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent rounded-t-xl z-10"></div>
             
-            {/* Profile Image with animated container */}
-            <div className="relative mb-7">
-              <motion.div
-                className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full opacity-70 blur-sm"
-                animate={{ 
-                  rotate: [0, 360],
-                }}
-                transition={{ 
-                  duration: 10, 
-                  ease: "linear", 
-                  repeat: Infinity,
-                }}
+            {/* Profile Image Header */}
+            <div className="relative w-full h-48 sm:h-56 md:h-60">
+              <img 
+                src="/profile-placeholder.webp" 
+                alt="Harikrishnan V K" 
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.onerror = null; e.target.src='https://via.placeholder.com/400x240?text=Profile+Image';}}
               />
-              <motion.div 
-                className="relative w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden border-2 border-background bg-muted flex items-center justify-center"
-                whileHover={{ scale: 1.03 }}
-                transition={{ type: 'spring', stiffness: 400 }}
-              >
-                <img 
-                  src="/profile-placeholder.webp" 
-                  alt="Harikrishnan V K" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => { e.target.onerror = null; e.target.src='https://via.placeholder.com/160?text=Profile';}}
-                />
-              </motion.div>
-              
-              {/* Sparkle decoration */}
-              <motion.div 
-                className="absolute -top-2 -right-4 text-primary transform rotate-12"
-                animate={{ 
-                  rotate: [12, 20, 12],
-                  scale: [1, 1.1, 1],
-                }}
-                transition={{ 
-                  duration: 3, 
-                  ease: "easeInOut", 
-                  repeat: Infinity,
-                }}
-              >
-                <SparkleIllustration size={18} />
-              </motion.div>
+              {/* Scrim for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
+              {/* Name and Title Overlay */}
+              <div className="absolute bottom-0 left-0 p-4 sm:p-5 md:p-6">
+                <motion.h2 
+                  className="text-xl sm:text-2xl md:text-3xl font-bold text-white shadow-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.5 }}
+                >
+                  Harikrishnan V K
+                </motion.h2>
+                <motion.p 
+                  className="text-sm sm:text-md font-medium text-gray-200 shadow-sm"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  Full Stack Developer & Student
+                </motion.p>
+              </div>
             </div>
 
-            {/* Name and title with gradient */}
-            <motion.div 
-              className="mb-4"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-            >
-              <h2 className="text-2xl md:text-3xl font-bold mb-1 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Harikrishnan V K
-              </h2>
-              <p className="text-md font-medium text-foreground/80">
-                Full Stack Developer & Student
-              </p>
-            </motion.div>
+            {/* Content Section Below Image */}
+            <div className="p-4 sm:p-5 md:p-6 flex flex-col items-center text-center">
+              {/* Bio with subtle highlight */}
+              <motion.div 
+                className="mb-5 sm:mb-6 relative"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                <div className="w-16 h-1 bg-gradient-to-r from-primary/50 to-accent/50 mx-auto mb-3 sm:mb-4 rounded-full"></div>
+                <p className="text-xs sm:text-sm text-foreground/70 max-w-xs mx-auto leading-relaxed">
+                  Building digital experiences that combine clean code with intuitive design. Passionate about solving real problems with tech.
+                </p>
+              </motion.div>
 
-            {/* Bio with subtle highlight */}
-            <motion.div 
-              className="mb-6 relative"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-            >
-              <div className="w-16 h-1 bg-gradient-to-r from-primary/50 to-accent/50 mx-auto mb-4 rounded-full"></div>
-              <p className="text-sm text-foreground/70 max-w-xs mx-auto leading-relaxed">
-                Building digital experiences that combine clean code with intuitive design. Passionate about solving real problems with tech.
-              </p>
-            </motion.div>
+              {/* Skills */}
+              <motion.div 
+                className="mb-5 sm:mb-6 w-full max-w-xs mx-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-semibold">Key Skills</h3>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {skills.map((skill, index) => (
+                    <motion.span 
+                      key={index} 
+                      className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 text-primary hover:text-primary-foreground text-xs font-medium border border-primary/20 transition-colors duration-200"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 + index * 0.05, type: 'spring', stiffness: 400, damping: 15 }}
+                      whileHover={{ y: -2, backgroundImage: 'linear-gradient(to right, var(--primary), var(--accent))', scale: 1.05 }}
+                    >
+                      {skill}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
 
-            {/* Skills */}
-            <motion.div 
-              className="mb-6 w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-semibold">Key Skills</h3>
-              <div className="flex flex-wrap justify-center gap-2">
-                {skills.map((skill, index) => (
-                  <motion.span 
-                    key={index} 
-                    className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 text-primary hover:text-primary-foreground text-xs font-medium border border-primary/20 transition-colors duration-200"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.05, type: 'spring', stiffness: 400, damping: 15 }}
-                    whileHover={{ y: -2, backgroundImage: 'linear-gradient(to right, var(--primary), var(--accent))', scale: 1.05 }}
+              {/* Social links */}
+              <motion.div 
+                className="flex justify-center space-x-2 sm:space-x-3 mb-5 sm:mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+              >
+                {socialLinks.map((social, index) => (
+                  <motion.a
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
+                    whileHover={{ y: -3, scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 400 }}
                   >
-                    {skill}
-                  </motion.span>
+                    <svg 
+                      className="w-4 h-4" 
+                      fill="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path d={social.icon} />
+                    </svg>
+                  </motion.a>
                 ))}
-              </div>
-            </motion.div>
+              </motion.div>
 
-            {/* Social links */}
-            <motion.div 
-              className="flex justify-center space-x-3 mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-            >
-              {socialLinks.map((social, index) => (
-                <motion.a
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10 hover:bg-primary/20 text-primary transition-colors"
-                  whileHover={{ y: -3, scale: 1.1 }}
-                  transition={{ type: 'spring', stiffness: 400 }}
-                >
-                  <svg 
-                    className="w-4 h-4" 
-                    fill="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path d={social.icon} />
-                  </svg>
-                </motion.a>
-              ))}
-            </motion.div>
-
-            {/* Call to action */}
-            <motion.a
-              href="#contact"
-              className="relative overflow-hidden button-primary py-2.5 px-6 inline-flex items-center group"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7, duration: 0.5, type: 'spring', stiffness: 200 }}
-              whileHover={{ scale: 1.03 }}
-            >
-              <span className="relative z-10">Get in Touch</span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                initial={{ backgroundPosition: "0% 0%" }}
-                animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              />
-              <SparkleIllustration size={12} className="relative z-10 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
-            </motion.a>
+              {/* Call to action */}
+              <motion.a
+                href="#contact"
+                className="relative overflow-hidden button-primary py-2.5 px-6 inline-flex items-center group"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.7, duration: 0.5, type: 'spring', stiffness: 200 }}
+                whileHover={{ scale: 1.03 }}
+              >
+                <span className="relative z-10">Get in Touch</span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  initial={{ backgroundPosition: "0% 0%" }}
+                  animate={{ backgroundPosition: ["0% 0%", "100% 0%"] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+                <SparkleIllustration size={12} className="relative z-10 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+              </motion.a>
+            </div>
           </div>
         </div>
       </div>
