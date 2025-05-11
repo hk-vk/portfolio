@@ -312,8 +312,8 @@ const Home = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <a
-              href="mailto:your.email@example.com?subject=Portfolio Inquiry"
+            <Link
+              to="/contact"
               className="button-primary inline-flex items-center text-lg group"
             >
               Contact Me
@@ -325,7 +325,7 @@ const Home = () => {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
-            </a>
+            </Link>
           </motion.div>
         </div>
       </AnimatedSection>

@@ -42,37 +42,38 @@ const BlogPostCard = ({ post }) => (
 const Blog = () => {
   const blogPosts = [
     {
-      id: "my-first-blog-post",
-      title: "My First Blog Post",
-      date: "October 26, 2023",
-      excerpt: "This is a short summary of my very first blog post. I'm excited to start sharing my thoughts...",
-      imageUrl: null, // Or add a placeholder image URL e.g., 'https://picsum.photos/seed/firstpost/600/400'
+      id: "portfolio-speed-reader-blog",
+      title: "Super Speedy Reading on My Site! How I Did It",
+      date: "May 11, 2025",
+      excerpt: "Ever wanted to read blog posts super fast? I added a speed reader to my portfolio, and here\'s how I did it, keeping it simple!",
+      imageUrl: null,
       content: `
-        This is the content of my very first blog post. I'm excited to start sharing my thoughts and experiences.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Hey everyone!
 
-        Further details and more paragraphs can go here. We can talk about various topics and share insights.
-        The structure of the blog allows for multiple paragraphs and even embedded images or code snippets if needed later.
+        So, I had this cool idea: what if you could read stuff on my blog, like, REALLY fast? That\'s where a speed reader comes in! It flashes words at you one by one, so you can zoom through text.
+
+        Why a speed reader, you ask?
+        Well, sometimes you just want to get the main points SUPER quick, right? Or maybe you\'re just curious to see how fast you can actually read. Plus, it\'s a fun little techy thing to add to a portfolio.
+
+        How I built it (the simple version!):
+        Okay, so making a speed reader sounds complicated, but the basic idea isn\'t too crazy.
+
+        1.  **Get the Text:** First, the code grabs all the words from the blog post. Easy peasy.
+        2.  **Split it Up:** Then, it breaks that big chunk of text into single words. Like making a list of every word.
+        3.  **Flash Them:** This is the fun part! The code takes each word from the list and shows it on the screen for a tiny moment. Then it shows the next word, and the next, and so on.
+        4.  **You Control the Speed:** I added a little button or slider so YOU can decide how fast the words appear. Want to go super slow? Cool. Want to feel like a reading superhero? Crank it up!
+
+        Some thoughts and ideas I had:
+        *   **Where to put it?** I thought about having a button on each blog post like "Read with Speed Reader!"
+        *   **Making it look good:** The words need to be easy to see, maybe big and in the middle of the screen.
+        *   **Pausing and Playing:** Definitely need a way to stop and start it, in case you get a phone call or something.
+
+        It was a neat little project! It makes you think about how we read and how tech can change that. Maybe not everyone will use it all the time, but it\'s a cool feature to have, and it was fun to figure out how to make it work.
+
+        Let me know if you try it out and what you think!
       `
-    },
-    {
-      id: "another-cool-post",
-      title: "Another Cool Post Title",
-      date: "October 28, 2023",
-      excerpt: "A brief look into another interesting topic, with more details inside the full post.",
-      imageUrl: 'https://picsum.photos/seed/secondpost/600/400', // Example with an image
-      content: `
-        This is the main content for 'Another Cool Post'.
-        It explores different ideas and provides more in-depth information.
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, 
-        eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-      `
-    },
-    // Add more blog posts here as needed
+    }
+    // Add more blog posts here as needed // Ensure this comment remains if you want to add more later, or remove it if this is the only post.
   ];
 
   return (

@@ -63,17 +63,12 @@ const Contact = () => {
     {
       icon: "📍",
       title: "Location",
-      details: "San Francisco, CA, USA",
+      details: "Kerala, India",
     },
     {
       icon: "📧",
       title: "Email",
-      details: "contact@portfolio.com",
-    },
-    {
-      icon: "📞",
-      title: "Phone",
-      details: "+1 (123) 456-7890",
+      details: "vkharikrishnan45@gmail.com",
     },
   ];
 
@@ -257,6 +252,7 @@ const Contact = () => {
         </div>
 
         {/* Map or Additional Content */}
+        {/* 
         <AnimatedSection animation="fadeUp" delay={0.3} className="mt-16">
           <div className="bg-card border border-accent/10 rounded-xl p-2 overflow-hidden">
             <div className="aspect-[21/9] bg-accent/10 rounded-lg flex items-center justify-center">
@@ -264,6 +260,7 @@ const Contact = () => {
             </div>
           </div>
         </AnimatedSection>
+        */}
       </div>
     </div>
   );
