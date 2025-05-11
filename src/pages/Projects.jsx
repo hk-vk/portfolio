@@ -88,10 +88,10 @@ const Projects = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background ${
                   selectedCategory === category
-                    ? 'bg-primary text-white'
-                    : 'bg-muted text-foreground hover:bg-muted/70'
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'
                 }`}
               >
                 {category}

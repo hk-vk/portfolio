@@ -160,13 +160,13 @@ const Home = () => {
                   >
                     <Link
                       to="/projects"
-                      className="button-primary font-medium"
+                      className="button-primary"
                     >
                       View Projects
                     </Link>
                     <Link
                       to="/contact"
-                      className="button-secondary font-medium"
+                      className="button-secondary"
                     >
                       Get in Touch
                     </Link>
@@ -314,7 +314,7 @@ const Home = () => {
           >
             <a
               href="mailto:your.email@example.com?subject=Portfolio Inquiry"
-              className="button-primary inline-flex items-center text-lg px-8 py-3 group"
+              className="button-primary inline-flex items-center text-lg group"
             >
               Contact Me
               <svg

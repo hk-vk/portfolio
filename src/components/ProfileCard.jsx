@@ -130,7 +130,7 @@ const ProfileCard = () => {
             {/* Call to action */}
             <motion.a
               href="#contact"
-              className="relative overflow-hidden button-primary py-2.5 px-6 inline-flex items-center group"
+              className="button-primary inline-flex items-center group"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.7, duration: 0.5, type: 'spring', stiffness: 200 }}

@@ -98,11 +98,11 @@
   }
 
   .button-primary {
-    @apply bg-primary hover:bg-primary/90 text-white rounded-md px-4 py-2 transition-all duration-300 hover:translate-y-[-2px] hover:shadow-md active:translate-y-[0px];
+    @apply bg-primary hover:bg-primary/80 text-primary-foreground rounded-md px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
   .button-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-white rounded-md px-4 py-2 transition-all duration-300 hover:translate-y-[-2px] hover:shadow-md active:translate-y-[0px];
+    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-md px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
   }
 
   .skill-tag {
