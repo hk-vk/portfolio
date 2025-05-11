@@ -2,40 +2,82 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+// Utility function to strip Markdown syntax
+const stripMarkdown = (markdownText) => {
+  if (!markdownText) return '';
+  
+  // Replace headers
+  let plainText = markdownText.replace(/^#{1,6}\s+/gm, '');
+  
+  // Replace bold and italic
+  plainText = plainText.replace(/\*\*(.+?)\*\*/g, '$1'); // Bold
+  plainText = plainText.replace(/\*(.+?)\*/g, '$1'); // Italic
+  plainText = plainText.replace(/_(.+?)_/g, '$1'); // Italic with underscores
+  plainText = plainText.replace(/__(.*?)__/g, '$1'); // Bold with underscores
+  
+  // Replace links
+  plainText = plainText.replace(/\[(.+?)\]\(.+?\)/g, '$1');
+  
+  // Replace lists
+  plainText = plainText.replace(/^[\*\-\+]\s+/gm, ''); // Unordered lists
+  plainText = plainText.replace(/^\d+\.\s+/gm, ''); // Ordered lists
+  
+  // Replace blockquotes
+  plainText = plainText.replace(/^>\s+/gm, '');
+  
+  // Replace code blocks and inline code
+  plainText = plainText.replace(/```[a-z]*\n[\s\S]*?\n```/g, ''); // Code blocks
+  plainText = plainText.replace(/`([^`]+)`/g, '$1'); // Inline code
+  
+  // Replace images
+  plainText = plainText.replace(/!\[.*?\]\(.*?\)/g, '');
+  
+  // Remove any HTML tags
+  plainText = plainText.replace(/<[^>]*>/g, '');
+  
+  // Fix consecutive spaces
+  plainText = plainText.replace(/\s+/g, ' ');
+  
+  // Special case: Remove the underscore in the Toffler quote
+  plainText = plainText.replace(/^_(.*)_$/gm, '$1');
+  
+  return plainText.trim();
+};
 
 // Temporary: Define posts here. In a real app, this would come from a CMS, API, or context.
 const blogPostsData = [
   {
-    id: "my-first-blog-post",
-    title: "My First Blog Post",
-    date: "October 26, 2023",
-    excerpt: "This is a short summary of my very first blog post. I'm excited to start sharing my thoughts...",
+    id: "portfolio-speed-reader-blog",
+    title: "Don't spend too much time reading my blogs.",
+    date: "May 11, 2025",
+    excerpt: "Seriously, who has time for long reads? Use my speed reader and get on with your day. Here's why it's awesome.",
     imageUrl: null,
     content: `
-      This is the content of my very first blog post. I'm excited to start sharing my thoughts and experiences.
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+# Don't spend too much time reading my blogs.
 
-      Further details and more paragraphs can go here. We can talk about various topics and share insights.
-      The structure of the blog allows for multiple paragraphs and even embedded images or code snippets if needed later.
+Seriously. You've got stuff to do. I've got stuff to do. Let's not make this a whole thing.
+
+That's why I built a speed reader into this site. It's that little button up there. Click it.
+
+## Why Bother?
+
+*   **Time:** You get the gist, fast.
+*   **Focus:** No distractions, just words.
+*   **Magic:** Okay, not magic, but it feels pretty cool.
+
+## How It Works (The TL;DR Version)
+
+It flashes words at you. Your brain does the rest. Science! (Sort of). You can control the speed. Faster is... well, faster.
+
+## So, Go Ahead.
+
+Try the speed reader on this very post. See? Done. Now go build something amazing. Or take a nap. Your call.
     `
-  },
-  {
-    id: "another-cool-post",
-    title: "Another Cool Post Title",
-    date: "October 28, 2023",
-    excerpt: "A brief look into another interesting topic, with more details inside the full post.",
-    imageUrl: 'https://picsum.photos/seed/secondpost/600/400',
-    content: `
-      This is the main content for 'Another Cool Post'.
-      It explores different ideas and provides more in-depth information.
-      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, 
-      eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-      Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
-    `
-  },
+  }
+  // Add more blog posts here as needed // Ensure this comment remains if you want to add more later, or remove it if this is the only post.
 ];
 
 const SpeedReaderControls = ({ 
@@ -137,7 +179,10 @@ const SpeedReader = ({ content, isActive, wordsPerMinute, chunkSize }) => {
   const totalWordsRef = useRef(0);
 
   useEffect(() => {
-    const allWords = content
+    // Strip markdown syntax before processing
+    const plainTextContent = stripMarkdown(content);
+    
+    const allWords = plainTextContent
       .split('\n')
       .filter(para => para.trim())
       .flatMap(para => para.trim().split(/\s+/))
@@ -249,7 +294,10 @@ const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const paragraphs = content.split('\n').filter(p => p.trim() !== '');
+    // Strip markdown syntax before processing
+    const plainTextContent = stripMarkdown(content);
+    
+    const paragraphs = plainTextContent.split('\n').filter(p => p.trim() !== '');
     let wordCounter = 0;
     const processedWords = paragraphs.map((paragraph, pIndex) => {
       const words = paragraph.trim().split(/\s+/).filter(w => w.length > 0);
@@ -442,9 +490,7 @@ const BlogPostPage = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
             >
-              {post.content.split('\n').map((paragraph, index) => (
-                paragraph.trim() && <p key={index}>{paragraph.trim()}</p>
-              ))}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
             </motion.div>
           )}
         </div>
