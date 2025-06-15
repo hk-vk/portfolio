@@ -278,27 +278,29 @@ html {
   border: 1px solid hsl(var(--border));
   padding: 2px;
   transition: all 0.3s ease;
+  border-radius: var(--radius);
 }
 
 .fancy-border::before {
   content: '';
   position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  border: 1px solid hsl(var(--primary) / 0.3);
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 1px solid hsl(var(--border) / 0.3);
   pointer-events: none;
   z-index: -1;
+  border-radius: calc(var(--radius) + 4px);
   transition: all 0.3s ease;
 }
 
 .fancy-border:hover::before {
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
-  border-color: hsl(var(--primary) / 0.6);
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-color: hsl(var(--primary) / 0.4);
 }
 
 /* Portfolio image container */

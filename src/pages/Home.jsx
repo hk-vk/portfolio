@@ -46,7 +46,7 @@ const Home = () => {
   };
 
   return (
-    <div className="pt-32 pb-20">
+    <div className="pt-12 md:pt-20 pb-20">
       {/* Hero Section */}
       <AnimatedSection className="mb-24">
         <div className="content-container relative">
@@ -77,7 +77,7 @@ const Home = () => {
                     rows={12} 
                     columns={12} 
                     containerSize="120%" 
-                    lineColor="hsl(var(--primary) / 0.2)" 
+                    lineColor="hsl(var(--primary) / 0.1)" 
                     lineWidth="0.3vmin" 
                     lineHeight="3vmin" 
                     baseAngle={-15} 
