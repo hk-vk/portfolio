@@ -66,10 +66,13 @@ const Home = () => {
           <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
           <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
-          <div className="fancy-border p-4 md:p-8 mb-16 relative">
+          <motion.div
+            className="relative mb-16 rounded-2xl bg-background/70 backdrop-blur-lg shadow-2xl ring-2 ring-primary/15 p-6 md:p-12"
+            whileHover={{ scale: 1.02 }}
+          >
             <HeroHighlightLine />
 
-            <div className="border border-border flex flex-col md:flex-row items-center justify-between">
+            <div className="flex flex-col md:flex-row items-center justify-between md:divide-x md:divide-border/40">
               <div className="p-6 md:p-10 flex-1 relative">
                 {/* MagnetLines Component */}
                 <div className="absolute inset-0 -left-10 -top-10 -z-10 overflow-hidden opacity-75">
@@ -193,7 +196,7 @@ const Home = () => {
                 </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </AnimatedSection>
 
