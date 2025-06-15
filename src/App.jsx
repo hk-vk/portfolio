@@ -60,7 +60,8 @@ function App() {
           const newProgress = prev + Math.random() * 25; // Increased random step
           if (newProgress >= 100) {
             clearInterval(interval);
-            setLoading(false); // Remove the setTimeout delay
+            // small delay for exit animation
+            setTimeout(() => setLoading(false), 700);
             return 100;
           }
           return newProgress;
