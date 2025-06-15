@@ -201,7 +201,12 @@ const Navbar = () => {
                     initial={false}
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                   >
-                    <SparkleIllustration className="text-primary drop-shadow" size={16} />
+                    <motion.span
+                      animate={{ rotate: [0, 15, -15, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
+                    >
+                      <SparkleIllustration className="text-primary drop-shadow" size={18} />
+                    </motion.span>
                   </motion.div>
                 )}
               </motion.div>

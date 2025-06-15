@@ -11,12 +11,8 @@ const SparkleIllustration = ({ className = '', size = 24 }) => {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 2L13.59 8.41L20 10L13.59 11.59L12 18L10.41 11.59L4 10L10.41 8.41L12 2Z"
+        d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.82 8.63 12 2 9.18 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27Z"
         fill="currentColor"
-        stroke="black"
-        strokeWidth="1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   );
