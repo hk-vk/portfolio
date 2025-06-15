@@ -159,7 +159,7 @@ const Home = () => {
           {/* Background watermark */}
           <div className="pointer-events-none select-none absolute inset-0 -z-10">
             <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -top-20 -left-8">HARI</h1>
-            <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 -right-6">KRISHNAN</h1>
+            <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
           </div>
         </div>
       </AnimatedSection>
