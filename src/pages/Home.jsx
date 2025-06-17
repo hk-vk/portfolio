@@ -1,41 +1,197 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { spring } from '../utils/motionSettings';
 import { useMotionSafe } from '../utils/useMotionSafe';
 import { Link } from 'react-router-dom';
-import AnimatedSection from '../components/AnimatedSection';
-import SparkleIllustration from '../components/SparkleIllustration';
-import HeroHighlightLine from '../components/HeroHighlightLine';
-import MagnetLines from '../components/MagnetLines';
+import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
+
+// Lazy load heavy components for better performance
+const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
+const SparkleIllustration = lazy(() => import('../components/SparkleIllustration'));
+const HeroHighlightLine = lazy(() => import('../components/HeroHighlightLine'));
+const MagnetLines = lazy(() => import('../components/MagnetLines'));
+
+// Lightweight fallback components for instant loading
+const QuickSparkle = memo(() => (
+  <div className="w-4 h-4 bg-primary rounded-full animate-pulse"></div>
+));
+QuickSparkle.displayName = 'QuickSparkle';
+
+const QuickLoader = memo(({ className }) => (
+  <div className={`bg-gradient-to-r from-muted to-muted/50 animate-pulse rounded ${className}`}></div>
+));
+QuickLoader.displayName = 'QuickLoader';
+
+// Optimized project card with intersection observer and image loading
+const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
+  const cardVariants = useMemo(() => ({
+    hidden: { opacity: 0, y: 15 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { delay: 0.05 * index, duration: 0.25, ease: "easeOut" }
+    }
+  }), [index]);
+
+  const hoverVariants = useMemo(() => ({
+    y: -2,
+    rotateX: motionSafe ? -1 : 0,
+    rotateY: motionSafe ? 1 : 0,
+    scale: motionSafe ? 1.01 : 1,
+    transition: { duration: 0.15, ease: "easeOut" }
+  }), [motionSafe]);
+
+  return (
+    <motion.div
+      className="portfolio-item overflow-hidden group"
+      variants={cardVariants}
+      initial="hidden"
+      animate={isVisible ? "visible" : "hidden"}
+      whileHover={hoverVariants}
+      layout
+    >
+      <div className="relative overflow-hidden aspect-video bg-muted">
+        <AnimatePresence>
+          {!imageLoaded && (
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-br from-muted to-muted/80 flex items-center justify-center"
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className="text-4xl font-bold text-primary/40">{project.id}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-t from-background/95 to-transparent flex items-end p-4"
+          initial={{ opacity: 0.9 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+        >
+          <div className="w-full">
+            <div className="flex flex-wrap gap-1 mb-2">
+              {project.tags.map((tag, i) => (
+                <span key={i} className="text-xs px-2 py-1 bg-background/90 text-foreground rounded-full backdrop-blur-sm">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <h3 className="text-lg font-bold mb-1">{project.title}</h3>
+            <motion.div
+              className="h-0.5 bg-primary rounded-full"
+              initial={{ width: 0 }}
+              animate={isVisible ? { width: "30%" } : { width: 0 }}
+              transition={{ delay: 0.15 + (0.03 * index), duration: 0.25 }}
+            />
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+});
+
+ProjectCard.displayName = 'ProjectCard';
+
+// Ultra-fast skill tag with reduced animations
+const SkillTag = memo(({ skill, index, isVisible }) => {
+  const skillVariants = useMemo(() => ({
+    initial: { opacity: 0, scale: 0.9 },
+    animate: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { delay: 0.6 + (index * 0.03), duration: 0.15, ease: "easeOut" }
+    },
+    hover: { scale: 1.03, y: -1, transition: { duration: 0.1 } }
+  }), [index]);
+
+  return (
+    <motion.span
+      className="skill-tag"
+      variants={skillVariants}
+      initial="initial"
+      animate={isVisible ? "animate" : "initial"}
+      whileHover="hover"
+    >
+      {skill}
+    </motion.span>
+  );
+});
+
+SkillTag.displayName = 'SkillTag';
 
 const Home = () => {
   const motionSafe = useMotionSafe();
+  const [sectionsVisible, setSectionsVisible] = useState({
+    hero: false,
+    projects: false,
+    experience: false
+  });
+  
+  const heroRef = useRef(null);
+  const projectsRef = useRef(null);
+  const experienceRef = useRef(null);
 
-  // Animation variants
-  const containerVariants = {
+  // Intersection observer for performance optimization
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '50px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.dataset.section;
+          setSectionsVisible(prev => ({ ...prev, [sectionId]: true }));
+        }
+      });
+    }, observerOptions);
+
+    const refs = [
+      { ref: heroRef, id: 'hero' },
+      { ref: projectsRef, id: 'projects' },
+      { ref: experienceRef, id: 'experience' }
+    ];
+
+    refs.forEach(({ ref, id }) => {
+      if (ref.current) {
+        ref.current.dataset.section = id;
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Ultra-fast animation variants
+  const containerVariants = useMemo(() => ({
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        staggerChildren: 0.03,
+        delayChildren: 0.05
       }
     }
-  };
+  }), []);
 
-  const childVariants = {
-    hidden: { y: 20, opacity: 0 },
+  const childVariants = useMemo(() => ({
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: spring
+      transition: { duration: 0.2, ease: "easeOut" }
     }
-  };
+  }), []);
 
-  // Decoration animation variants
-  const floatVariants = {
+  // Optimized float animation (reduced intensity)
+  const floatVariants = useMemo(() => ({
     animate: {
-      y: [0, -10, 0],
-      x: [0, 5, 0],
+      y: [0, -4, 0],
+      x: [0, 2, 0],
       transition: {
         duration: 6,
         repeat: Infinity,
@@ -43,24 +199,33 @@ const Home = () => {
         ease: "easeInOut"
       }
     }
-  };
+  }), []);
 
+  // Cached skills array
+  const skills = useMemo(() => [
+    "React", "TypeScript", "JavaScript", "Node.js", "UI/UX Design"
+  ], []);
+
+  // Memoized featured projects for this component
+  const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
     <div className="pt-12 md:pt-20 pb-20">
-      {/* Hero Section */}
-      <AnimatedSection className="mb-24">
+      {/* Instant loading hero section */}
+      <div ref={heroRef} className="mb-24">
         <div className="content-container relative">
-          {/* Decorative Elements */}
+          {/* Decorative Elements with conditional loading */}
           <motion.div
             className="absolute -right-10 top-20 opacity-80 z-10 hidden md:block"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 0.8, scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={sectionsVisible.hero ? { opacity: 0.8, scale: 1 } : {}}
+            transition={{ delay: 0.3, duration: 0.2 }}
             variants={floatVariants}
             whileInView="animate"
             viewport={{ once: false }}
           >
-            <SparkleIllustration className="transform rotate-12" size={24} />
+            <Suspense fallback={<QuickSparkle />}>
+              <SparkleIllustration className="transform rotate-12" size={24} />
+            </Suspense>
           </motion.div>
 
           <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
@@ -68,33 +233,50 @@ const Home = () => {
 
           <motion.div
             className="relative mb-16 rounded-2xl bg-background/70 backdrop-blur-lg shadow-2xl ring-2 ring-primary/15 p-6 md:p-12"
-            whileHover={{ scale: 1.02 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.3 }}
+            whileHover={{ scale: 1.005 }}
           >
-            <HeroHighlightLine />            <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-left">
-              {/* MagnetLines behind whole card */}
-              <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
-                <MagnetLines
-                  rows={10}
-                  columns={10}
-                  containerSize="110%"
-                  lineColor="hsl(var(--primary) / 0.08)"
-                  lineWidth="0.25vmin"
-                  lineHeight="3vmin"
-                  baseAngle={-15}
-                />
-              </div>              <motion.div
+            <Suspense fallback={<QuickLoader className="h-1 w-full mb-4" />}>
+              <HeroHighlightLine />
+            </Suspense>
+
+            <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-left">
+              {/* Conditional MagnetLines for better performance */}
+              {sectionsVisible.hero && (
+                <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
+                  <Suspense fallback={null}>
+                    <MagnetLines
+                      rows={8}
+                      columns={8}
+                      containerSize="100%"
+                      lineColor="hsl(var(--primary) / 0.06)"
+                      lineWidth="0.2vmin"
+                      lineHeight="2.5vmin"
+                      baseAngle={-15}
+                    />
+                  </Suspense>
+                </div>
+              )}
+
+              <motion.div
                 variants={containerVariants}
                 initial="hidden"
-                animate="visible"
+                animate={sectionsVisible.hero ? "visible" : "hidden"}
                 className="w-full"
               >
                 <motion.div
                   variants={childVariants}
                   className="flex items-center mb-4"
                 >
-                  <SparkleIllustration className="text-primary mr-2" size={16} />
+                  <Suspense fallback={<QuickSparkle />}>
+                    <SparkleIllustration className="text-primary mr-2" size={16} />
+                  </Suspense>
                   <h2 className="text-2xl md:text-3xl font-bold">HELLO!</h2>
-                </motion.div><motion.p
+                </motion.div>
+
+                <motion.p
                   variants={childVariants}
                   className="mb-6 text-xl text-left"
                 >
@@ -110,7 +292,9 @@ const Home = () => {
                   I create responsive web applications that combine clean design with efficient code.
                   My expertise ranges from interactive frontend interfaces to scalable backend systems.
                   I'm constantly learning and implementing new technologies to develop better solutions.
-                </motion.p>                <motion.div
+                </motion.p>
+
+                <motion.div
                   variants={childVariants}
                   className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-8 w-full"
                 >
@@ -131,174 +315,130 @@ const Home = () => {
                 <motion.div variants={childVariants} className="w-full">
                   <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
                   <div className="flex flex-wrap gap-2 justify-start">
-                    {["React", "TypeScript", "JavaScript", "Node.js", "UI/UX Design"].map((skill, index) => (
-                      <motion.span
-                        key={skill}
-                        className="skill-tag"
-                        whileHover={{ scale: 1.1, y: -2 }}
-                        transition={spring}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        custom={{ delay: 1 + (index * 0.1) }}
-                      >
-                        {skill}
-                      </motion.span>
+                    {skills.map((skill, index) => (
+                      <SkillTag 
+                        key={skill} 
+                        skill={skill} 
+                        index={index} 
+                        isVisible={sectionsVisible.hero}
+                      />
                     ))}
                   </div>
                 </motion.div>
               </motion.div>
             </div>
           </motion.div>
+          
           {/* Background watermark */}
           <div className="pointer-events-none select-none absolute inset-0 -z-10">
             <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -top-20 -left-8">HARI</h1>
             <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
           </div>
         </div>
-      </AnimatedSection>
+      </div>        {/* Projects Preview Section */}
+        <div ref={projectsRef} className="mb-24">
+          <div className="content-container">
+            <motion.div
+              className="mb-12 flex items-center"
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.25 }}
+            >
+              <Suspense fallback={<QuickSparkle />}>
+                <SparkleIllustration className="text-primary mr-2" size={16} />
+              </Suspense>
+              <h2 className="text-3xl font-bold">FEATURED PROJECTS</h2>
+            </motion.div>
 
-      {/* Projects Preview Section */}
-      <AnimatedSection className="mb-24">
-        <div className="content-container">
-          <motion.div
-            className="mb-12 flex items-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <SparkleIllustration className="text-primary mr-2" size={16} />
-            <h2 className="text-3xl font-bold">FEATURED PROJECTS</h2>
-          </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {memoizedProjects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  index={index}
+                  motionSafe={motionSafe}
+                  isVisible={sectionsVisible.projects}
+                />
+              ))}
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {featuredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                className="portfolio-item overflow-hidden group"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 * index, duration: 0.5 }}
-                whileHover={{
-                  y: -5,
-                  rotateX: motionSafe ? -3 : 0,
-                  rotateY: motionSafe ? 3 : 0,
-                  scale: motionSafe ? 1.03 : 1,
-                  transition: { duration: 0.3 }
-                }}
+            <motion.div
+              className="mt-12 text-center"
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.2, duration: 0.25 }}
+            >
+              <Link
+                to="/projects"
+                className="button-primary btn-gloss inline-flex items-center group"
               >
-                <div className="relative overflow-hidden aspect-video">
-                  <div className="bg-muted w-full h-full flex items-center justify-center portfolio-image">
-                    <span className="text-6xl font-bold text-primary opacity-20">{project.id}</span>
-                  </div>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-6"
-                    initial={{ opacity: 0.8 }}
-                    whileHover={{ opacity: 1 }}
-                  >
-                    <div>
-                      <div className="flex space-x-2 mb-3">
-                        {project.tags.map((tag, i) => (
-                          <span key={i} className="skill-tag bg-background/80 text-foreground">{tag}</span>
-                        ))}
-                      </div>
-                      <h3 className="text-xl font-bold">{project.title}</h3>
-                      <motion.div
-                        className="w-0 h-0.5 bg-primary mt-2"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: "40%" }}
-                        transition={{ delay: 0.3 + (0.1 * index), duration: 0.5 }}
-                      />
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
+                View All Projects
+                <svg
+                  className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-150"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+            </motion.div>
           </div>
-
-          <motion.div
-            className="mt-12 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          >
-            <Link
-              to="/projects"
-              className="button-primary btn-gloss inline-flex items-center"
+        </div>        {/* Experience Section */}
+        <div ref={experienceRef} className="py-16 md:py-24 bg-background">
+          <div className="content-container text-center">
+            <motion.div
+              className="mb-8 flex items-center justify-center"
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.25 }}
             >
-              View All Projects
-              <svg
-                className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <Suspense fallback={<QuickSparkle />}>
+                <SparkleIllustration className="text-primary mr-3" size={20} />
+              </Suspense>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">EXPERIENCE</h2>
+              <motion.span
+                animate={sectionsVisible.experience ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
-          </motion.div>
-        </div>
-      </AnimatedSection>
+                <Suspense fallback={<QuickSparkle />}>
+                  <SparkleIllustration className="text-accent ml-3" size={20} />
+                </Suspense>
+              </motion.span>
+            </motion.div>
 
-      {/* Experience Section */}
-      <AnimatedSection className="py-16 md:py-24 bg-background">
-        <div className="content-container text-center">
-          <motion.div
-            className="mb-8 flex items-center justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <SparkleIllustration className="text-primary mr-3" size={20} />
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">EXPERIENCE</h2>
-            <motion.span
-              animate={{ scale: [1, 1.4, 1] }}
-              transition={{ duration: 1.8, repeat: Infinity }}
+            <motion.p
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.25, delay: 0.1 }}
             >
-              <SparkleIllustration className="text-accent ml-3" size={20} />
-            </motion.span>
-          </motion.div>
+              I am currently seeking opportunities to gain professional experience and apply my skills
+              in a real-world setting. If you have a project or an opening where I can contribute
+              and grow, please feel free to reach out. Let's build something great together!
+            </motion.p>
 
-          <motion.p
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            I am currently seeking opportunities to gain professional experience and apply my skills
-            in a real-world setting. If you have a project or an opening where I can contribute
-            and grow, please feel free to reach out. Let's build something great together!
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Link
-              to="/contact"
-              className="button-primary btn-gloss inline-flex items-center text-lg group"
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.25, delay: 0.15 }}
             >
-              Contact Me
-              <svg
-                className="ml-2 w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <Link
+                to="/contact"
+                className="button-primary btn-gloss inline-flex items-center text-lg group"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
-          </motion.div>
+                Contact Me
+                <svg
+                  className="ml-2 w-5 h-5 transform transition-transform duration-150 group-hover:translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>            </motion.div>
+          </div>
         </div>
-      </AnimatedSection>
-
-      
     </div>
   );
 };

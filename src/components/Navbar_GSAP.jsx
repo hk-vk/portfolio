@@ -76,37 +76,35 @@ const Navbar = () => {
           transformStyle: "preserve-3d",
           ease: "silkySmooth"
         }
-      });
-
-      // Subtle container lift with ultra-smooth easing
+      });      // Subtle container lift with ultra-smooth easing
       tl.to(container, {
-        y: -5,
-        scale: 1.04,
-        duration: 0.5,
+        y: -2,
+        scale: 1.01,
+        duration: 0.4,
         ease: "ultraSmooth"
       }, 0)
 
       // Front face ultra-smooth flip out
       .to(frontFace, {
         rotationX: -90,
-        duration: 0.35,
+        duration: 0.25,
         ease: "power1.out",
-        transformOrigin: "center center -35px"
-      }, 0.08)
+        transformOrigin: "center center -30px"
+      }, 0.05)
 
       // Back face ultra-smooth flip in with gentle spring
       .fromTo(backFace, 
         {
           rotationX: 90,
-          transformOrigin: "center center -35px"
+          transformOrigin: "center center -30px"
         },
         {
           rotationX: 0,
-          duration: 0.4,
-          ease: "back.out(0.8)",
-          transformOrigin: "center center -35px"
+          duration: 0.3,
+          ease: "back.out(0.5)",
+          transformOrigin: "center center -30px"
         }, 
-        0.22
+        0.15
       );
 
       flipTimelinesRef.current[index] = tl;
@@ -131,37 +129,35 @@ const Navbar = () => {
           transformStyle: "preserve-3d",
           ease: "silkySmooth"
         }
-      });
-
-      // Container return to normal with gentle easing
+      });      // Container return to normal with gentle easing
       tl.to(container, {
         y: 0,
         scale: 1,
-        duration: 0.5,
+        duration: 0.4,
         ease: "ultraSmooth"
       }, 0)
 
       // Back face ultra-smooth flip out
       .to(backFace, {
         rotationX: 90,
-        duration: 0.32,
+        duration: 0.22,
         ease: "power1.in",
-        transformOrigin: "center center -35px"
-      }, 0.06)
+        transformOrigin: "center center -30px"
+      }, 0.03)
 
       // Front face ultra-smooth flip in with gentle bounce
       .fromTo(frontFace,
         {
           rotationX: -90,
-          transformOrigin: "center center -35px"
+          transformOrigin: "center center -30px"
         },
         {
           rotationX: 0,
-          duration: 0.38,
-          ease: "back.out(0.7)",
-          transformOrigin: "center center -35px"
+          duration: 0.28,
+          ease: "back.out(0.4)",
+          transformOrigin: "center center -30px"
         },
-        0.2
+        0.13
       );
 
       flipTimelinesRef.current[index] = tl;
@@ -183,26 +179,24 @@ const Navbar = () => {
       y: 50,
       opacity: 0,
     },
-  };
-  const navItemVariants = {
+  };  const navItemVariants = {
     hover: {
-      scale: 1.02,
-      y: -3,
+      scale: 1.01,
+      y: -1,
       transition: {
         type: 'spring',
-        stiffness: 350,
-        damping: 30,
-        mass: 0.4,
-        velocity: 2
+        stiffness: 300,
+        damping: 35,
+        mass: 0.5
       }
     },
     tap: {
-      scale: 0.98,
+      scale: 0.99,
       y: 0,
       transition: {
         type: 'spring',
-        stiffness: 500,
-        damping: 35,
+        stiffness: 400,
+        damping: 40,
         mass: 0.3
       }
     }
@@ -295,20 +289,20 @@ const Navbar = () => {
         <span className="hidden sm:inline-block w-px h-6 bg-border/40 mx-2"></span>        {/* Enhanced Theme Toggle */}
         <motion.div
           whileHover={{ 
-            scale: 1.08, 
-            rotate: 12,
-            y: -3
+            scale: 1.03, 
+            rotate: 6,
+            y: -1
           }}
           whileTap={{ 
-            scale: 0.92, 
+            scale: 0.97, 
             rotate: 0 
           }}
           transition={{ 
-            duration: 0.4,
+            duration: 0.3,
             type: 'spring',
-            stiffness: 350,
-            damping: 30,
-            mass: 0.4
+            stiffness: 300,
+            damping: 35,
+            mass: 0.5
           }}
           className="ml-2 flex-shrink-0"
         >
