@@ -6,7 +6,7 @@ import './index.css';
 import { motion } from 'framer-motion';
 
 // Components
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar_GSAP';
 import Footer from './components/Footer';
 import CharacterIllustration from './components/CharacterIllustration';
 import GreenBallIllustration from './components/GreenBallIllustration';

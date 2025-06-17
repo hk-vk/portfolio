@@ -70,9 +70,7 @@ const Home = () => {
             className="relative mb-16 rounded-2xl bg-background/70 backdrop-blur-lg shadow-2xl ring-2 ring-primary/15 p-6 md:p-12"
             whileHover={{ scale: 1.02 }}
           >
-            <HeroHighlightLine />
-
-            <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-center md:text-left">
+            <HeroHighlightLine />            <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-left">
               {/* MagnetLines behind whole card */}
               <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
                 <MagnetLines
@@ -84,12 +82,11 @@ const Home = () => {
                   lineHeight="3vmin"
                   baseAngle={-15}
                 />
-              </div>
-
-              <motion.div
+              </div>              <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
+                className="w-full"
               >
                 <motion.div
                   variants={childVariants}
@@ -97,11 +94,9 @@ const Home = () => {
                 >
                   <SparkleIllustration className="text-primary mr-2" size={16} />
                   <h2 className="text-2xl md:text-3xl font-bold">HELLO!</h2>
-                </motion.div>
-
-                <motion.p
+                </motion.div><motion.p
                   variants={childVariants}
-                  className="mb-6 text-xl"
+                  className="mb-6 text-xl text-left"
                 >
                   I'm a Full Stack Developer based in India.
                   <br />
@@ -110,34 +105,32 @@ const Home = () => {
 
                 <motion.p
                   variants={childVariants}
-                  className="mb-8 text-muted-foreground"
+                  className="mb-8 text-muted-foreground text-left"
                 >
                   I create responsive web applications that combine clean design with efficient code.
                   My expertise ranges from interactive frontend interfaces to scalable backend systems.
                   I'm constantly learning and implementing new technologies to develop better solutions.
-                </motion.p>
-
-                <motion.div
+                </motion.p>                <motion.div
                   variants={childVariants}
-                  className="flex space-x-4 mb-8"
+                  className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-8 w-full"
                 >
                   <Link
                     to="/projects"
-                    className="button-primary btn-gloss"
+                    className="button-primary btn-gloss text-center sm:text-left"
                   >
                     View Projects
                   </Link>
                   <Link
                     to="/contact"
-                    className="button-secondary btn-gloss"
+                    className="button-secondary btn-gloss text-center sm:text-left"
                   >
                     Get in Touch
                   </Link>
                 </motion.div>
 
-                <motion.div variants={childVariants}>
-                  <h3 className="text-sm uppercase tracking-widest mb-3">Main Skills</h3>
-                  <div className="flex flex-wrap gap-2">
+                <motion.div variants={childVariants} className="w-full">
+                  <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
+                  <div className="flex flex-wrap gap-2 justify-start">
                     {["React", "TypeScript", "JavaScript", "Node.js", "UI/UX Design"].map((skill, index) => (
                       <motion.span
                         key={skill}

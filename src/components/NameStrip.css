@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css?family=PT+Mono');
+
+.name-strip {
+  width: 100%;
+  max-width: 400px;
+  min-width: 250px;
+  display: block;
+  height: 60px;
+  position: relative;
+  border-radius: 8px;
+  background: linear-gradient(to right, #abbd73 35%, #d6e2ad 100%);
+  margin: 20px auto;
+  padding: 18px 25px 0 50px;
+  color: #2f4f4f;
+  box-shadow: 2px 4px 8px rgba(119, 119, 119, 0.3);
+  transition: all 300ms ease-in-out;
+  font-family: 'PT Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.name-strip.shadow {
+  position: relative;
+}
+
+.name-strip.shadow:before {
+  z-index: -1;
+  position: absolute;
+  content: "";
+  bottom: 15px;
+  right: 8px;
+  width: 30%;
+  top: 0;
+  box-shadow: 0 18px 12px rgba(119, 119, 119, 0.4);
+  transform: rotate(4deg);
+  transition: all 200ms ease-in-out;
+}
+
+.name-strip:hover {
+  background: linear-gradient(to right, #abbd73 0%, #abbd73 100%);
+  transform: translateY(-2px);
+  box-shadow: 2px 6px 12px rgba(119, 119, 119, 0.4);
+}
+
+.name-strip.shadow:hover::before {
+  transform: rotate(0deg);
+  bottom: 22px;
+  z-index: -10;
+}
+
+.circle {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  border-radius: 50%;
+  box-shadow: 
+    inset 2px 2px 2px 0px rgba(0, 0, 0, 0.3), 
+    inset 0 0 0 25px #faebd7;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  transition: all 200ms ease-in-out;
+}
+
+.name-strip:hover .circle {
+  box-shadow: 
+    inset 2px 2px 2px 0px rgba(0, 0, 0, 0.4), 
+    inset 0 0 0 25px #f5f5dc;
+  transform: scale(1.1);
+}
+
+.name-text {
+  display: inline-block;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-left: 5px;
+  transition: all 200ms ease-in-out;
+}
+
+.name-strip:hover .name-text {
+  color: #1a3a1a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme support */
+.dark .name-strip {
+  background: linear-gradient(to right, #4a5d3a 35%, #6b7d5a 100%);
+  color: #e8f5e8;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .name-strip:hover {
+  background: linear-gradient(to right, #4a5d3a 0%, #4a5d3a 100%);
+}
+
+.dark .circle {
+  box-shadow: 
+    inset 2px 2px 2px 0px rgba(0, 0, 0, 0.5), 
+    inset 0 0 0 25px #2a2a2a;
+}
+
+.dark .name-strip:hover .circle {
+  box-shadow: 
+    inset 2px 2px 2px 0px rgba(0, 0, 0, 0.6), 
+    inset 0 0 0 25px #1a1a1a;
+}
+
+.dark .name-strip:hover .name-text {
+  color: #b8d4b8;
+}

@@ -51,16 +51,24 @@ const Navbar = () => {
       y: 50,
       opacity: 0,
     },
-  };
-
-  const navItemVariants = {
+  };  const navItemVariants = {
     hover: {
-      scale: 1.05,
-      y: -3,
+      scale: 1.02,
+      y: -2,
       transition: {
         type: 'spring',
         stiffness: 400,
-        damping: 10
+        damping: 25,
+        mass: 0.5,
+      }
+    },
+    tap: {
+      scale: 0.98,
+      y: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 600,
+        damping: 30,
       }
     }
   };
@@ -79,10 +87,10 @@ const Navbar = () => {
           {mainLinks.map((link, idx) => {
             const isActive = idx === activeIndex;
             const isHovered = idx === hoverIndex;
-            return (
-              <motion.div
+            return (              <motion.div
                 key={link.path}
                 whileHover="hover"
+                whileTap="tap"
                 variants={navItemVariants}
                 className="relative flex flex-col items-center justify-center min-w-[64px]"
                 onMouseEnter={() => setHoverIndex(idx)}
@@ -91,60 +99,71 @@ const Navbar = () => {
                   perspective: '400px',
                 }}
               >
-                <Link
-                  to={link.path}
+                <div
                   className="relative block overflow-hidden"
                   style={{
                     width: '64px',
                     height: '48px',
                     transformStyle: 'preserve-3d',
                   }}
-                >
-                  {/* Front face with icon */}
+                >                  {/* Front face with icon */}
                   <motion.div
-                    className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${
-                      isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-background/50 text-foreground hover:text-primary hover:bg-background'
+                    className={`absolute inset-0 flex flex-col items-center justify-center ${
+                      isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-background/50 text-foreground'
                     } backdrop-blur-sm border border-border/20 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
+                      backfaceVisibility: 'hidden',
                     }}
                     animate={{
                       rotateX: isHovered ? -90 : 0,
-                      scale: isHovered ? 1.05 : 1,
                     }}
                     transition={{
-                      duration: 0.4,
-                      ease: 'easeOut',
+                      type: 'spring',
+                      stiffness: 200,
+                      damping: 20,
+                      mass: 0.8,
+                      restDelta: 0.01,
                     }}
                   >
                     <Icon 
                       icon={link.icon} 
-                      className="text-2xl"
+                      className="text-xl"
                     />
                   </motion.div>
 
-                  {/* Back face with full name */}
+                  {/* Back face with label */}
                   <motion.div
-                    className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${
+                    className={`absolute inset-0 flex flex-col items-center justify-center ${
                       isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-accent/80 text-accent-foreground'
                     } backdrop-blur-sm border border-border/20 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
+                      backfaceVisibility: 'hidden',
+                      transform: 'rotateX(90deg)',
                     }}
                     animate={{
                       rotateX: isHovered ? 0 : 90,
-                      scale: isHovered ? 1.05 : 1,
                     }}
                     transition={{
-                      duration: 0.4,
-                      ease: 'easeOut',
+                      type: 'spring',
+                      stiffness: 200,
+                      damping: 20,
+                      mass: 0.8,
+                      restDelta: 0.01,
                     }}
                   >
-                    <span className="text-[10px] font-semibold uppercase tracking-wider leading-none text-center px-1 break-words max-w-full">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider leading-none text-center px-1">
                       {link.name}
                     </span>
                   </motion.div>
-                </Link>
+
+                  {/* Clickable Link overlay */}
+                  <Link
+                    to={link.path}
+                    className="absolute inset-0 z-10"
+                  />
+                </div>
 
                 {/* Star indicator */}
                 {highlightIndex === idx && (
@@ -168,11 +187,20 @@ const Navbar = () => {
         </div>
 
         {/* Divider */}
-        <span className="hidden sm:inline-block w-px h-6 bg-border/40 mx-2"></span>
-
-        {/* Theme Toggle */}
+        <span className="hidden sm:inline-block w-px h-6 bg-border/40 mx-2"></span>        {/* Theme Toggle */}
         <motion.div
-          whileHover={{ y: -2, rotate: 5 }}
+          whileHover={{ 
+            scale: 1.05, 
+            rotate: 3,
+            y: -1
+          }}
+          whileTap={{ scale: 0.95, rotate: 0 }}
+          transition={{ 
+            duration: 0.3,
+            type: 'spring',
+            stiffness: 300,
+            damping: 25
+          }}
           className="ml-2 flex-shrink-0"
         >
           <ThemeToggle />
