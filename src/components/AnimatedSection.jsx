@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
-const AnimatedSection = ({ 
+const AnimatedSection = memo(({ 
   children, 
   className = "", 
   animation = "fadeUp", 
@@ -10,23 +10,16 @@ const AnimatedSection = ({
   threshold = 0.1,
   ...props 
 }) => {
-  const [hasAnimated, setHasAnimated] = useState(false);
-
-  useEffect(() => {
-    // Reset animation state when animation type changes
-    setHasAnimated(false);
-  }, [animation]);
-
-  // Animation variants
+  // Simplified and optimized animation variants
   const variants = {
     fadeUp: {
-      hidden: { y: 30, opacity: 0 },
+      hidden: { y: 20, opacity: 0 },
       visible: { 
         y: 0, 
         opacity: 1,
         transition: { 
-          duration: 0.45, 
-          ease: [0.25, 0.1, 0.25, 1.0],
+          duration: 0.3, 
+          ease: "easeOut",
           delay 
         }
       }
@@ -36,18 +29,19 @@ const AnimatedSection = ({
       visible: { 
         opacity: 1,
         transition: { 
-          duration: 0.4,
+          duration: 0.25,
           delay 
         }
       }
     },
     slideInLeft: {
-      hidden: { x: -40, opacity: 0 },
+      hidden: { x: -30, opacity: 0 },
       visible: { 
         x: 0, 
         opacity: 1,
         transition: { 
-          type: "spring",
+          duration: 0.3,
+          ease: "easeOut",
           stiffness: 180,
           damping: 25,
           delay 
@@ -55,38 +49,37 @@ const AnimatedSection = ({
       }
     },
     slideInRight: {
-      hidden: { x: 40, opacity: 0 },
+      hidden: { x: 30, opacity: 0 },
       visible: { 
         x: 0, 
         opacity: 1,
         transition: { 
-          type: "spring",
-          stiffness: 180,
-          damping: 25,
+          duration: 0.3,
+          ease: "easeOut",
           delay 
         }
       }
     },
     zoomIn: {
-      hidden: { scale: 0.95, opacity: 0 },
+      hidden: { scale: 0.98, opacity: 0 },
       visible: { 
         scale: 1, 
         opacity: 1,
         transition: { 
-          type: "spring",
-          stiffness: 300,
-          damping: 25,
+          duration: 0.25,
+          ease: "easeOut",
           delay 
         }
       }
     },
     scale: {
-      hidden: { scale: 0.8, opacity: 0 },
+      hidden: { scale: 0.95, opacity: 0 },
       visible: { 
         scale: 1, 
         opacity: 1,
         transition: { 
-          duration: 0.4,
+          duration: 0.3,
+          ease: "easeOut",
           delay 
         }
       }
@@ -96,25 +89,26 @@ const AnimatedSection = ({
   return (
     <motion.div
       className={className}
-      initial={hasAnimated && once ? false : "hidden"}
+      initial="hidden"
       whileInView="visible"
-      viewport={{ once, threshold }}
+      viewport={{ once, threshold, margin: "-50px" }}
       variants={variants[animation]}
-      onAnimationComplete={() => setHasAnimated(true)}
       {...props}
     >
       {children}
     </motion.div>
   );
-};
+});
 
-// Animated Grid Component
-export const AnimatedGrid = ({ 
+AnimatedSection.displayName = 'AnimatedSection';
+
+// Optimized Animated Grid Component
+export const AnimatedGrid = memo(({ 
   children, 
   className = "", 
   columns = { sm: 1, md: 2, lg: 3 }, 
   gap = 6,
-  stagger = 0.05,
+  stagger = 0.03,
   once = true,
   threshold = 0.1,
   ...props 
@@ -125,20 +119,19 @@ export const AnimatedGrid = ({
       opacity: 1,
       transition: {
         staggerChildren: stagger,
-        delayChildren: 0.1
+        delayChildren: 0.05
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 15, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 25
+        duration: 0.3,
+        ease: "easeOut"
       }
     }
   };
@@ -158,7 +151,7 @@ export const AnimatedGrid = ({
       className={gridClasses}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once, threshold }}
+      viewport={{ once, threshold, margin: "-50px" }}
       variants={containerVariants}
       {...props}
     >
@@ -170,6 +163,8 @@ export const AnimatedGrid = ({
       {!Array.isArray(children) && children}
     </motion.div>
   );
-};
+});
+
+AnimatedGrid.displayName = 'AnimatedGrid';
 
 export default AnimatedSection;
