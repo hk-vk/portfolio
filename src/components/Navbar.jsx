@@ -1,99 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Icon } from '@iconify/react';
 import ThemeToggle from './ThemeToggle';
 import SparkleIllustration from './SparkleIllustration';
-
-// Simple SVG icons for the nav items (keeps bundle small – no additional deps)
-const HomeIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M3 9.75L12 3l9 6.75v9.75A1.5 1.5 0 0 1 19.5 21h-15A1.5 1.5 0 0 1 3 19.5V9.75Z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 21V12h6v9"
-    />
-  </svg>
-);
-
-const AboutIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z"
-    />
-  </svg>
-);
-
-const BlogIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M4 5h16M4 10h16M4 15h10"
-    />
-  </svg>
-);
-
-const ProjectsIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M5 3h14a2 2 0 0 1 2 2v6H3V5a2 2 0 0 1 2-2Zm16 10H3v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6Z"
-    />
-  </svg>
-);
-
-const ContactIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M4 4h16v16H4V4Zm8 4.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm0 6c-2.5 0-4.71 1.28-6 3.22V18h12v-0.28C16.71 15.78 14.5 14.5 12 14.5Z"
-    />
-  </svg>
-);
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -114,11 +24,11 @@ const Navbar = () => {
   }, []);
 
   const mainLinks = [
-    { name: 'Home', path: '/', icon: HomeIcon },
-    { name: 'About', path: '/about', icon: AboutIcon },
-    { name: 'Blog', path: '/blog', icon: BlogIcon },
-    { name: 'Projects', path: '/projects', icon: ProjectsIcon },
-    { name: 'Contact', path: '/contact', icon: ContactIcon },
+    { name: 'Home', path: '/', icon: 'uil:home-alt' },
+    { name: 'About', path: '/about', icon: 'uil:user' },
+    { name: 'Blog', path: '/blog', icon: 'uil:edit-alt' },
+    { name: 'Projects', path: '/projects', icon: 'uil:briefcase-alt' },
+    { name: 'Contact', path: '/contact', icon: 'uil:envelope-alt' },
   ];
 
   // Track hover to move star smoothly like the provided example
@@ -169,6 +79,7 @@ const Navbar = () => {
         <div className="grid grid-flow-col auto-cols-max gap-3 sm:gap-4">
           {mainLinks.map((link, idx) => {
             const isActive = idx === activeIndex;
+            const isHovered = idx === hoverIndex;
             return (
               <motion.div
                 key={link.path}
@@ -177,20 +88,61 @@ const Navbar = () => {
                 className="relative flex flex-col items-center justify-center min-w-[48px]"
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
+                style={{
+                  perspective: '400px',
+                }}
               >
                 <Link
                   to={link.path}
-                  className={`flex flex-col items-center justify-center px-2 py-1 transition-colors ${
-                    isActive ? 'text-primary' : 'text-foreground hover:text-primary'
-                  }`}
+                  className="relative block overflow-hidden"
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    transformStyle: 'preserve-3d',
+                  }}
                 >
-                  {(() => {
-                    const Icon = link.icon;
-                    return <Icon className="w-6 h-6 mb-0.5" />;
-                  })()}
-                  <span className="text-[10px] uppercase tracking-wide font-medium hidden sm:block">
-                    {link.name}
-                  </span>
+                  {/* Front face with icon */}
+                  <motion.div
+                    className={`absolute inset-0 flex flex-col items-center justify-center transition-colors ${
+                      isActive ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground hover:text-primary'
+                    } rounded-lg border border-border/40`}
+                    style={{
+                      transformOrigin: 'center center -24px',
+                    }}
+                    animate={{
+                      rotateX: isHovered ? -90 : 0,
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      ease: 'easeOut',
+                    }}
+                  >
+                    <Icon 
+                      icon={link.icon} 
+                      className="text-2xl"
+                    />
+                  </motion.div>
+
+                  {/* Back face with full name */}
+                  <motion.div
+                    className={`absolute inset-0 flex flex-col items-center justify-center transition-colors ${
+                      isActive ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground'
+                    } rounded-lg border border-border/40`}
+                    style={{
+                      transformOrigin: 'center center -24px',
+                    }}
+                    animate={{
+                      rotateX: isHovered ? 0 : 90,
+                    }}
+                    transition={{
+                      duration: 0.4,
+                      ease: 'easeOut',
+                    }}
+                  >
+                    <span className="text-xs font-medium uppercase tracking-wide leading-tight text-center px-1">
+                      {link.name}
+                    </span>
+                  </motion.div>
                 </Link>
 
                 {/* Star indicator */}
