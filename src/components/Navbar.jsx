@@ -25,9 +25,8 @@ const Navbar = () => {
 
   const mainLinks = [
     { name: 'Home', path: '/', icon: 'uil:estate' },
-    { name: 'About', path: '/about', icon: 'uil:user-circle' },
     { name: 'Blog', path: '/blog', icon: 'uil:document-layout-left' },
-    { name: 'Projects', path: '/projects', icon: 'uil:apps' },
+    { name: 'Work', path: '/projects', icon: 'uil:apps' },
     { name: 'Contact', path: '/contact', icon: 'uil:message' },
   ];
 
