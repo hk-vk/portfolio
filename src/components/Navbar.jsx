@@ -24,11 +24,11 @@ const Navbar = () => {
   }, []);
 
   const mainLinks = [
-    { name: 'Home', path: '/', icon: 'uil:home-alt' },
-    { name: 'About', path: '/about', icon: 'uil:user' },
-    { name: 'Blog', path: '/blog', icon: 'uil:edit-alt' },
-    { name: 'Projects', path: '/projects', icon: 'uil:briefcase-alt' },
-    { name: 'Contact', path: '/contact', icon: 'uil:envelope-alt' },
+    { name: 'Home', path: '/', icon: 'uil:estate' },
+    { name: 'About', path: '/about', icon: 'uil:user-circle' },
+    { name: 'Blog', path: '/blog', icon: 'uil:document-layout-left' },
+    { name: 'Projects', path: '/projects', icon: 'uil:apps' },
+    { name: 'Contact', path: '/contact', icon: 'uil:message' },
   ];
 
   // Track hover to move star smoothly like the provided example
@@ -85,7 +85,7 @@ const Navbar = () => {
                 key={link.path}
                 whileHover="hover"
                 variants={navItemVariants}
-                className="relative flex flex-col items-center justify-center min-w-[48px]"
+                className="relative flex flex-col items-center justify-center min-w-[64px]"
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
                 style={{
@@ -96,21 +96,22 @@ const Navbar = () => {
                   to={link.path}
                   className="relative block overflow-hidden"
                   style={{
-                    width: '48px',
+                    width: '64px',
                     height: '48px',
                     transformStyle: 'preserve-3d',
                   }}
                 >
                   {/* Front face with icon */}
                   <motion.div
-                    className={`absolute inset-0 flex flex-col items-center justify-center transition-colors ${
-                      isActive ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground hover:text-primary'
-                    } rounded-lg border border-border/40`}
+                    className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${
+                      isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-background/50 text-foreground hover:text-primary hover:bg-background'
+                    } backdrop-blur-sm border border-border/20 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
                     }}
                     animate={{
                       rotateX: isHovered ? -90 : 0,
+                      scale: isHovered ? 1.05 : 1,
                     }}
                     transition={{
                       duration: 0.4,
@@ -125,21 +126,22 @@ const Navbar = () => {
 
                   {/* Back face with full name */}
                   <motion.div
-                    className={`absolute inset-0 flex flex-col items-center justify-center transition-colors ${
-                      isActive ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground'
-                    } rounded-lg border border-border/40`}
+                    className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${
+                      isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-accent/80 text-accent-foreground'
+                    } backdrop-blur-sm border border-border/20 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
                     }}
                     animate={{
                       rotateX: isHovered ? 0 : 90,
+                      scale: isHovered ? 1.05 : 1,
                     }}
                     transition={{
                       duration: 0.4,
                       ease: 'easeOut',
                     }}
                   >
-                    <span className="text-xs font-medium uppercase tracking-wide leading-tight text-center px-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider leading-none text-center px-1 break-words max-w-full">
                       {link.name}
                     </span>
                   </motion.div>
