@@ -9,6 +9,7 @@ const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
 const SparkleIllustration = lazy(() => import('../components/SparkleIllustration'));
 const HeroHighlightLine = lazy(() => import('../components/HeroHighlightLine'));
 const MagnetLines = lazy(() => import('../components/MagnetLines'));
+const BlurText = lazy(() => import('../components/BlurText/BlurText'));
 
 // Lightweight fallback components for instant loading
 const QuickSparkle = memo(() => (
@@ -271,9 +272,16 @@ const Home = () => {
                   className="flex items-center mb-4"
                 >
                   <Suspense fallback={<QuickSparkle />}>
-                    <SparkleIllustration className="text-primary mr-2" size={16} />
+                    <SparkleIllustration className="text-primary mr-3" size={20} />
                   </Suspense>
-                  <h2 className="text-2xl md:text-3xl font-bold">HELLO!</h2>
+                  {sectionsVisible.hero && (
+                    <BlurText
+                      text="HELLO, I am HARIKRISHNAN"
+                      className="text-2xl md:text-3xl font-bold gradient-last-word"
+                      animateBy="words"
+                      delay={50}
+                    />
+                  )}
                 </motion.div>
 
                 <motion.p

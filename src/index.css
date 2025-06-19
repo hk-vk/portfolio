@@ -212,6 +212,14 @@
     transition: left 0.6s ease;
     left: 120%;
   }
+
+  /* BlurText helper classes */
+  .gradient-first-word span:first-child {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary;
+  }
+  .gradient-last-word span:last-child {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary;
+  }
 }
 
 .scroll-section {
