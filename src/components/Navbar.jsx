@@ -3,7 +3,6 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import ThemeToggle from './ThemeToggle';
-import SparkleIllustration from './SparkleIllustration';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,7 +36,6 @@ const Navbar = () => {
   const activeIndex = mainLinks.findIndex(({ path }) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
   );
-  const highlightIndex = hoverIndex != null ? hoverIndex : activeIndex;
 
   // Animation variants (slide in from bottom instead of top)
   const headerVariants = {
@@ -166,23 +164,6 @@ const Navbar = () => {
                     className="absolute inset-0 z-10"
                   />
                 </div>
-
-                {/* Star indicator */}
-                {highlightIndex === idx && (
-                  <motion.div
-                    layoutId="active-star"
-                    className="absolute -top-3 left-1/2 -translate-x-1/2"
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                  >
-                    <motion.span
-                      animate={{ rotate: [0, 15, -15, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
-                    >
-                      <SparkleIllustration className="text-primary drop-shadow" size={18} />
-                    </motion.span>
-                  </motion.div>
-                )}
               </motion.div>
             );
           })}

@@ -5,7 +5,7 @@ import '@fontsource/dm-serif-display';
 import './index.css';
 
 // Only import essential components synchronously
-import Navbar from './components/Navbar_GSAP';
+import Navbar from './components/Navbar';
 import LoadingScreen from './components/LoadingScreen';
 
 // Lazy load all pages for code splitting and faster initial load
