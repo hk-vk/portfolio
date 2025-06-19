@@ -210,7 +210,7 @@ const Home = () => {
   // Memoized featured projects for this component
   const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
-    <div className="pt-28 md:pt-36 pb-20">
+    <div className="pt-16 md:pt-24 pb-20">
       {/* Instant loading hero section */}
       <div ref={heroRef} className="mb-24">
         <div className="content-container relative">
@@ -233,7 +233,7 @@ const Home = () => {
           <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
           <motion.div
-            className="relative mb-16 rounded-2xl bg-background/70 backdrop-blur-lg shadow-2xl ring-2 ring-primary/15 p-6 md:p-12"
+            className="relative mb-16 rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-6 md:p-12"
             initial={{ opacity: 0, y: 20 }}
             animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.3 }}

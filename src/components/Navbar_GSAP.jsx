@@ -210,10 +210,10 @@ const Navbar = () => {
       initial="hidden"
       animate="visible"
       variants={headerVariants}
-      className="fixed top-6 inset-x-0 z-50 flex justify-center pointer-events-none"
+      className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none"
     >
       {/* Floating pill wrapper */}
-      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-2 divide-x divide-border/30 pointer-events-auto">
+      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-2 divide-x divide-border/30 pointer-events-auto">
         {/* Navigation Links */}
         <div className="grid grid-flow-col auto-cols-max gap-3 sm:gap-4">
           {mainLinks.map((link, idx) => {
@@ -225,7 +225,7 @@ const Navbar = () => {
                 whileHover="hover"
                 whileTap="tap"
                 variants={navItemVariants}
-                className="relative flex flex-col items-center justify-center min-w-[64px]"                onMouseEnter={() => {
+                className="relative flex flex-col items-center justify-center min-w-[56px] sm:min-w-[64px]"                onMouseEnter={() => {
                   setHoverIndex(idx);
                   handleFlipIn(idx);
                 }}
@@ -237,10 +237,8 @@ const Navbar = () => {
                   perspective: '500px',
                 }}
               >                <div
-                  className="flip-container relative block overflow-hidden"
+                  className="flip-container relative block overflow-hidden w-14 h-12 sm:w-16 sm:h-12"
                   style={{
-                    width: '64px',
-                    height: '48px',
                     transformStyle: 'preserve-3d',
                   }}
                 >
@@ -257,7 +255,7 @@ const Navbar = () => {
                   >
                     <Icon 
                       icon={link.icon} 
-                      className="text-xl drop-shadow-sm"
+                      className="text-lg sm:text-xl drop-shadow-sm"
                     />
                   </div>
 
