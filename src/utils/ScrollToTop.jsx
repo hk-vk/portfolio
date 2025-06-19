@@ -7,7 +7,7 @@ function ScrollToTop() {
   useEffect(() => {
     // Use requestAnimationFrame for smoother scrolling
     requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     });
   }, [pathname]);
 

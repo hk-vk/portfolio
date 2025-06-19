@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import { gsap } from 'gsap';
@@ -56,7 +56,10 @@ const Navbar = () => {
   // Track hover to move star smoothly like the provided example
   const [hoverIndex, setHoverIndex] = useState(null);
 
-  const activeIndex = mainLinks.findIndex((l) => l.path === location.pathname);
+  // Determine which link should be marked active (handles nested URLs)
+  const activeIndex = mainLinks.findIndex(({ path }) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
+  );
   const highlightIndex = hoverIndex != null ? hoverIndex : activeIndex;  // Ultra-smooth GSAP flip animation with natural physics
   const handleFlipIn = (index) => {
     const frontFace = navItemsRef.current[index]?.querySelector('.front-face');
@@ -275,8 +278,10 @@ const Navbar = () => {
                     </span>
                   </div>
 
-                  {/* Clickable Link overlay */}                  <Link
+                  {/* Clickable Link overlay */}
+                  <NavLink
                     to={link.path}
+                    end={link.path === '/'}
                     className="absolute inset-0 z-10"
                   />
                 </div>
