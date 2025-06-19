@@ -210,7 +210,7 @@ const Navbar = () => {
       initial="hidden"
       animate="visible"
       variants={headerVariants}
-      className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none"
+      className="fixed top-6 inset-x-0 z-50 flex justify-center pointer-events-none"
     >
       {/* Floating pill wrapper */}
       <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-2 divide-x divide-border/30 pointer-events-auto">

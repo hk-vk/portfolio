@@ -210,7 +210,7 @@ const Home = () => {
   // Memoized featured projects for this component
   const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
-    <div className="pt-12 md:pt-20 pb-20">
+    <div className="pt-28 md:pt-36 pb-20">
       {/* Instant loading hero section */}
       <div ref={heroRef} className="mb-24">
         <div className="content-container relative">
@@ -301,24 +301,6 @@ const Home = () => {
                   My expertise ranges from interactive frontend interfaces to scalable backend systems.
                   I'm constantly learning and implementing new technologies to develop better solutions.
                 </motion.p>
-
-                <motion.div
-                  variants={childVariants}
-                  className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-8 w-full"
-                >
-                  <Link
-                    to="/projects"
-                    className="button-primary btn-gloss text-center sm:text-left"
-                  >
-                    View Projects
-                  </Link>
-                  <Link
-                    to="/contact"
-                    className="button-secondary btn-gloss text-center sm:text-left"
-                  >
-                    Get in Touch
-                  </Link>
-                </motion.div>
 
                 <motion.div variants={childVariants} className="w-full">
                   <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
