@@ -309,10 +309,10 @@ const Home = () => {
           </div>
         </div>
       </div>        {/* Experience Section */}
-        <div ref={experienceRef} className="py-16 md:py-24 bg-background">
-          <div className="content-container text-center">
+        <div ref={experienceRef} className="py-12 md:py-16 bg-background">
+          <div className="content-container">
             <motion.div
-              className="mb-8 flex items-center justify-center"
+              className="mb-8 flex items-center"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.25 }}
@@ -321,14 +321,6 @@ const Home = () => {
                 <SparkleIllustration className="text-primary mr-3" size={20} />
               </Suspense>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">EXPERIENCE</h2>
-              <motion.span
-                animate={sectionsVisible.experience ? { scale: 1.05 } : {}}
-                transition={{ duration: 2, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
-              >
-                <Suspense fallback={<QuickSparkle />}>
-                  <SparkleIllustration className="text-accent ml-3" size={20} />
-                </Suspense>
-              </motion.span>
             </motion.div>
 
             {/* Timeline of roles */}
@@ -336,7 +328,7 @@ const Home = () => {
                 {experienceItems.map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className="flex items-center justify-between gap-4"
+                    className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-2"
                     initial={{ opacity: 0, y: 8 }}
                     animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.25, delay: 0.1 + idx * 0.05 }}
@@ -358,7 +350,7 @@ const Home = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                    <span className="text-sm text-muted-foreground sm:whitespace-nowrap text-left sm:text-right w-full sm:w-auto">
                       {item.date}
                     </span>
                   </motion.div>
@@ -366,7 +358,7 @@ const Home = () => {
             </div>
           </div>
         </div>        {/* Projects Preview Section */}
-        <div ref={projectsRef} className="mb-24">
+        <div ref={projectsRef} className="mb-16">
           <div className="content-container">
             <motion.div
               className="mb-12 flex items-center"
@@ -375,7 +367,7 @@ const Home = () => {
               transition={{ duration: 0.25 }}
             >
               <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="text-primary mr-2" size={16} />
+                <SparkleIllustration className="text-primary mr-3" size={20} />
               </Suspense>
               <h2 className="text-3xl font-bold">FEATURED PROJECTS</h2>
             </motion.div>
