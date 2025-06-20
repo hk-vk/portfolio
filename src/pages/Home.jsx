@@ -210,7 +210,7 @@ const Home = () => {
   // Memoized featured projects for this component
   const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
-    <div className="pt-16 md:pt-24 pb-20">
+    <div className="pt-16 md:pt-24 pb-20 overflow-hidden">
       {/* Instant loading hero section */}
       <div ref={heroRef} className="mb-24">
         <div className="content-container relative">
@@ -325,56 +325,7 @@ const Home = () => {
             <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
           </div>
         </div>
-      </div>        {/* Projects Preview Section */}
-        <div ref={projectsRef} className="mb-24">
-          <div className="content-container">
-            <motion.div
-              className="mb-12 flex items-center"
-              initial={{ opacity: 0, y: 15 }}
-              animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.25 }}
-            >
-              <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="text-primary mr-2" size={16} />
-              </Suspense>
-              <h2 className="text-3xl font-bold">FEATURED PROJECTS</h2>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {memoizedProjects.map((project, index) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={index}
-                  motionSafe={motionSafe}
-                  isVisible={sectionsVisible.projects}
-                />
-              ))}
-            </div>
-
-            <motion.div
-              className="mt-12 text-center"
-              initial={{ opacity: 0, y: 15 }}
-              animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2, duration: 0.25 }}
-            >
-              <Link
-                to="/projects"
-                className="button-primary btn-gloss inline-flex items-center group"
-              >
-                View All Projects
-                <svg
-                  className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-150"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
-            </motion.div>
-          </div>
-        </div>        {/* Experience Section */}
+      </div>        {/* Experience Section */}
         <div ref={experienceRef} className="py-16 md:py-24 bg-background">
           <div className="content-container text-center">
             <motion.div
@@ -426,7 +377,57 @@ const Home = () => {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </Link>            </motion.div>
+              </Link>
+            </motion.div>
+          </div>
+        </div>        {/* Projects Preview Section */}
+        <div ref={projectsRef} className="mb-24">
+          <div className="content-container">
+            <motion.div
+              className="mb-12 flex items-center"
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.25 }}
+            >
+              <Suspense fallback={<QuickSparkle />}>
+                <SparkleIllustration className="text-primary mr-2" size={16} />
+              </Suspense>
+              <h2 className="text-3xl font-bold">FEATURED PROJECTS</h2>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {memoizedProjects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  index={index}
+                  motionSafe={motionSafe}
+                  isVisible={sectionsVisible.projects}
+                />
+              ))}
+            </div>
+
+            <motion.div
+              className="mt-12 text-center"
+              initial={{ opacity: 0, y: 15 }}
+              animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.2, duration: 0.25 }}
+            >
+              <Link
+                to="/projects"
+                className="button-primary btn-gloss inline-flex items-center group"
+              >
+                View All Projects
+                <svg
+                  className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-150"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+            </motion.div>
           </div>
         </div>
     </div>

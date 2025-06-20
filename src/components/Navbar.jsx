@@ -23,10 +23,10 @@ const Navbar = () => {
   }, []);
 
   const mainLinks = [
-    { name: 'Home', path: '/', icon: 'uil:estate' },
-    { name: 'Blog', path: '/blog', icon: 'uil:document-layout-left' },
-    { name: 'Work', path: '/projects', icon: 'uil:apps' },
-    { name: 'Contact', path: '/contact', icon: 'uil:message' },
+    { name: 'Home', path: '/', icon: 'tabler:home' },
+    { name: 'Blog', path: '/blog', icon: 'tabler:pencil' },
+    { name: 'Work', path: '/projects', icon: 'tabler:code' },
+    { name: 'Contact', path: '/contact', icon: 'tabler:mail' },
   ];
 
   // Track hover to move star smoothly like the provided example
@@ -82,7 +82,7 @@ const Navbar = () => {
       className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none"
     >
       {/* Floating pill wrapper */}
-      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-2 divide-x divide-border/30 pointer-events-auto">
+      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-6 pointer-events-auto">
         {/* Navigation Links */}
         <div className="grid grid-flow-col auto-cols-max gap-3 sm:gap-4">
           {mainLinks.map((link, idx) => {
@@ -169,8 +169,7 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* Divider */}
-        <span className="hidden sm:inline-block w-px h-6 bg-border/40 mx-2"></span>        {/* Theme Toggle */}
+        {/* Theme Toggle */}
         <motion.div
           whileHover={{ 
             scale: 1.05, 
