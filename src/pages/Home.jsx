@@ -188,20 +188,6 @@ const Home = () => {
     }
   }), []);
 
-  // Optimized float animation (reduced intensity)
-  const floatVariants = useMemo(() => ({
-    animate: {
-      y: [0, -4, 0],
-      x: [0, 2, 0],
-      transition: {
-        duration: 6,
-        repeat: Infinity,
-        repeatType: "mirror",
-        ease: "easeInOut"
-      }
-    }
-  }), []);
-
   // Cached skills array
   const skills = useMemo(() => [
     "React", "TypeScript", "JavaScript", "Node.js", "UI/UX Design"
@@ -220,9 +206,6 @@ const Home = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={sectionsVisible.hero ? { opacity: 0.8, scale: 1 } : {}}
             transition={{ delay: 0.3, duration: 0.2 }}
-            variants={floatVariants}
-            whileInView="animate"
-            viewport={{ once: false }}
           >
             <Suspense fallback={<QuickSparkle />}>
               <SparkleIllustration className="transform rotate-12" size={24} />
@@ -339,8 +322,8 @@ const Home = () => {
               </Suspense>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground">EXPERIENCE</h2>
               <motion.span
-                animate={sectionsVisible.experience ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 2, repeat: Infinity }}
+                animate={sectionsVisible.experience ? { scale: 1.05 } : {}}
+                transition={{ duration: 2, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
               >
                 <Suspense fallback={<QuickSparkle />}>
                   <SparkleIllustration className="text-accent ml-3" size={20} />
