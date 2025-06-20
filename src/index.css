@@ -662,3 +662,35 @@ html {
   /* Remove any conflicting animation properties if they exist */
   animation: none;
 }
+
+/* View Transition API for Theme Toggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  isolation: isolate;
+}
+
+/* New view is always on top */
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* Old view is underneath */
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+@keyframes reveal {
+  from {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+  to {
+    clip-path: circle(150vmax at var(--x) var(--y));
+  }
+}
+
+/* Animate the new view */
+html::view-transition-new(root) {
+  animation: reveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

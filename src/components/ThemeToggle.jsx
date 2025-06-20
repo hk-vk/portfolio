@@ -14,13 +14,33 @@ const ThemeToggle = () => {
     initializeTheme();
     
     // Set initial state based on current theme
-    const currentTheme = localStorage.getItem('theme');
-    setIsDark(currentTheme === 'dark');
+    const currentTheme = document.documentElement.classList.contains('dark');
+    setIsDark(currentTheme);
   }, []);
   
-  const handleToggle = () => {
-    const newTheme = toggleTheme();
-    setIsDark(newTheme === 'dark');
+  const handleToggle = (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+
+    const performToggle = () => {
+      const newTheme = toggleTheme();
+      setIsDark(newTheme === 'dark');
+    };
+
+    if (!document.startViewTransition) {
+      console.warn("View Transition API not supported, falling back.");
+      performToggle();
+      return;
+    }
+
+    const transition = document.startViewTransition(() => {
+      performToggle();
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.style.setProperty('--x', `${x}px`);
+      document.documentElement.style.setProperty('--y', `${y}px`);
+    });
   };
   
   // Sun and moon icons (inline SVG)
