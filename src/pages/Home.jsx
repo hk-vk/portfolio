@@ -312,7 +312,7 @@ const Home = () => {
         <div ref={experienceRef} className="py-12 md:py-16 bg-background">
           <div className="content-container">
             <motion.div
-              className="mb-8 flex items-center"
+              className="mb-6 flex items-center"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.25 }}
@@ -324,16 +324,16 @@ const Home = () => {
             </motion.div>
 
             {/* Timeline of roles */}
-            <div className="max-w-3xl mx-auto mb-12 space-y-8">
+            <div className="mb-8 space-y-6 pl-8">
                 {experienceItems.map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-2"
+                    className="flex flex-col sm:flex-row sm:items-center gap-2 w-full"
                     initial={{ opacity: 0, y: 8 }}
                     animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.25, delay: 0.1 + idx * 0.05 }}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
                       {item.logo && (
                         <img
                           src={item.logo}
@@ -350,7 +350,7 @@ const Home = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-sm text-muted-foreground sm:whitespace-nowrap text-left sm:text-right w-full sm:w-auto">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap ml-auto">
                       {item.date}
                     </span>
                   </motion.div>
@@ -358,10 +358,10 @@ const Home = () => {
             </div>
           </div>
         </div>        {/* Projects Preview Section */}
-        <div ref={projectsRef} className="mb-16">
-          <div className="content-container">
+        <div ref={projectsRef} className="mb-12">
+          <div className="content-container mt-4">
             <motion.div
-              className="mb-12 flex items-center"
+              className="mb-8 flex items-center"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.25 }}
