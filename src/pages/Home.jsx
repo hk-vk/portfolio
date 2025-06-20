@@ -348,37 +348,39 @@ const Home = () => {
               </motion.span>
             </motion.div>
 
-            <motion.p
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
-              initial={{ opacity: 0, y: 15 }}
-              animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.25, delay: 0.1 }}
-            >
-              I am currently seeking opportunities to gain professional experience and apply my skills
-              in a real-world setting. If you have a project or an opening where I can contribute
-              and grow, please feel free to reach out. Let's build something great together!
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.25, delay: 0.15 }}
-            >
-              <Link
-                to="/contact"
-                className="button-primary btn-gloss inline-flex items-center text-lg group"
-              >
-                Contact Me
-                <svg
-                  className="ml-2 w-5 h-5 transform transition-transform duration-150 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
-            </motion.div>
+            {/* Timeline of roles */}
+            <div className="max-w-3xl mx-auto mb-12 space-y-8">
+                {experienceItems.map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="flex items-center justify-between gap-4"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.25, delay: 0.1 + idx * 0.05 }}
+                  >
+                    <div className="flex items-center gap-4">
+                      {item.logo && (
+                        <img
+                          src={item.logo}
+                          alt={`${item.company} logo`}
+                          className="w-12 h-12 object-cover rounded-md shadow-sm shrink-0"
+                        />
+                      )}
+                      <div className="text-left">
+                        <h3 className="font-medium text-base text-foreground leading-none mb-0.5">
+                          {item.company}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-none">
+                          {item.title}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      {item.date}
+                    </span>
+                  </motion.div>
+                ))}
+            </div>
           </div>
         </div>        {/* Projects Preview Section */}
         <div ref={projectsRef} className="mb-24">
@@ -460,28 +462,10 @@ const featuredProjects = [
 
 const experienceItems = [
   {
-    date: '2022 - Present',
-    title: 'Full Stack Developer',
-    company: 'Freelance',
-    description: 'Developing custom web applications with a focus on TypeScript, React, and Node.js. Creating solutions for various client needs.',
-  },
-  {
-    date: '2021 - 2022',
-    title: 'Frontend Developer',
-    company: 'Tech Solutions',
-    description: 'Built interactive web interfaces using modern JavaScript frameworks. Implemented responsive designs and optimized application performance.',
-  },
-  {
-    date: '2020 - 2021',
-    title: 'Web Developer',
-    company: 'Digital Innovations',
-    description: 'Developed and maintained web applications using JavaScript, HTML, and CSS. Collaborated with design teams to implement user interfaces.',
-  },
-  {
-    date: '2018 - 2020',
-    title: 'Junior Developer',
-    company: 'Creative Technologies',
-    description: 'Assisted in building websites and web applications. Gained experience in frontend development and UI implementation.',
+    date: 'May 2025 - Present',
+    title: 'Software Engineering Intern',
+    company: 'Comini Learning',
+    logo: 'https://i.ibb.co/bM9CVPGj/Image-Editor.png',
   },
 ];
 
