@@ -8,8 +8,9 @@ import { Icon } from '@iconify/react';
  * Props:
  *  isOpen   – boolean controlling visibility
  *  onClose  – function called to close the popover
+ *  triggerRef – React ref to the element that triggered the popover
  */
-const SocialPopover = ({ isOpen, onClose }) => {
+const SocialPopover = ({ isOpen, onClose, triggerRef }) => {
   const panelRef = useRef(null);
 
   // Close on outside click or ESC key
@@ -22,16 +23,20 @@ const SocialPopover = ({ isOpen, onClose }) => {
         if (e.key === 'Escape') onClose();
       }
       function handleClick(e) {
+        // Ignore clicks that originated from the trigger element itself
+        if (triggerRef.current && triggerRef.current.contains(e.target)) {
+          return;
+        }
         if (panelRef.current && !panelRef.current.contains(e.target)) {
           onClose();
         }
       }
       window.addEventListener('keydown', handleKey);
-      window.addEventListener('mousedown', handleClick);
+      window.addEventListener('click', handleClick);
       // Clean up
       panelRef.current._cleanup = () => {
         window.removeEventListener('keydown', handleKey);
-        window.removeEventListener('mousedown', handleClick);
+        window.removeEventListener('click', handleClick);
       };
     }, 0);
 
@@ -42,7 +47,7 @@ const SocialPopover = ({ isOpen, onClose }) => {
         delete panelRef.current._cleanup;
       }
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, triggerRef]);
 
   const links = [
     { href: 'https://github.com/hk-vk', icon: 'tabler:brand-github', label: 'GitHub' },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
@@ -8,6 +8,7 @@ import SocialPopover from './SocialPopover';
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const contactIconRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +28,7 @@ const Navbar = () => {
     { name: 'Home', path: '/', icon: 'tabler:home' },
     { name: 'Blog', path: '/blog', icon: 'tabler:pencil' },
     { name: 'Work', path: '/projects', icon: 'tabler:code' },
-    { name: 'Contact', path: '/contact', icon: 'tabler:mail' },
+    { name: 'Connect', path: '/contact', icon: 'tabler:at' },
   ];
 
   // Track hover to move star smoothly like the provided example
@@ -93,6 +94,7 @@ const Navbar = () => {
             const isHovered = idx === hoverIndex;
             return (              <motion.div
                 key={link.path}
+                ref={link.name === 'Connect' ? contactIconRef : null}
                 whileHover="hover"
                 whileTap="tap"
                 variants={navItemVariants}
@@ -100,12 +102,8 @@ const Navbar = () => {
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
                 onClick={() => {
-                  if (link.name === 'Contact') {
-                    console.log('Contact icon clicked');
-                    setSocialOpen((prev) => {
-                      console.log('Toggling socialOpen. Previous:', prev, 'Next:', !prev);
-                      return !prev;
-                    });
+                  if (link.name === 'Connect') {
+                    setSocialOpen((prev) => !prev);
                   }
                 }}
                 style={{
@@ -170,7 +168,7 @@ const Navbar = () => {
                   </motion.div>
 
                   {/* Clickable overlay */}
-                  {link.name !== 'Contact' && (
+                  {link.name !== 'Connect' && (
                     <NavLink
                       to={link.path}
                       end={link.path === '/'}
@@ -211,6 +209,7 @@ const Navbar = () => {
             console.log('Popover onClose called');
             setSocialOpen(false);
           }}
+          triggerRef={contactIconRef}
         />
       </div>
     </motion.header>
