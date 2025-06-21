@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import ThemeToggle from './ThemeToggle';
+import SocialPopover from './SocialPopover';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,6 +32,8 @@ const Navbar = () => {
 
   // Track hover to move star smoothly like the provided example
   const [hoverIndex, setHoverIndex] = useState(null);
+  // Popover state for social links
+  const [socialOpen, setSocialOpen] = useState(false);
 
   // Determine which link should be marked active (supports nested URLs)
   const activeIndex = mainLinks.findIndex(({ path }) =>
@@ -79,7 +82,7 @@ const Navbar = () => {
       initial="hidden"
       animate="visible"
       variants={headerVariants}
-      className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-none"
+      className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-auto"
     >
       {/* Floating pill wrapper */}
       <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-6 pointer-events-auto">
@@ -93,9 +96,18 @@ const Navbar = () => {
                 whileHover="hover"
                 whileTap="tap"
                 variants={navItemVariants}
-                className="relative flex flex-col items-center justify-center min-w-[56px] sm:min-w-[64px]"
+                className="relative flex flex-col items-center justify-center min-w-[56px] sm:min-w-[64px] cursor-pointer"
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
+                onClick={() => {
+                  if (link.name === 'Contact') {
+                    console.log('Contact icon clicked');
+                    setSocialOpen((prev) => {
+                      console.log('Toggling socialOpen. Previous:', prev, 'Next:', !prev);
+                      return !prev;
+                    });
+                  }
+                }}
                 style={{
                   perspective: '400px',
                 }}
@@ -157,13 +169,17 @@ const Navbar = () => {
                     </span>
                   </motion.div>
 
-                  {/* Clickable Link overlay */}
-                  <NavLink
-                    to={link.path}
-                    end={link.path === '/'}
-                    className="absolute inset-0 z-10"
-                  />
+                  {/* Clickable overlay */}
+                  {link.name !== 'Contact' && (
+                    <NavLink
+                      to={link.path}
+                      end={link.path === '/'}
+                      className="absolute inset-0 z-10"
+                    />
+                  )}
                 </div>
+
+                {/* Social popover is no longer here */}
               </motion.div>
             );
           })}
@@ -187,6 +203,15 @@ const Navbar = () => {
         >
           <ThemeToggle />
         </motion.div>
+
+        {/* Social Popover is now a direct child of the main pill */}
+        <SocialPopover
+          isOpen={socialOpen}
+          onClose={() => {
+            console.log('Popover onClose called');
+            setSocialOpen(false);
+          }}
+        />
       </div>
     </motion.header>
   );

@@ -222,7 +222,7 @@ const Home = () => {
   return (
     <div className="pt-16 md:pt-24 pb-20 overflow-hidden relative">
       {/* Waves Background - hero section only */}
-      <div ref={heroRef} className="mb-24 relative overflow-hidden">
+      <div ref={heroRef} className="mb-0 relative overflow-hidden">
         {/* Hero content container */}
         <div className="content-container relative">
           {/* Decorative Elements with conditional loading */}
