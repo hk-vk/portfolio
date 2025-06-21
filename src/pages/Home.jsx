@@ -4,6 +4,9 @@ import { useMotionSafe } from '../utils/useMotionSafe';
 import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
 
+// Direct import Waves - no lazy loading to ensure immediate visibility
+import Waves from '../components/Waves/Waves';
+
 // Lazy load heavy components for better performance
 const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
 const SparkleIllustration = lazy(() => import('../components/SparkleIllustration'));
@@ -130,10 +133,31 @@ const Home = () => {
     projects: false,
     experience: false
   });
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   const heroRef = useRef(null);
   const projectsRef = useRef(null);
   const experienceRef = useRef(null);
+
+  // Check for dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+
+    // Check initial state
+    checkDarkMode();
+
+    // Set up a MutationObserver to watch for theme changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Intersection observer for performance optimization
   useEffect(() => {
@@ -196,9 +220,10 @@ const Home = () => {
   // Memoized featured projects for this component
   const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
-    <div className="pt-16 md:pt-24 pb-20 overflow-hidden">
-      {/* Instant loading hero section */}
-      <div ref={heroRef} className="mb-24">
+    <div className="pt-16 md:pt-24 pb-20 overflow-hidden relative">
+      {/* Waves Background - hero section only */}
+      <div ref={heroRef} className="mb-24 relative overflow-hidden">
+        {/* Hero content container */}
         <div className="content-container relative">
           {/* Decorative Elements with conditional loading */}
           <motion.div
@@ -216,12 +241,26 @@ const Home = () => {
           <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
           <motion.div
-            className="relative mb-16 rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-6 md:p-12"
+            className="relative mb-16 rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-6 md:p-12 overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.3 }}
             whileHover={{ scale: 1.005 }}
           >
+            {/* Waves inside hero card */}
+            <div className="absolute inset-0 -z-10 pointer-events-none select-none">
+              <Waves 
+                lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
+                backgroundColor="transparent"
+                waveSpeedX={0.012}
+                waveSpeedY={0.006}
+                waveAmpX={35}
+                waveAmpY={22}
+                xGap={16}
+                yGap={26}
+              />
+            </div>
+
             <Suspense fallback={<QuickLoader className="h-1 w-full mb-4" />}>
               <HeroHighlightLine />
             </Suspense>

@@ -221,6 +221,15 @@
   .gradient-last-word span:last-child {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-secondary;
   }
+
+  /* Accessibility: on small screens, remove gradient for better legibility */
+  @media (max-width: 420px) {
+    .gradient-last-word span:last-child {
+      background-image: none !important;
+      -webkit-background-clip: initial;
+      @apply text-primary;
+    }
+  }
 }
 
 .scroll-section {
