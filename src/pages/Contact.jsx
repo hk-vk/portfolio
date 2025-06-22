@@ -31,8 +31,8 @@ import React, { useState } from 'react';import { motion } from 'framer-motion';c
     {
       name: 'Email',
       icon: '📧',
-      value: 'hello@harikrishnan.dev',
-      href: 'mailto:hello@harikrishnan.dev'
+      value: 'vkharikrishnan45@gmail.com',
+      href: 'mailto:vkharikrishnan45@gmail.com'
     },
     {
       name: 'GitHub',
@@ -226,7 +226,7 @@ import React, { useState } from 'react';import { motion } from 'framer-motion';c
           <h3 className="text-lg font-medium mb-4">Quick Actions</h3>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="mailto:hello@harikrishnan.dev?subject=Project Inquiry"
+              href="mailto:vkharikrishnan45@gmail.com?subject=Project Inquiry"
               className="px-6 py-2 border border-border rounded-lg hover:bg-muted transition-colors"
             >
               📧 Quick Email

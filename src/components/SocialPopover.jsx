@@ -52,7 +52,7 @@ const SocialPopover = ({ isOpen, onClose, triggerRef }) => {
   const links = [
     { href: 'https://github.com/hk-vk', icon: 'tabler:brand-github', label: 'GitHub' },
     { href: 'https://linkedin.com/in/harikrishnanvk', icon: 'tabler:brand-linkedin', label: 'LinkedIn' },
-    { href: 'mailto:hello@harikrishnan.dev', icon: 'tabler:mail', label: 'Email' },
+    { href: 'mailto:vkharikrishnan45@gmail.com', icon: 'tabler:mail', label: 'Email' },
   ];
 
   return (
