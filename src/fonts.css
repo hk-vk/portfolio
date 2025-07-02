@@ -1,2 +1,14 @@
+/* Optimized font loading with font-display: swap */
 @import '@fontsource-variable/space-grotesk';
 @import '@fontsource/dm-serif-display';
+
+/* Override font-display for better performance */
+@font-face {
+  font-family: 'Space Grotesk Variable';
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Serif Display';
+  font-display: swap;
+}

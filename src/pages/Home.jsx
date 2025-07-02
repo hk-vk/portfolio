@@ -3,6 +3,7 @@ import { spring } from '../utils/motionSettings';
 import { useMotionSafe } from '../utils/useMotionSafe';
 import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
+import { useIntersectionObserver } from '../utils/usePerformanceHooks';
 
 // Direct import Waves - no lazy loading to ensure immediate visibility
 import Waves from '../components/Waves/Waves';
@@ -126,18 +127,15 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
 
 SkillTag.displayName = 'SkillTag';
 
-const Home = () => {
+const Home = memo(() => {
   const motionSafe = useMotionSafe();
-  const [sectionsVisible, setSectionsVisible] = useState({
-    hero: false,
-    projects: false,
-    experience: false
-  });
-  const [isDarkMode, setIsDarkMode] = useState(false);
   
-  const heroRef = useRef(null);
-  const projectsRef = useRef(null);
-  const experienceRef = useRef(null);
+  // Use optimized intersection observer hooks
+  const [heroRef, heroVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const [projectsRef, projectsVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const [experienceRef, experienceVisible] = useIntersectionObserver({ threshold: 0.1 });
+  
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Check for dark mode
   useEffect(() => {
@@ -159,37 +157,12 @@ const Home = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Intersection observer for performance optimization
-  useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '50px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const sectionId = entry.target.dataset.section;
-          setSectionsVisible(prev => ({ ...prev, [sectionId]: true }));
-        }
-      });
-    }, observerOptions);
-
-    const refs = [
-      { ref: heroRef, id: 'hero' },
-      { ref: projectsRef, id: 'projects' },
-      { ref: experienceRef, id: 'experience' }
-    ];
-
-    refs.forEach(({ ref, id }) => {
-      if (ref.current) {
-        ref.current.dataset.section = id;
-        observer.observe(ref.current);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, []);
+  // Memoize section visibility for performance
+  const sectionsVisible = useMemo(() => ({
+    hero: heroVisible,
+    projects: projectsVisible,
+    experience: experienceVisible
+  }), [heroVisible, projectsVisible, experienceVisible]);
 
   // Ultra-fast animation variants
   const containerVariants = useMemo(() => ({
@@ -448,7 +421,9 @@ const Home = () => {
         </div>
     </div>
   );
-};
+});
+
+Home.displayName = 'Home';
 
 // Sample data
 const featuredProjects = [

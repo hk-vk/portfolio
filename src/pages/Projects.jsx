@@ -34,14 +34,7 @@ const Projects = () => {
       tags: ['TypeScript', 'WebAssembly', 'PDF'],
       year: '2024',
     },
-    {
-      id: '04',
-      title: 'Placeholder Project',
-      description: 'Example description for a placeholder project.',
-      category: 'Frontend',
-      tags: ['React', 'Tailwind CSS'],
-      year: '2023',
-    },
+    
   ];
 
   const filteredProjects = selectedCategory === 'All'

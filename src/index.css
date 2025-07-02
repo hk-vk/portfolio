@@ -61,10 +61,17 @@
     font-family: 'DM Serif Display', serif;
   }
 
-  /* Add transitions to common interactive elements */
+  /* Optimized transitions - only transform and opacity for better performance */
   a,
   button {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-transform duration-200 ease-out;
+  }
+  
+  /* Enable hardware acceleration for better performance */
+  * {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 }
 
@@ -98,11 +105,11 @@
   }
 
   .button-primary {
-    @apply bg-primary hover:bg-primary/80 text-primary-foreground rounded-md px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+    @apply bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-5 py-2.5 text-sm font-semibold transition-transform duration-150 hover:-translate-y-px focus:outline-none focus:ring-2 focus:ring-ring;
   }
 
   .button-secondary {
-    @apply bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-md px-5 py-2.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+    @apply bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md px-5 py-2.5 text-sm font-semibold transition-transform duration-150 hover:-translate-y-px focus:outline-none focus:ring-2 focus:ring-ring;
   }
 
   .skill-tag {
@@ -111,7 +118,7 @@
   }
 
   .portfolio-item {
-    @apply border border-border rounded-md overflow-hidden transition-all duration-300 hover:shadow-md hover:translate-y-[-4px];
+    @apply border border-border rounded-md overflow-hidden transition-transform duration-200 hover:translate-y-[-2px];
   }
 
   .section-divider {

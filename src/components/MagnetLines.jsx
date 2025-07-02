@@ -24,29 +24,32 @@ export default function MagnetLines({
 
     const items = container.querySelectorAll("span");
     
-    // Set initial state
+    // Set initial state - optimized with requestAnimationFrame
     if (items.length) {
-      const middleIndex = Math.floor(items.length / 2);
-      const rect = items[middleIndex].getBoundingClientRect();
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
       mousePositionRef.current = { x: centerX, y: centerY };
       
-      // Initial animation
-      items.forEach((item, index) => {
-        const itemRect = item.getBoundingClientRect();
-        const itemCenterX = itemRect.x + itemRect.width / 2;
-        const itemCenterY = itemRect.y + itemRect.height / 2;
-        
-        const delay = index * 10; // Staggered delay
-        setTimeout(() => {
+      // Batch DOM updates for better performance
+      requestAnimationFrame(() => {
+        items.forEach((item, index) => {
+          const itemRect = item.getBoundingClientRect();
+          const itemCenterX = itemRect.x + itemRect.width / 2;
+          const itemCenterY = itemRect.y + itemRect.height / 2;
+          
           const b = centerX - itemCenterX;
           const a = centerY - itemCenterY;
           const c = Math.sqrt(a * a + b * b) || 1;
           const r = (Math.acos(b / c) * 180) / Math.PI * (centerY > itemCenterY ? 1 : -1);
-          item.style.setProperty("--rotate", `${r + baseAngle}deg`);
-          item.style.setProperty("--opacity", "1");
-        }, delay);
+          
+          // Use CSS transforms for better performance
+          item.style.cssText = `
+            --rotate: ${r + baseAngle}deg;
+            --opacity: 1;
+            transform: rotate(var(--rotate));
+            transition: opacity ${(index % 10) * 50 + 300}ms ease-out;
+          `;
+        });
       });
     }
 
@@ -59,46 +62,69 @@ export default function MagnetLines({
       setIsHovering(false);
     };
 
-    // Animate function for smooth movement
+    // Optimized animate function with throttling and reduced calculations
+    let lastFrameTime = 0;
+    const frameThrottle = 16.67; // ~60fps throttling
+    
     const animate = (time) => {
-      if (!timeRef.current) timeRef.current = time;
-      const elapsed = time - timeRef.current;
-      timeRef.current = time;
+      // Throttle animation to 60fps max
+      if (time - lastFrameTime < frameThrottle) {
+        requestRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTime = time;
 
-      // Only apply pointer-based movement when hovering
+      // Only animate when component is visible and needed
+      if (!container.offsetParent) {
+        requestRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      // Batch DOM updates for better performance
+      const updates = [];
+      
       if (isHovering) {
-        items.forEach((item) => {
-          const rect = item.getBoundingClientRect();
-          const centerX = rect.x + rect.width / 2;
-          const centerY = rect.y + rect.height / 2;
+        // More efficient hover animation - reduced calculations
+        items.forEach((item, index) => {
+          if (index % 2 === 0) { // Only animate every other item for performance
+            const rect = item.getBoundingClientRect();
+            const centerX = rect.x + rect.width / 2;
+            const centerY = rect.y + rect.height / 2;
 
-          // Calculate angle with damping for smoother motion
-          const b = mousePositionRef.current.x - centerX;
-          const a = mousePositionRef.current.y - centerY;
-          const c = Math.sqrt(a * a + b * b) || 1;
-          const targetR = (Math.acos(b / c) * 180) / Math.PI * (mousePositionRef.current.y > centerY ? 1 : -1);
-          
-          // Get current rotation
-          const currentRotateStr = item.style.getPropertyValue("--rotate") || `${baseAngle}deg`;
-          const currentRotate = parseFloat(currentRotateStr);
-          
-          // Smoothly interpolate rotation
-          const newRotate = currentRotate + (targetR - currentRotate) * 0.05;
-          item.style.setProperty("--rotate", `${newRotate}deg`);
+            const b = mousePositionRef.current.x - centerX;
+            const a = mousePositionRef.current.y - centerY;
+            const c = Math.sqrt(a * a + b * b) || 1;
+            const targetR = (Math.acos(b / c) * 180) / Math.PI * (mousePositionRef.current.y > centerY ? 1 : -1);
+            
+            const currentRotateStr = item.style.getPropertyValue("--rotate") || `${baseAngle}deg`;
+            const currentRotate = parseFloat(currentRotateStr);
+            const newRotate = currentRotate + (targetR - currentRotate) * 0.08; // Faster interpolation
+            
+            updates.push({ item, rotate: newRotate });
+          }
         });
       } else {
-        // Subtle breathing animation when not hovering
-        const breathe = Math.sin(time * 0.001) * 5;
+        // Reduced breathing animation frequency
+        const breathe = Math.sin(time * 0.0008) * 3; // Reduced amplitude and frequency
         
         items.forEach((item, index) => {
-          const row = Math.floor(index / columns);
-          const col = index % columns;
-          const offset = (row + col) * 0.1; // Creates a wave effect
-          const angle = baseAngle + breathe + Math.sin(time * 0.0005 + offset) * 8;
-          
-          item.style.setProperty("--rotate", `${angle}deg`);
+          if (index % 3 === 0) { // Only animate every third item
+            const row = Math.floor(index / columns);
+            const col = index % columns;
+            const offset = (row + col) * 0.08;
+            const angle = baseAngle + breathe + Math.sin(time * 0.0003 + offset) * 4;
+            
+            updates.push({ item, rotate: angle });
+          }
         });
       }
+
+      // Apply all updates in a single batch
+      requestAnimationFrame(() => {
+        updates.forEach(({ item, rotate }) => {
+          item.style.transform = `rotate(${rotate}deg)`;
+        });
+      });
 
       requestRef.current = requestAnimationFrame(animate);
     };

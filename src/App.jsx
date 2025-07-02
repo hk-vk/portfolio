@@ -29,9 +29,8 @@ const PageLoader = () => (
 function App() {
   const [loading, setLoading] = useState(true);
 
-  // Optimized theme initialization
+  // Optimized theme initialization with proper cleanup
   useEffect(() => {
-    // Initialize theme immediately without dynamic import for better performance
     const initTheme = () => {
       const savedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -43,9 +42,23 @@ function App() {
     
     initTheme();
     
-    // Fast loading simulation - much quicker
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
+    // Faster loading with reduced time
+    const timer = setTimeout(() => setLoading(false), 300);
+    
+    // Performance optimization: preload critical routes
+    const preloadRoutes = () => {
+      // Preload the most likely next routes
+      import('./pages/Home');
+      import('./pages/About');
+    };
+    
+    // Preload after initial render
+    const preloadTimer = setTimeout(preloadRoutes, 1000);
+    
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(preloadTimer);
+    };
   }, []);
 
   // Ultra-fast loading screen

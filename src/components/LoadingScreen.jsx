@@ -42,20 +42,20 @@ const generateMiniStars = (count) => {
 };
 
 const LoadingScreen = ({ progress }) => {
-  // Animate star pulse
-  const [pulse, cyclePulse] = useCycle(1, 1.15);
-  const [miniStars, setMiniStars] = useState(generateMiniStars(5));
+  // Simplified animations for better performance
+  const [pulse, cyclePulse] = useCycle(1, 1.08); // Reduced pulse amount
+  const [miniStars, setMiniStars] = useState(generateMiniStars(3)); // Fewer stars
 
-  // regenerate constellation every 1.8s
+  // Reduced constellation regeneration frequency
   useEffect(() => {
-    const i = setInterval(() => setMiniStars(generateMiniStars(5)), 1800);
+    const i = setInterval(() => setMiniStars(generateMiniStars(3)), 2500);
     return () => clearInterval(i);
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(cyclePulse, 600);
+    const interval = setInterval(cyclePulse, 800); // Slower pulse
     return () => clearInterval(interval);
-  }, []);
+  }, [cyclePulse]);
 
   // Exit animation controller
   const exitVariants = {
