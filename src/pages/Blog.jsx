@@ -4,48 +4,64 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
 
-// Placeholder for Blog Post Card component - will be created in a separate step
+// Enhanced Blog Post Card component with improved aesthetics
 const BlogPostCard = ({ post }) => (
   <motion.div
-    className="fancy-border group"
+    className="group h-full"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
+    whileHover={{ y: -4 }}
   >
     <Link to={`/blog/${post.id}`} className="block h-full">
-      <div className="border border-border p-6 h-full flex flex-col bg-card hover:shadow-lg group-hover:shadow-xl transition-shadow duration-300 rounded-lg">
+      <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
+                      hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 
+                      transition-all duration-300 rounded-xl 
+                      group-hover:bg-card/90">
         {post.imageUrl ? (
           <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover rounded-md mb-4" />
         ) : (
-          <div className="w-full h-48 rounded-md mb-4 p-6 text-center relative overflow-hidden 
+          <div className="w-full h-48 rounded-md mb-4 relative overflow-hidden 
                           flex flex-col items-center justify-center 
-                          bg-gradient-to-br from-primary/5 via-accent/5 to-card">
-            {/* Decorative Sparkles */}
-            <SparkleIllustration size={16} className="absolute top-4 left-4 text-primary/30 opacity-70" />
-            <SparkleIllustration size={12} className="absolute bottom-6 right-8 text-accent/30 opacity-60" />
-            <SparkleIllustration size={10} className="absolute top-12 right-16 text-primary/20 opacity-50" />
-            <SparkleIllustration size={8} className="absolute bottom-10 left-12 text-accent/20 opacity-40" />
-
-            {/* Subtle background pattern (optional, can be complex to implement without new components) */}
-            {/* <div className="absolute inset-0 pattern-dots opacity-5"></div> */}
-
-            <div className="relative z-10">
-              {/* You can add a more stylized icon here if desired, or remove the SVG altogether */}
-              {/* For example, a simpler, abstract icon or just text */}
-              <svg className="w-10 h-10 text-primary/40 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25M9 17.25h6M9 17.25a2.25 2.25 0 002.25 2.25h1.5A2.25 2.25 0 0015 17.25M9 17.25V9.75M15 17.25V9.75m0-4.5c0-3.941-3.403-6-7.5-6S0 1.309 0 5.25M22.5 9.75c0-3.941-3.403-6-7.5-6S7.5 1.309 7.5 5.25M15 9.75c0 .75-.25 1.5-.656 2.118M9 9.75c0 .75.25 1.5.656 2.118" />              
-              </svg>
-              <h3 className="text-base font-light text-foreground/80 leading-snug">{post.title}</h3>
+                          bg-gradient-to-br from-muted/30 via-background to-muted/10 
+                          border border-border/30 group-hover:border-primary/20 
+                          transition-all duration-300">
+            
+            {/* Subtle decorative elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/[0.02] to-accent/[0.02]"></div>
+            
+            {/* Single sparkle accent */}
+            <SparkleIllustration 
+              size={20} 
+              className="text-primary/40 mb-4 group-hover:text-primary/60 transition-colors duration-300" 
+            />
+            
+            {/* Clean typography */}
+            <div className="relative z-10 px-4">
+              <h3 className="text-sm font-medium text-muted-foreground/80 text-center leading-relaxed">
+                {post.title}
+              </h3>
+              <div className="w-8 h-px bg-primary/30 mx-auto mt-3 group-hover:w-12 group-hover:bg-primary/50 transition-all duration-300"></div>
             </div>
           </div>
         )}
-        <h2 className="text-xl font-bold mb-2 text-foreground">{post.title}</h2>
-        <p className="text-sm text-muted-foreground mb-3">{post.date}</p>
-        <p className="text-muted-foreground mb-4 flex-grow text-sm leading-relaxed">{post.excerpt}</p>
-        <div className="mt-auto">
-          <span className="inline-flex items-center text-primary hover:text-primary/80 text-sm font-semibold group-hover:underline transition-colors duration-200">
-            Read More 
-            <svg className="ml-1 w-4 h-4 transform group-hover:translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+        <div className="flex-grow">
+          <h2 className="text-lg font-semibold mb-3 text-foreground group-hover:text-primary/90 transition-colors duration-300">
+            {post.title}
+          </h2>
+          <p className="text-xs text-muted-foreground/80 mb-3 uppercase tracking-wider font-medium">
+            {post.date}
+          </p>
+          <p className="text-muted-foreground mb-6 text-sm leading-relaxed line-clamp-3">
+            {post.excerpt}
+          </p>
+        </div>
+        <div className="mt-auto pt-4 border-t border-border/30">
+          <span className="inline-flex items-center text-primary/80 hover:text-primary text-sm font-medium 
+                           group-hover:translate-x-1 transition-all duration-300">
+            Read Article
+            <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m7-5H6" />
             </svg>
           </span>
@@ -89,34 +105,50 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
   ];
 
   return (
-    <div className="pt-32 pb-20">
+    <div className="pt-32 pb-20 min-h-screen bg-gradient-to-br from-background via-background to-muted/5">
       <AnimatedSection animation="fadeUp">
-        <div className="content-container text-center mb-16">
-          <motion.h1
-            className="text-3xl md:text-4xl font-bold uppercase mb-6"
+        <div className="content-container text-center mb-20">
+          <motion.div
+            className="flex items-center justify-center mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            BLOG
-          </motion.h1>
+            <SparkleIllustration className="text-primary mr-3" size={24} />
+            <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider">
+              BLOG
+            </h1>
+          </motion.div>
           <motion.p
-            className="text-muted-foreground max-w-2xl mx-auto"
+            className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            Thoughts, stories, and ideas.
+            Thoughts, stories, and ideas worth sharing.
           </motion.p>
+          <motion.div
+            className="w-16 h-px bg-primary/40 mx-auto mt-6"
+            initial={{ width: 0 }}
+            animate={{ width: "4rem" }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+          />
         </div>
       </AnimatedSection>
 
       <AnimatedSection animation="fadeIn" delay={0.3}>
         <div className="content-container">
           {blogPosts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
               {blogPosts.map((post, index) => (
-                <BlogPostCard key={post.id} post={post} />
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index, duration: 0.6 }}
+                >
+                  <BlogPostCard post={post} />
+                </motion.div>
               ))}
             </div>
           ) : (
