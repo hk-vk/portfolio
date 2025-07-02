@@ -286,33 +286,153 @@ const SpeedReader = ({ content, isActive, wordsPerMinute, chunkSize }) => {
   );
 };
 
+// Enhanced guided reading component with formatted content and word highlighting
+const HighlightableMarkdown = ({ content, currentWordIndex, wordRefs }) => {
+  const [wordElements, setWordElements] = useState([]);
+  
+  useEffect(() => {
+    // Extract all words from the plain text version for indexing
+    const plainText = stripMarkdown(content);
+    const words = plainText.split(/\s+/).filter(w => w.length > 0);
+    setWordElements(words);
+  }, [content]);
+
+  // Custom text renderer that adds word highlighting
+  const renderText = (text, elementType = 'span') => {
+    const words = text.split(/(\s+)/);
+    let wordIndex = 0;
+    
+    return words.map((part, i) => {
+      if (/\s/.test(part)) {
+        return part; // Return whitespace as-is
+      }
+      
+      // Find the global word index
+      const globalWordIndex = wordElements.findIndex((word, idx) => 
+        idx >= wordIndex && word.toLowerCase() === part.toLowerCase()
+      );
+      
+      if (globalWordIndex !== -1) {
+        wordIndex = globalWordIndex + 1;
+        const isHighlighted = globalWordIndex === currentWordIndex;
+        const wordId = `word-${globalWordIndex}`;
+        
+        return (
+          <motion.span
+            key={`${wordId}-${i}`}
+            ref={el => {
+              if (wordRefs.current && wordId) {
+                wordRefs.current[wordId] = { current: el };
+              }
+            }}
+            className={`guided-word cursor-pointer transition-all duration-200 ease-in-out ${
+              isHighlighted 
+                ? 'bg-primary/40 text-primary-foreground rounded-md px-1 py-0.5 shadow-md font-medium' 
+                : 'hover:bg-muted/20 rounded-sm'
+            }`}
+            animate={isHighlighted ? { 
+              scale: 1.05,
+              boxShadow: '0 4px 12px rgba(var(--primary), 0.4)'
+            } : { 
+              scale: 1,
+              boxShadow: '0 0px 0px rgba(var(--primary), 0)'
+            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            {part}
+          </motion.span>
+        );
+      }
+      
+      return part;
+    });
+  };
+
+  return (
+    <div className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content">
+      <ReactMarkdown 
+        remarkPlugins={[remarkGfm]}
+        components={{
+          // Enhanced text rendering with word highlighting
+          p: ({ children }) => (
+            <p className="mb-6 leading-relaxed tracking-wide">
+              {typeof children === 'string' ? renderText(children) : children}
+            </p>
+          ),
+          h1: ({ children }) => (
+            <h1 className="text-3xl md:text-4xl font-bold mb-6 mt-10 leading-tight">
+              {typeof children === 'string' ? renderText(children) : children}
+            </h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className="text-2xl md:text-3xl font-bold mb-5 mt-8 leading-tight">
+              {typeof children === 'string' ? renderText(children) : children}
+            </h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className="text-xl md:text-2xl font-bold mb-4 mt-6">
+              {typeof children === 'string' ? renderText(children) : children}
+            </h3>
+          ),
+          strong: ({ children }) => (
+            <strong className="font-bold text-primary">
+              {typeof children === 'string' ? renderText(children) : children}
+            </strong>
+          ),
+          em: ({ children }) => (
+            <em className="italic text-accent">
+              {typeof children === 'string' ? renderText(children) : children}
+            </em>
+          ),
+          code: ({ children }) => (
+            <code className="bg-muted/70 text-primary px-1.5 py-0.5 rounded text-sm font-mono">
+              {children}
+            </code>
+          ),
+          li: ({ children }) => (
+            <li className="mb-2">
+              {typeof children === 'string' ? renderText(children) : children}
+            </li>
+          ),
+          ul: ({ children }) => <ul className="list-disc pl-6 mb-6 space-y-2">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal pl-6 mb-6 space-y-2">{children}</ol>,
+          a: ({ children, href }) => (
+            <a href={href} className="text-primary hover:text-primary/80 hover:underline transition-colors">
+              {typeof children === 'string' ? renderText(children) : children}
+            </a>
+          ),
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-6">
+              {children}
+            </blockquote>
+          )
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+};
+
 const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
-  const [wordsData, setWordsData] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
+  const [totalWords, setTotalWords] = useState(0);
+  const [progress, setProgress] = useState(0);
   const wordRefs = useRef({});
   const intervalRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // Strip markdown syntax before processing
-    const plainTextContent = stripMarkdown(content);
-    
-    const paragraphs = plainTextContent.split('\n').filter(p => p.trim() !== '');
-    let wordCounter = 0;
-    const processedWords = paragraphs.map((paragraph, pIndex) => {
-      const words = paragraph.trim().split(/\s+/).filter(w => w.length > 0);
-      return words.map((word, wIndex) => {
-        const id = `word-${pIndex}-${wIndex}-${wordCounter++}`;
-        wordRefs.current[id] = React.createRef();
-        return { text: word, id, paragraphIndex: pIndex };
-      });
-    });
-    setWordsData(processedWords.flat());
+    // Count total words for progress tracking
+    const plainText = stripMarkdown(content);
+    const words = plainText.split(/\s+/).filter(w => w.length > 0);
+    setTotalWords(words.length);
     setCurrentWordIndex(-1);
+    setProgress(0);
   }, [content]);
 
   useEffect(() => {
-    if (isActive && wordsData.length > 0) {
+    if (isActive && totalWords > 0) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setCurrentWordIndex(0);
 
@@ -320,54 +440,87 @@ const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
       intervalRef.current = setInterval(() => {
         setCurrentWordIndex(prevIndex => {
           const nextIndex = prevIndex + 1;
-          if (nextIndex >= wordsData.length) {
+          if (nextIndex >= totalWords) {
             clearInterval(intervalRef.current);
+            setProgress(100);
             return prevIndex;
           }
-          const wordId = wordsData[nextIndex].id;
+          
+          // Update progress
+          const newProgress = Math.round((nextIndex / totalWords) * 100);
+          setProgress(newProgress);
+          
+          // Auto-scroll to current word
+          const wordId = `word-${nextIndex}`;
           const wordElement = wordRefs.current[wordId]?.current;
           if (wordElement && containerRef.current) {
             const containerRect = containerRef.current.getBoundingClientRect();
             const wordRect = wordElement.getBoundingClientRect();
             
-            if (wordRect.top < containerRect.top + 50 || wordRect.bottom > containerRect.bottom - 50) {
-                 wordElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center' 
-                });
+            if (wordRect.top < containerRect.top + 100 || wordRect.bottom > containerRect.bottom - 100) {
+              wordElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+              });
             }
           }
+          
           return nextIndex;
         });
       }, interval);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
-    return () => clearInterval(intervalRef.current);
-  }, [isActive, wordsData, wordsPerMinute]);
+    
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [isActive, totalWords, wordsPerMinute]);
 
   if (!isActive) return null;
-  if (wordsData.length === 0) return <p className="text-muted-foreground">Preparing guided reading...</p>; 
+  if (totalWords === 0) return <p className="text-muted-foreground">Preparing guided reading...</p>;
 
-  let currentPIndex = -1;
   return (
-    <div ref={containerRef} className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content mb-8 relative overflow-auto" style={{maxHeight: '50vh'}}>
-      {wordsData.reduce((acc, word, index) => {
-        if (word.paragraphIndex !== currentPIndex) {
-          if (currentPIndex !== -1) acc.push(<br key={`br-${word.paragraphIndex}`} />);
-          currentPIndex = word.paragraphIndex;
-        }
-        acc.push(
-          <motion.span 
-            key={word.id} 
-            ref={wordRefs.current[word.id]}
-            className={`transition-colors duration-100 ease-in-out ${index === currentWordIndex ? 'bg-primary/30 text-primary-foreground rounded px-0.5' : ''}`}
-          >
-            {word.text}{' '}
-          </motion.span>
-        );
-        return acc;
-      }, [])}
+    <div className="mb-8">
+      {/* Progress Bar */}
+      <div className="mb-6 p-4 bg-card/50 backdrop-blur-sm border border-border/30 rounded-lg">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-foreground">Reading Progress</span>
+          <span className="text-sm text-muted-foreground">
+            {currentWordIndex + 1} / {totalWords} words ({progress}%)
+          </span>
+        </div>
+        <div className="w-full bg-muted/30 rounded-full h-2 overflow-hidden">
+          <motion.div 
+            className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          />
+        </div>
+        <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+          <span>Est. time remaining: ~{Math.ceil((totalWords - currentWordIndex) / wordsPerMinute)}m</span>
+          <span>{wordsPerMinute} WPM</span>
+        </div>
+      </div>
+
+      {/* Enhanced Content with Formatting Preserved */}
+      <div 
+        ref={containerRef} 
+        className="relative bg-card/30 backdrop-blur-sm border border-border/20 rounded-xl p-6 
+                   max-h-[60vh] overflow-auto shadow-inner"
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'hsl(var(--primary) / 0.3) transparent'
+        }}
+      >
+        <HighlightableMarkdown 
+          content={content}
+          currentWordIndex={currentWordIndex}
+          wordRefs={wordRefs}
+        />
+      </div>
     </div>
   );
 };
