@@ -67,12 +67,7 @@
     @apply transition-transform duration-200 ease-out;
   }
   
-  /* Enable hardware acceleration for better performance */
-  * {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
+  /* Hardware acceleration for specific elements only - avoid universal selector */
 }
 
 @layer components {

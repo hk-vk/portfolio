@@ -11,22 +11,16 @@ const Navbar = () => {
   const contactIconRef = useRef(null);
 
   useEffect(() => {
-    // Throttled scroll handler for better performance
-    let ticking = false;
-    
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrollPosition = window.scrollY;
-          setIsScrolled(scrollPosition > 10);
-          ticking = false;
-        });
-        ticking = true;
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
       }
     };
 
-    // Passive listener for better performance
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -90,6 +84,13 @@ const Navbar = () => {
       animate="visible"
       variants={headerVariants}
       className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-auto"
+      style={{ 
+        position: 'fixed',
+        bottom: '1.5rem',
+        left: '0',
+        right: '0',
+        zIndex: 50
+      }}
     >
       {/* Floating pill wrapper */}
       <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-6 py-3 gap-x-6 pointer-events-auto">
