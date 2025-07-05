@@ -16,6 +16,7 @@ const Projects = lazy(() => import('./pages/Projects'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
+const OGPreview = lazy(() => import('./pages/OGPreview'));
 
 // Lazy load utilities for better performance
 const ScrollToTop = lazy(() => import('./utils/ScrollToTop'));
@@ -79,9 +80,10 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/projects" element={<Projects />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:postId" element={<BlogPostPage />} />
-                <Route path="/contact" element={<Contact />} />
+                              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:postId" element={<BlogPostPage />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/og-preview" element={<OGPreview />} />
               </Routes>
             </Suspense>
           </main>
