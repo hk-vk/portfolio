@@ -578,7 +578,7 @@ const BlogPostPage = () => {
         description={post.excerpt || stripMarkdown(post.content).substring(0, 160) + '...'}
         url={`/blog/${post.id}`}
         type="article"
-        image={post.imageUrl || "https://i.postimg.cc/CZzW7hVn/og-blog.png"}
+        image={post.imageUrl || `/api/og?type=blog-post&blogTitle=${encodeURIComponent(post.title)}&blogExcerpt=${encodeURIComponent(post.excerpt || stripMarkdown(post.content).substring(0, 120))}&date=${encodeURIComponent(post.date || 'May 11, 2025')}&readTime=${encodeURIComponent(post.readTime || '2 min read')}`}
       />
       <div className="pt-32 pb-20">
       <AnimatedSection animation="fadeUp">

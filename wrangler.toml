@@ -8,5 +8,8 @@ pages_build_output_dir = "dist"
 [vars]
 NPM_FLAGS = "--version"
 
+[functions]
+directory = "functions"
+
 [env.production]
 # Specify the build command in the Cloudflare dashboard instead 
