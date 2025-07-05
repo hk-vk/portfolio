@@ -437,23 +437,35 @@ Home.displayName = 'Home';
 const featuredProjects = [
   {
     id: '01',
-    title: 'YEAH',
-    tags: ['TypeScript', 'Fake News Detection', 'Web App'],
+    title: 'YEAH - FAKE NEWS DETECTOR',
+    tags: ['TypeScript', 'AI/ML', 'Computer Vision'],
+    image: '/projects/images/yeah-fake-news.jpg',
+    liveUrl: 'https://yeah-fake-news-detector.vercel.app',
+    githubUrl: 'https://github.com/yourusername/yeah-fake-news-detector',
   },
   {
     id: '02',
     title: 'COMMITSTORYGEN',
     tags: ['JavaScript', 'GitHub API', 'Story Generation'],
+    image: '/projects/images/commitstorygen.jpg',
+    liveUrl: 'https://commitstorygen.netlify.app',
+    githubUrl: 'https://github.com/yourusername/commitstorygen',
   },
   {
     id: '03',
-    title: 'PDFX',
-    tags: ['TypeScript', 'PDF Processing', 'Offline Tools'],
+    title: 'PDFX TOOLKIT',
+    tags: ['TypeScript', 'WebAssembly', 'Privacy'],
+    image: '/projects/images/pdfx.jpg',
+    liveUrl: 'https://pdfx-toolkit.vercel.app',
+    githubUrl: 'https://github.com/yourusername/pdfx-toolkit',
   },
   {
     id: '04',
-    title: 'PORTFOLIO',
-    tags: ['React', 'Framer Motion', 'Tailwind'],
+    title: 'AI CODE REVIEWER',
+    tags: ['Python', 'Machine Learning', 'Code Analysis'],
+    image: '/projects/images/ai-code-reviewer.jpg',
+    liveUrl: 'https://ai-code-reviewer.streamlit.app',
+    githubUrl: 'https://github.com/yourusername/ai-code-reviewer',
   },
 ];
 
