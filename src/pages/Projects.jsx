@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import AnimatedSection from '../components/AnimatedSection';
 import SparkleIllustration from '../components/SparkleIllustration';
 import LeafIllustration from '../components/LeafIllustration';
+import { useSocialPopover } from '../context/SocialPopoverContext';
 
 const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
+  const { toggleSocialPopover } = useSocialPopover();
+  const contactButtonRef = useRef(null);
 
   const categories = ['All', 'Web App', 'Mobile App', 'Desktop App', 'DevOps', 'AI/ML', 'Blockchain'];
 
@@ -326,8 +329,9 @@ const Projects = () => {
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                 I'm always open to discussing product design work or partnership opportunities.
               </p>
-              <a
-                href="/contact"
+              <button
+                ref={contactButtonRef}
+                onClick={() => toggleSocialPopover(contactButtonRef)}
                 className="button-primary inline-flex items-center"
               >
                 Get in Touch
@@ -339,10 +343,11 @@ const Projects = () => {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </a>
+              </button>
             </div>
           </div>
         </AnimatedSection>
+
       </div>
     </div>
   );

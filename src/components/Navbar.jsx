@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import ThemeToggle from './ThemeToggle';
 import SocialPopover from './SocialPopover';
+import { useSocialPopover } from '../context/SocialPopoverContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const contactIconRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,15 +26,15 @@ const Navbar = () => {
 
   const mainLinks = [
     { name: 'Home', path: '/', icon: 'tabler:home' },
-    { name: 'Blog', path: '/blog', icon: 'tabler:pencil' },
     { name: 'Work', path: '/projects', icon: 'tabler:code' },
+    { name: 'Blog', path: '/blog', icon: 'tabler:pencil' },
     { name: 'Connect', path: '/contact', icon: 'tabler:at' },
   ];
 
   // Track hover to move star smoothly like the provided example
   const [hoverIndex, setHoverIndex] = useState(null);
-  // Popover state for social links
-  const [socialOpen, setSocialOpen] = useState(false);
+  // Use context for social popover state
+  const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } = useSocialPopover();
 
   // Determine which link should be marked active (supports nested URLs)
   const activeIndex = mainLinks.findIndex(({ path }) =>
@@ -84,7 +84,7 @@ const Navbar = () => {
       animate="visible"
       variants={headerVariants}
       className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-auto"
-      style={{ 
+      style={{
         position: 'fixed',
         bottom: '1.5rem',
         left: '0',
@@ -101,16 +101,16 @@ const Navbar = () => {
             const isHovered = idx === hoverIndex;
             return (              <motion.div
                 key={link.path}
-                ref={link.name === 'Connect' ? contactIconRef : null}
+                ref={link.name === 'Connect' ? triggerRef : null}
                 whileHover="hover"
                 whileTap="tap"
                 variants={navItemVariants}
-                className="relative flex flex-col items-center justify-center min-w-[56px] sm:min-w-[64px] cursor-pointer"
+                className={`relative flex flex-col items-center justify-center min-w-[56px] sm:min-w-[64px] cursor-pointer ${link.name === 'Connect' && socialOpen ? 'z-20' : ''}`}
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
                 onClick={() => {
                   if (link.name === 'Connect') {
-                    setSocialOpen((prev) => !prev);
+                    toggleSocialPopover();
                   }
                 }}
                 style={{
@@ -125,7 +125,7 @@ const Navbar = () => {
                 >                  {/* Front face with icon */}
                   <motion.div
                     className={`absolute inset-0 flex flex-col items-center justify-center ${
-                      isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-background/50 text-foreground'
+                      isActive || (link.name === 'Connect' && socialOpen) ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-background/50 text-foreground'
                     } backdrop-blur-sm border border-border/20 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
@@ -142,8 +142,8 @@ const Navbar = () => {
                       restDelta: 0.01,
                     }}
                   >
-                    <Icon 
-                      icon={link.icon} 
+                    <Icon
+                      icon={link.icon}
                       className="text-lg sm:text-xl"
                     />
                   </motion.div>
@@ -151,7 +151,7 @@ const Navbar = () => {
                   {/* Back face with label */}
                   <motion.div
                     className={`absolute inset-0 flex flex-col items-center justify-center ${
-                      isActive ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-accent/80 text-accent-foreground'
+                      isActive || (link.name === 'Connect' && socialOpen) ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-accent/80 text-accent-foreground'
                     } backdrop-blur-sm border border-border/20 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
@@ -192,13 +192,13 @@ const Navbar = () => {
 
         {/* Theme Toggle */}
         <motion.div
-          whileHover={{ 
-            scale: 1.05, 
+          whileHover={{
+            scale: 1.05,
             rotate: 3,
             y: -1
           }}
           whileTap={{ scale: 0.95, rotate: 0 }}
-          transition={{ 
+          transition={{
             duration: 0.3,
             type: 'spring',
             stiffness: 300,
@@ -212,11 +212,8 @@ const Navbar = () => {
         {/* Social Popover is now a direct child of the main pill */}
         <SocialPopover
           isOpen={socialOpen}
-          onClose={() => {
-            console.log('Popover onClose called');
-            setSocialOpen(false);
-          }}
-          triggerRef={contactIconRef}
+          onClose={closeSocialPopover}
+          triggerRef={triggerRef}
         />
       </div>
     </motion.header>
