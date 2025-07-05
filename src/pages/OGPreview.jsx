@@ -13,27 +13,29 @@ const OGPreview = () => {
           <div className="text-center">
             <h2 className="text-2xl font-semibold text-white mb-4">Homepage OG Image</h2>
             <div className="bg-gray-900 p-4 rounded-lg inline-block">
-              <img src="/og-homepage.svg" alt="Homepage OG" className="max-w-full h-auto" />
+              <img src="/og-homepage.png" alt="Homepage OG" className="max-w-full h-auto" />
             </div>
-            <p className="text-gray-400 mt-2">URL: /og-homepage.svg</p>
+            <p className="text-gray-400 mt-2">URL: /og-homepage.png</p>
           </div>
 
           {/* Blog OG */}
           <div className="text-center">
-            <h2 className="text-2xl font-semibold text-white mb-4">Blog Page OG Image</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">Blog Page & Blog Posts OG Image</h2>
             <div className="bg-gray-900 p-4 rounded-lg inline-block">
-              <img src="/og-blog.svg" alt="Blog OG" className="max-w-full h-auto" />
+              <img src="/og-blog.png" alt="Blog OG" className="max-w-full h-auto" />
             </div>
-            <p className="text-gray-400 mt-2">URL: /og-blog.svg</p>
+            <p className="text-gray-400 mt-2">URL: /og-blog.png (used for all blog pages)</p>
           </div>
 
-          {/* Blog Post OG */}
+          {/* Note about future blog posts */}
           <div className="text-center">
-            <h2 className="text-2xl font-semibold text-white mb-4">Blog Post OG Image</h2>
-            <div className="bg-gray-900 p-4 rounded-lg inline-block">
-              <img src="/og-blog-portfolio-speed-reader-blog.svg" alt="Blog Post OG" className="max-w-full h-auto" />
+            <h2 className="text-2xl font-semibold text-white mb-4">Future: Individual Blog Post Images</h2>
+            <div className="bg-gray-800 p-6 rounded-lg inline-block border-2 border-dashed border-gray-600">
+              <p className="text-gray-400 text-lg">🚀 Coming Soon</p>
+              <p className="text-gray-300 mt-2">Dynamic OG images for each blog post</p>
+              <p className="text-gray-500 text-sm mt-1">For now, all blog posts use the same beautiful blog image above</p>
             </div>
-            <p className="text-gray-400 mt-2">URL: /og-blog-portfolio-speed-reader-blog.svg</p>
+            <p className="text-gray-400 mt-2">We can implement dynamic blog post images later</p>
           </div>
         </div>
 
