@@ -1,5 +1,4 @@
 import React from 'react';
-import OGImageGenerator from '../components/OGImageGenerator';
 
 const OGPreview = () => {
   return (
@@ -14,33 +13,27 @@ const OGPreview = () => {
           <div className="text-center">
             <h2 className="text-2xl font-semibold text-white mb-4">Homepage OG Image</h2>
             <div className="bg-gray-900 p-4 rounded-lg inline-block">
-              <OGImageGenerator type="homepage" />
+              <img src="/og-homepage.svg" alt="Homepage OG" className="max-w-full h-auto" />
             </div>
-            <p className="text-gray-400 mt-2">URL: /api/og?type=homepage</p>
+            <p className="text-gray-400 mt-2">URL: /og-homepage.svg</p>
           </div>
 
           {/* Blog OG */}
           <div className="text-center">
             <h2 className="text-2xl font-semibold text-white mb-4">Blog Page OG Image</h2>
             <div className="bg-gray-900 p-4 rounded-lg inline-block">
-              <OGImageGenerator type="blog" />
+              <img src="/og-blog.svg" alt="Blog OG" className="max-w-full h-auto" />
             </div>
-            <p className="text-gray-400 mt-2">URL: /api/og?type=blog</p>
+            <p className="text-gray-400 mt-2">URL: /og-blog.svg</p>
           </div>
 
           {/* Blog Post OG */}
           <div className="text-center">
             <h2 className="text-2xl font-semibold text-white mb-4">Blog Post OG Image</h2>
             <div className="bg-gray-900 p-4 rounded-lg inline-block">
-              <OGImageGenerator 
-                type="blog-post"
-                blogTitle="Don't spend too much time reading my blogs."
-                blogExcerpt="Seriously, who has time for long reads? Use my speed reader and get on with your day. Here's why it's awesome."
-                date="May 11, 2025"
-                readTime="2 min read"
-              />
+              <img src="/og-blog-portfolio-speed-reader-blog.svg" alt="Blog Post OG" className="max-w-full h-auto" />
             </div>
-            <p className="text-gray-400 mt-2">URL: /api/og?type=blog-post&blogTitle=...</p>
+            <p className="text-gray-400 mt-2">URL: /og-blog-portfolio-speed-reader-blog.svg</p>
           </div>
         </div>
 
