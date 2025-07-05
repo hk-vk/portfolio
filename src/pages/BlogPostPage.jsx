@@ -4,6 +4,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import SEOHead from '../components/SEOHead';
 
 // Utility function to strip Markdown syntax
 const stripMarkdown = (markdownText) => {
@@ -571,7 +572,15 @@ const BlogPostPage = () => {
   }
 
   return (
-    <div className="pt-32 pb-20">
+    <>
+      <SEOHead 
+        title={`${post.title} | Harikrishnan V K`}
+        description={post.excerpt || stripMarkdown(post.content).substring(0, 160) + '...'}
+        url={`/blog/${post.id}`}
+        type="article"
+        image={post.imageUrl || `/og-blog-${post.id}.svg`}
+      />
+      <div className="pt-32 pb-20">
       <AnimatedSection animation="fadeUp">
         <div className="content-container max-w-3xl mx-auto">
           <motion.h1
@@ -649,6 +658,7 @@ const BlogPostPage = () => {
         </div>
       </AnimatedSection>
     </div>
+    </>
   );
 };
 

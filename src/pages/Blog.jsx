@@ -3,6 +3,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
+import SEOHead from '../components/SEOHead';
 
 // Enhanced Blog Post Card component with improved aesthetics
 const BlogPostCard = ({ post }) => (
@@ -105,7 +106,14 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
   ];
 
   return (
-    <div className="pt-32 pb-20 min-h-screen bg-gradient-to-br from-background via-background to-muted/5">
+    <>
+      <SEOHead 
+        title="Blog | Harikrishnan V K"
+        description="Read my thoughts on web development, programming, and technology. Discover insights about React, Node.js, and modern web development practices."
+        url="/blog"
+        type="website"
+      />
+      <div className="pt-32 pb-20 min-h-screen bg-gradient-to-br from-background via-background to-muted/5">
       <AnimatedSection animation="fadeUp">
         <div className="content-container text-center mb-20">
           <motion.div
@@ -174,6 +182,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
         </div>
       </AnimatedSection>
     </div>
+    </>
   );
 };
 

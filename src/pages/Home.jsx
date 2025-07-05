@@ -4,6 +4,7 @@ import { useMotionSafe } from '../utils/useMotionSafe';
 import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
+import SEOHead from '../components/SEOHead';
 
 // Direct import Waves - no lazy loading to ensure immediate visibility
 import Waves from '../components/Waves/Waves';
@@ -193,7 +194,13 @@ const Home = memo(() => {
   // Memoized featured projects for this component
   const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
-    <div className="pt-16 md:pt-24 pb-20 overflow-hidden relative">
+    <>
+      <SEOHead 
+        title="Harikrishnan V K | Full-Stack Developer Portfolio"
+        description="Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences."
+        url="/"
+      />
+      <div className="pt-16 md:pt-24 pb-20 overflow-hidden relative">
       {/* Waves Background - hero section only */}
       <div ref={heroRef} className="mb-0 relative overflow-hidden">
         {/* Hero content container */}
@@ -420,6 +427,7 @@ const Home = memo(() => {
           </div>
         </div>
     </div>
+    </>
   );
 });
 
