@@ -8,7 +8,7 @@ const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
 
-  const categories = ['All', 'Web App', 'Mobile App', 'DevOps', 'AI/ML', 'Blockchain'];
+  const categories = ['All', 'Web App', 'Mobile App', 'Desktop App', 'DevOps', 'AI/ML', 'Blockchain'];
 
   const projects = [
     {
@@ -58,6 +58,21 @@ const Projects = () => {
       features: ['Merge PDFs', 'Split PDFs', 'Compress Files', 'Add Watermarks', 'Extract Pages', 'OCR Support'],
       challenges: 'Implementing complex PDF operations in the browser while maintaining performance and file size limits.',
       solutions: 'Leveraged WebAssembly for heavy computations and implemented chunked processing for large files.'
+    },
+    {
+      id: '04',
+      title: 'Cricket Score Widget',
+      description: 'An always-on-top Windows desktop application for live cricket scores built with Electron and React',
+      fullDescription: 'A simple system tray widget for Windows that displays live cricket scores from Cricbuzz. Features include fetching live match lists, detailed scorecards, match status updates, pinning functionality, light/dark theme toggling, and auto-refresh capabilities.',
+      category: 'Desktop App',
+      tags: ['Electron', 'React', 'JavaScript', 'Desktop', 'System Tray', 'Windows'],
+      image: 'https://i.ibb.co/7dDSnW5j/Screenshot-2025-07-06-020503.png',
+      video: '/projects/videos/cricket-widget-demo.mp4',
+      githubUrl: 'https://github.com/hk-vk/cricket-score-widget',
+      techStack: ['Electron', 'React', 'Vite', 'Node.js', 'Cheerio', 'CSS'],
+      features: ['Live Cricket Scores', 'System Tray Integration', 'Always-on-Top Window', 'Light/Dark Theme', 'Auto-refresh', 'Draggable Interface'],
+      challenges: 'Creating a system tray application with real-time data fetching while maintaining performance and user experience.',
+      solutions: 'Implemented efficient data scraping, optimized refresh intervals, and created an intuitive always-on-top interface.'
     }
   ];
 
