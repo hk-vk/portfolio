@@ -132,6 +132,20 @@
     @apply text-primary font-medium;
   }
 
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
   /* Enhanced Blog Content Styles */
   .blog-content p {
     @apply tracking-wide leading-relaxed mb-6 text-base;

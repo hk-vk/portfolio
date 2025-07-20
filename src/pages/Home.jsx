@@ -50,7 +50,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
 
   return (
     <motion.div
-      className="portfolio-item overflow-hidden group"
+      className="portfolio-item overflow-hidden group rounded-xl border border-border/50 hover:border-primary/30 transition-all duration-300"
       variants={cardVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
@@ -58,6 +58,21 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
       layout
     >
       <div className="relative overflow-hidden aspect-video bg-muted">
+        {/* Faded background image with gradient overlay */}
+        <div className="absolute inset-0">
+          <img
+            src={project.image}
+            alt={project.title}
+            className="w-full h-full object-cover opacity-40 transition-opacity duration-300 group-hover:opacity-50"
+            onLoad={() => setImageLoaded(true)}
+            style={{ opacity: imageLoaded ? 0.4 : 0 }}
+          />
+          {/* Cool gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/70 to-transparent"></div>
+          {/* Additional gradient for extra cool effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+        </div>
+        
         <AnimatePresence>
           {!imageLoaded && (
             <motion.div
@@ -72,26 +87,55 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
         </AnimatePresence>
         
         <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-background/95 to-transparent flex items-end p-4"
+          className="absolute inset-0 bg-gradient-to-t from-background/95 to-transparent flex items-end p-6"
           initial={{ opacity: 0.9 }}
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.15 }}
         >
           <div className="w-full">
-            <div className="flex flex-wrap gap-1 mb-2">
+            <div className="flex flex-wrap gap-1 mb-3">
               {project.tags.map((tag, i) => (
-                <span key={i} className="text-xs px-2 py-1 bg-background/90 text-foreground rounded-full backdrop-blur-sm">
+                <span key={i} className="text-xs px-2 py-1 bg-background/90 text-foreground rounded-full backdrop-blur-sm border border-border/50">
                   {tag}
                 </span>
               ))}
             </div>
-            <h3 className="text-lg font-bold mb-1">{project.title}</h3>
+            <h3 className="text-xl font-bold mb-2 text-foreground">{project.title}</h3>
+            {project.description && (
+              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                {project.description}
+              </p>
+            )}
             <motion.div
-              className="h-0.5 bg-primary rounded-full"
+              className="h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"
               initial={{ width: 0 }}
-              animate={isVisible ? { width: "30%" } : { width: 0 }}
+              animate={isVisible ? { width: "40%" } : { width: 0 }}
               transition={{ delay: 0.15 + (0.03 * index), duration: 0.25 }}
             />
+            
+            {/* Action buttons */}
+            <div className="flex gap-2 mt-4">
+              {project.liveUrl && (
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors"
+                >
+                  Live Demo
+                </a>
+              )}
+              {project.githubUrl && (
+                <a
+                  href={project.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs px-3 py-1 bg-muted/50 text-muted-foreground rounded-full hover:bg-muted/70 transition-colors"
+                >
+                  GitHub
+                </a>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
@@ -437,35 +481,38 @@ Home.displayName = 'Home';
 const featuredProjects = [
   {
     id: '01',
-    title: 'YEAH - FAKE NEWS DETECTOR',
-    tags: ['TypeScript', 'AI/ML', 'Computer Vision'],
-    image: '/projects/images/yeah-fake-news.jpg',
-    liveUrl: 'https://yeah-fake-news-detector.vercel.app',
-    githubUrl: 'https://github.com/yourusername/yeah-fake-news-detector',
+    title: 'YEAH - Fake News Detector',
+    description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
+    tags: ['TypeScript', 'React', 'Fake News Detection', 'AI/ML', 'Computer Vision'],
+    image: 'https://i.ibb.co/8L95n5wZ/yeahpreview.png',
+    liveUrl: 'https://www.yeahml.live',
+    githubUrl: 'https://github.com/hk-vk/yeah',
   },
   {
     id: '02',
-    title: 'COMMITSTORYGEN',
-    tags: ['JavaScript', 'GitHub API', 'Story Generation'],
-    image: '/projects/images/commitstorygen.jpg',
-    liveUrl: 'https://commitstorygen.netlify.app',
-    githubUrl: 'https://github.com/yourusername/commitstorygen',
+    title: 'CommitStoryGen',
+    description: 'A web App that generates a storyline based on the commit history of a github repo',
+    tags: ['JavaScript', 'Node.js', 'GitHub API', 'Story Generation', 'Data Visualization'],
+    image: 'https://i.ibb.co/3mZDXJPg/image.png',
+    liveUrl: 'https://commitstorygen.vercel.app/',
+    githubUrl: 'https://github.com/hk-vk/commitstorygen',
   },
   {
     id: '03',
-    title: 'PDFX TOOLKIT',
-    tags: ['TypeScript', 'WebAssembly', 'Privacy'],
-    image: '/projects/images/pdfx.jpg',
-    liveUrl: 'https://pdfx-toolkit.vercel.app',
-    githubUrl: 'https://github.com/yourusername/pdfx-toolkit',
+    title: 'PDFx - Offline PDF Toolkit',
+    description: 'A fully offline PDF manipulation toolkit with all processing done in your browser',
+    tags: ['TypeScript', 'WebAssembly', 'PDF', 'Privacy', 'Offline-First'],
+    image: 'https://i.ibb.co/pvwgtwFx/image.png',
+    liveUrl: 'https://pdfx-8su.pages.dev/',
+    githubUrl: 'https://github.com/hk-vk/pdfX',
   },
   {
     id: '04',
-    title: 'AI CODE REVIEWER',
-    tags: ['Python', 'Machine Learning', 'Code Analysis'],
-    image: '/projects/images/ai-code-reviewer.jpg',
-    liveUrl: 'https://ai-code-reviewer.streamlit.app',
-    githubUrl: 'https://github.com/yourusername/ai-code-reviewer',
+    title: 'Cricket Score Widget',
+    description: 'An always-on-top Windows desktop application for live cricket scores built with Electron and React',
+    tags: ['Electron', 'React', 'JavaScript', 'Desktop', 'System Tray', 'Windows'],
+    image: 'https://i.ibb.co/7dDSnW5j/Screenshot-2025-07-06-020503.png',
+    githubUrl: 'https://github.com/hk-vk/cricket-score-widget',
   },
 ];
 
