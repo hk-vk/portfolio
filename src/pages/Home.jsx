@@ -58,19 +58,16 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
       layout
     >
       <div className="relative overflow-hidden aspect-video bg-muted">
-        {/* Faded background image with gradient overlay */}
+        {/* Clear background image */}
         <div className="absolute inset-0">
           <img
             src={project.image}
             alt={project.title}
-            className="w-full h-full object-cover opacity-40 transition-opacity duration-300 group-hover:opacity-50"
+            className="w-full h-full object-cover"
             onLoad={() => setImageLoaded(true)}
-            style={{ opacity: imageLoaded ? 0.4 : 0 }}
           />
-          {/* Cool gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/70 to-transparent"></div>
-          {/* Additional gradient for extra cool effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+          {/* Simple overlay for text readability */}
+          <div className="absolute inset-0 bg-background/60"></div>
         </div>
         
         <AnimatePresence>
@@ -107,7 +104,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
               </p>
             )}
             <motion.div
-              className="h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"
+              className="h-0.5 bg-primary rounded-full"
               initial={{ width: 0 }}
               animate={isVisible ? { width: "40%" } : { width: 0 }}
               transition={{ delay: 0.15 + (0.03 * index), duration: 0.25 }}
@@ -120,7 +117,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors"
+                  className="text-xs text-primary hover:underline transition-colors"
                 >
                   Live Demo
                 </a>
@@ -130,7 +127,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs px-3 py-1 bg-muted/50 text-muted-foreground rounded-full hover:bg-muted/70 transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   GitHub
                 </a>
