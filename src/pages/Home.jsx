@@ -50,7 +50,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
 
   return (
     <motion.div
-      className="portfolio-item overflow-hidden group rounded-xl border border-border/50 hover:border-primary/30 transition-all duration-300"
+      className="group bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
       variants={cardVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
@@ -58,7 +58,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
       layout
     >
       <div className="relative overflow-hidden aspect-video bg-muted">
-        {/* Clear background image */}
+        {/* Background image */}
         <div className="absolute inset-0">
           <img
             src={project.image}
@@ -66,8 +66,8 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
             className="w-full h-full object-cover"
             onLoad={() => setImageLoaded(true)}
           />
-          {/* Simple overlay for text readability */}
-          <div className="absolute inset-0 bg-background/60"></div>
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent"></div>
         </div>
         
         <AnimatePresence>
@@ -83,58 +83,59 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
           )}
         </AnimatePresence>
         
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-background/95 to-transparent flex items-end p-6"
-          initial={{ opacity: 0.9 }}
-          whileHover={{ opacity: 1 }}
-          transition={{ duration: 0.15 }}
-        >
-          <div className="w-full">
-            <div className="flex flex-wrap gap-1 mb-3">
-              {project.tags.map((tag, i) => (
-                <span key={i} className="text-xs px-2 py-1 bg-background/90 text-foreground rounded-full backdrop-blur-sm border border-border/50">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <h3 className="text-xl font-bold mb-2 text-foreground">{project.title}</h3>
-            {project.description && (
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                {project.description}
-              </p>
-            )}
-            <motion.div
-              className="h-0.5 bg-primary rounded-full"
-              initial={{ width: 0 }}
-              animate={isVisible ? { width: "40%" } : { width: 0 }}
-              transition={{ delay: 0.15 + (0.03 * index), duration: 0.25 }}
-            />
-            
-            {/* Action buttons */}
-            <div className="flex gap-2 mt-4">
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-primary hover:underline transition-colors"
-                >
-                  Live Demo
-                </a>
-              )}
-              {project.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  GitHub
-                </a>
-              )}
-            </div>
+        {/* Content overlay */}
+        <div className="absolute inset-0 flex flex-col justify-end p-6">
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1 mb-3">
+            {project.tags.slice(0, 3).map((tag, i) => (
+              <span key={i} className="text-xs px-2 py-1 bg-background/90 text-foreground rounded-full backdrop-blur-sm border border-border/50 font-medium">
+                {tag}
+              </span>
+            ))}
           </div>
-        </motion.div>
+          
+          {/* Title */}
+          <h3 className="text-xl font-bold mb-2 text-foreground leading-tight">{project.title}</h3>
+          
+          {/* Description */}
+          {project.description && (
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+              {project.description}
+            </p>
+          )}
+          
+          {/* Animated underline */}
+          <motion.div
+            className="h-0.5 bg-primary rounded-full mb-4"
+            initial={{ width: 0 }}
+            animate={isVisible ? { width: "40%" } : { width: 0 }}
+            transition={{ delay: 0.15 + (0.03 * index), duration: 0.25 }}
+          />
+          
+          {/* Action buttons */}
+          <div className="flex gap-4">
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline transition-colors font-medium"
+              >
+                Live Demo
+              </a>
+            )}
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                GitHub
+              </a>
+            )}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -421,18 +422,18 @@ const Home = memo(() => {
         <div ref={projectsRef} className="mb-12">
           <div className="content-container mt-4">
             <motion.div
-              className="mb-8 flex items-center"
+              className="mb-12 flex items-center"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.25 }}
             >
               <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="text-primary mr-3" size={20} />
+                <SparkleIllustration className="text-primary mr-4" size={24} />
               </Suspense>
-              <h2 className="text-3xl font-bold">FEATURED PROJECTS</h2>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">FEATURED PROJECTS</h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
               {memoizedProjects.map((project, index) => (
                 <ProjectCard
                   key={project.id}

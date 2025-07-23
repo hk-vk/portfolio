@@ -92,7 +92,7 @@ const ThemeToggle = () => {
             exit={{ y: 10, opacity: 0, rotate: 90 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           >
-            <MoonIcon className="w-6 h-6" />
+            <MoonIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.span>
         ) : (
           <motion.span
@@ -102,7 +102,7 @@ const ThemeToggle = () => {
             exit={{ y: 10, opacity: 0, rotate: -90 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           >
-            <SunIcon className="w-6 h-6" />
+            <SunIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.span>
         )}
       </AnimatePresence>

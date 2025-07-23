@@ -113,7 +113,11 @@
   }
 
   .portfolio-item {
-    @apply border border-border rounded-md overflow-hidden transition-transform duration-200 hover:translate-y-[-2px];
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5;
+  }
+
+  .portfolio-item:hover {
+    @apply transform -translate-y-1;
   }
 
   .section-divider {
