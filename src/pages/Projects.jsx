@@ -4,6 +4,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import SparkleIllustration from '../components/SparkleIllustration';
 import LeafIllustration from '../components/LeafIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
+import SEOHead from '../components/SEOHead';
 
 const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -92,7 +93,13 @@ const Projects = () => {
   };
 
   return (
-    <div className="pt-32 pb-20">
+    <>
+      <SEOHead 
+        title="Projects | Harikrishnan V K"
+        description="Explore my portfolio of web applications, mobile apps, and development projects. Built with React, Node.js, Python, and modern technologies."
+        url="/projects"
+      />
+      <div className="pt-32 pb-20">
       <div className="content-container relative">
         {/* Decorative elements */}
         <div className="absolute -left-20 top-20 opacity-30 rotate-45 hidden lg:block">
@@ -350,6 +357,7 @@ const Projects = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

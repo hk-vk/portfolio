@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
 import ProfileCard from '../components/ProfileCard';
+import SEOHead from '../components/SEOHead';
 
 const About = () => {
   // Skills with progress levels
@@ -54,7 +55,13 @@ const About = () => {
   ];
 
   return (
-    <div className="pt-32 pb-20 relative">
+    <>
+      <SEOHead 
+        title="About | Harikrishnan V K"
+        description="Learn about Harikrishnan V K - a passionate full-stack developer with expertise in React, Node.js, and modern web technologies. Discover my journey, skills, and experience."
+        url="/about"
+      />
+      <div className="pt-32 pb-20 relative">
       
       <section className="content-container relative z-10">
         <AnimatedSection animation="fadeUp">
@@ -289,6 +296,7 @@ const About = () => {
         </AnimatedGrid>
       </section>
     </div>
+    </>
   );
 };
 

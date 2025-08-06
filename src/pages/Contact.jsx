@@ -1,4 +1,6 @@
-import React, { useState } from 'react';import { motion } from 'framer-motion';const Contact = () => {  const [formData, setFormData] = useState({
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import SEOHead from '../components/SEOHead';const Contact = () => {  const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
@@ -49,7 +51,13 @@ import React, { useState } from 'react';import { motion } from 'framer-motion';c
   ];
 
   return (
-    <div className="min-h-screen pt-20 pb-16">
+    <>
+      <SEOHead 
+        title="Contact | Harikrishnan V K"
+        description="Get in touch with Harikrishnan V K. Let's discuss your next project, collaborate on exciting opportunities, or just have a chat about web development."
+        url="/contact"
+      />
+      <div className="min-h-screen pt-20 pb-16">
       <div className="max-w-4xl mx-auto px-6">
         <motion.div
           className="text-center mb-16"
@@ -241,6 +249,7 @@ import React, { useState } from 'react';import { motion } from 'framer-motion';c
         </motion.div>
       </div>
     </div>
+    </>
   );
 };
 
