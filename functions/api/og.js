@@ -1,20 +1,35 @@
 // Cloudflare Functions API route for generating OG images
 // This will serve dynamic SVG OG images based on page content
 
+// Function to escape XML content
+function escapeXml(unsafe) {
+  if (!unsafe) return '';
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+}
+
 export async function onRequest(context) {
   const { request } = context;
   const url = new URL(request.url);
   const searchParams = url.searchParams;
   
-  // Get parameters from query string
+  // Get parameters from query string and escape them
   const type = searchParams.get('type') || 'homepage';
-  const title = searchParams.get('title') || 'Harikrishnan V K';
-  const subtitle = searchParams.get('subtitle') || 'Full-Stack Developer';
-  const description = searchParams.get('description') || 'Building modern web experiences with React, Node.js & cutting-edge tech';
-  const blogTitle = searchParams.get('blogTitle');
-  const blogExcerpt = searchParams.get('blogExcerpt');
-  const date = searchParams.get('date');
-  const readTime = searchParams.get('readTime') || '2 min read';
+  const title = escapeXml(searchParams.get('title') || 'Harikrishnan V K');
+  const subtitle = escapeXml(searchParams.get('subtitle') || 'Full-Stack Developer');
+  const description = escapeXml(searchParams.get('description') || 'Building modern web experiences with React, Node.js and cutting-edge tech');
+  const blogTitle = escapeXml(searchParams.get('blogTitle') || '');
+  const blogExcerpt = escapeXml(searchParams.get('blogExcerpt') || '');
+  const date = escapeXml(searchParams.get('date') || '');
+  const readTime = escapeXml(searchParams.get('readTime') || '2 min read');
 
   // Generate SVG based on type
   let svg;
@@ -99,7 +114,7 @@ function generateBlogSVG() {
     
     <text x="80" y="250" fill="#ffffff" font-size="48" font-weight="bold"
           font-family="DM Serif Display, serif">
-      Latest Thoughts &amp;
+      Latest Thoughts and
     </text>
     <text x="80" y="310" fill="#ffffff" font-size="48" font-weight="bold"
           font-family="DM Serif Display, serif">
@@ -128,11 +143,12 @@ function generateBlogSVG() {
 }
 
 function generateBlogPostSVG(blogTitle, blogExcerpt, date, readTime) {
+  // Use fallback values if parameters are empty and ensure they're properly escaped
   const title = blogTitle || "Don't spend too much time reading my blogs.";
   const excerpt = blogExcerpt || "Seriously, who has time for long reads? Use my speed reader and get on with your day.";
   const postDate = date || 'May 11, 2025';
   
-  // Truncate text to fit
+  // Truncate text to fit and ensure it's safe for XML
   const titleLines = title.length > 50 ? [title.substring(0, 50), title.substring(50, 100)] : [title];
   const excerptLines = excerpt.length > 60 ? [excerpt.substring(0, 60), excerpt.substring(60, 120)] : [excerpt];
 
@@ -158,25 +174,25 @@ function generateBlogPostSVG(blogTitle, blogExcerpt, date, readTime) {
     ${titleLines.map((line, index) => 
       `<text x="80" y="${200 + (index * 55)}" fill="#ffffff" font-size="42" font-weight="bold"
              font-family="DM Serif Display, serif">
-        ${line}
+        ${escapeXml(line)}
       </text>`
     ).join('')}
     
     ${excerptLines.map((line, index) => 
       `<text x="80" y="${315 + (index * 28)}" fill="#a0a0a0" font-size="22"
              font-family="Space Grotesk, sans-serif">
-        ${line}
+        ${escapeXml(line)}
       </text>`
     ).join('')}
     
     <text x="80" y="520" fill="#6366f1" font-size="18"
           font-family="Space Grotesk, sans-serif">
-      ${postDate} • Harikrishnan V K
+      ${escapeXml(postDate)} • Harikrishnan V K
     </text>
     
     <text x="80" y="550" fill="#8b5cf6" font-size="18"
           font-family="Space Grotesk, sans-serif">
-      ${readTime}
+      ${escapeXml(readTime)}
     </text>
   </svg>`;
 } 
