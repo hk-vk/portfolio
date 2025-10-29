@@ -8,6 +8,7 @@ import './index.css';
 // Only import essential components synchronously
 import Navbar from './components/Navbar';
 import LoadingScreen from './components/LoadingScreen';
+import DynamicIsland from './components/DynamicIsland';
 
 // Lazy load all pages for code splitting and faster initial load
 const Home = lazy(() => import('./pages/Home'));
@@ -37,26 +38,26 @@ function App() {
       const savedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-      
+
       document.documentElement.classList.toggle('dark', theme === 'dark');
       localStorage.setItem('theme', theme);
     };
-    
+
     initTheme();
-    
+
     // Faster loading with reduced time
     const timer = setTimeout(() => setLoading(false), 300);
-    
+
     // Performance optimization: preload critical routes
     const preloadRoutes = () => {
       // Preload the most likely next routes
       import('./pages/Home');
       import('./pages/About');
     };
-    
+
     // Preload after initial render
     const preloadTimer = setTimeout(preloadRoutes, 1000);
-    
+
     return () => {
       clearTimeout(timer);
       clearTimeout(preloadTimer);
@@ -73,6 +74,8 @@ function App() {
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="min-h-screen bg-background">
           <Navbar />
+          {/* Global Dynamic Island: renders on top of all routes */}
+          <DynamicIsland message={"Now playing • 0:25"} />
           <main className="relative">
             <Suspense fallback={<PageLoader />}>
               <ScrollToTop />
@@ -80,10 +83,10 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/projects" element={<Projects />} />
-                              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:postId" element={<BlogPostPage />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/og-preview" element={<OGPreview />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:postId" element={<BlogPostPage />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/og-preview" element={<OGPreview />} />
               </Routes>
             </Suspense>
           </main>
