@@ -123,17 +123,21 @@ const DynamicIsland = () => {
     }, []);
 
     return (
-        <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2">
-            <AnimatePresence mode="wait">
-                {!expanded && (
-                    <TimePill key="pill" time={time} onClick={() => setExpanded(true)} />
-                )}
+        <>
+            <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2">
+                <AnimatePresence mode="wait">
+                    {!expanded && (
+                        <TimePill key="pill" time={time} onClick={() => setExpanded(true)} />
+                    )}
+                </AnimatePresence>
+            </div>
 
+            <AnimatePresence>
                 {expanded && (
                     <TimeWidget key="widget" time={time} onClose={() => setExpanded(false)} />
                 )}
             </AnimatePresence>
-        </div>
+        </>
     );
 };
 

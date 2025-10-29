@@ -3,15 +3,15 @@ import { motion } from 'framer-motion';
 
 const TimeWidget = ({ time, onClose }) => (
     <>
+            <motion.div
+                className="fixed inset-0 z-40 bg-transparent"
+                onClick={onClose}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            />
         <motion.div
-            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
-            onClick={onClose}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-        />
-        <motion.div
-            className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-72"
+            className="fixed left-1/2 top-20 z-50 -translate-x-1/2 w-72"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
