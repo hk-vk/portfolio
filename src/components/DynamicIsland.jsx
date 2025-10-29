@@ -88,8 +88,9 @@ const AnimatedClockSVG = ({ time }) => {
     );
 };
 
-const TimePill = ({ time, onClick }) => (
+const TimePill = React.forwardRef(({ time, onClick }, ref) => (
     <motion.button
+        ref={ref}
         onClick={onClick}
         whileTap={{ scale: 0.95 }}
         className="inline-flex items-center gap-2 bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-3 py-2 hover:ring-border/60 transition-all cursor-pointer text-xs"
@@ -100,11 +101,13 @@ const TimePill = ({ time, onClick }) => (
         <AnimatedClockSVG time={time} />
         <span className="font-medium text-foreground">{time || '--:--'}</span>
     </motion.button>
-);
+));
 
 const DynamicIsland = () => {
     const [time, setTime] = useState('');
     const [expanded, setExpanded] = useState(false);
+    const pillRef = useRef(null);
+    const [widgetPos, setWidgetPos] = useState({ left: undefined, top: undefined });
 
     useEffect(() => {
         const updateTime = () => {
@@ -127,14 +130,23 @@ const DynamicIsland = () => {
             <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2">
                 <AnimatePresence mode="wait">
                     {!expanded && (
-                        <TimePill key="pill" time={time} onClick={() => setExpanded(true)} />
+                        <TimePill key="pill" ref={pillRef} time={time} onClick={() => {
+                            // compute pill position and open widget
+                            if (pillRef.current) {
+                                const r = pillRef.current.getBoundingClientRect();
+                                const left = r.left + r.width / 2;
+                                const top = r.bottom + 8;
+                                setWidgetPos({ left, top });
+                            }
+                            setExpanded(true);
+                        }} />
                     )}
                 </AnimatePresence>
             </div>
 
             <AnimatePresence>
                 {expanded && (
-                    <TimeWidget key="widget" time={time} onClose={() => setExpanded(false)} />
+                    <TimeWidget key="widget" time={time} left={widgetPos.left} top={widgetPos.top} onClose={() => setExpanded(false)} />
                 )}
             </AnimatePresence>
         </>

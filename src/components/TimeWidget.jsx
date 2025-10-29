@@ -1,8 +1,29 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const TimeWidget = ({ time, onClose }) => (
-    <>
+const TimeWidget = ({ time, onClose, left, top }) => {
+    // left/top are viewport pixel coordinates for the center point
+    const widgetWidth = 288; // w-72 => 18rem => 288px
+    const widgetHeight = 224; // estimate
+
+    // fallback to centered if no coords
+    const halfDefault = widgetWidth / 2;
+    let style = { left: typeof window !== 'undefined' ? `${Math.max(8, Math.round(window.innerWidth / 2 - halfDefault))}px` : '50%', top: '20px' };
+    if (typeof left === 'number' && !isNaN(left) && typeof top === 'number' && !isNaN(top)) {
+        const half = widgetWidth / 2;
+        const clampedLeft = Math.max(half + 8, Math.min(left, window.innerWidth - half - 8));
+        let computedTop = top;
+        // if overflowing bottom, try place above
+        if (computedTop + widgetHeight > window.innerHeight - 8) {
+            computedTop = top - widgetHeight - 16; // place above with gap
+            if (computedTop < 8) computedTop = 8;
+        }
+        // position by explicit left so we avoid transform interaction with other elements
+        style = { left: `${clampedLeft - half}px`, top: `${computedTop}px` };
+    }
+
+    return (
+        <>
             <motion.div
                 className="fixed inset-0 z-40 bg-transparent"
                 onClick={onClose}
@@ -10,14 +31,15 @@ const TimeWidget = ({ time, onClose }) => (
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
             />
-        <motion.div
-            className="fixed left-1/2 top-20 z-50 -translate-x-1/2 w-72"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            onClick={(e) => e.stopPropagation()}
-        >
+            <motion.div
+                className="fixed z-50 w-72"
+                style={style}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                onClick={(e) => e.stopPropagation()}
+            >
             <div className="bg-background/95 backdrop-blur-xl shadow-xl ring-1 ring-border/40 rounded-2xl p-4">
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -56,5 +78,7 @@ const TimeWidget = ({ time, onClose }) => (
         </motion.div>
     </>
 );
+
+}
 
 export default TimeWidget;
