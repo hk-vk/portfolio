@@ -30,11 +30,11 @@ QuickLoader.displayName = 'QuickLoader';
 // Optimized project card with intersection observer and image loading
 const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
-  
+
   const cardVariants = useMemo(() => ({
     hidden: { opacity: 0, y: 15 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { delay: 0.05 * index, duration: 0.25, ease: "easeOut" }
     }
@@ -69,7 +69,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
           {/* Overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent"></div>
         </div>
-        
+
         <AnimatePresence>
           {!imageLoaded && (
             <motion.div
@@ -82,7 +82,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
             </motion.div>
           )}
         </AnimatePresence>
-        
+
         {/* Content overlay */}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           {/* Tags */}
@@ -93,17 +93,17 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
               </span>
             ))}
           </div>
-          
+
           {/* Title */}
           <h3 className="text-xl font-bold mb-2 text-foreground leading-tight">{project.title}</h3>
-          
+
           {/* Description */}
           {project.description && (
             <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
               {project.description}
             </p>
           )}
-          
+
           {/* Animated underline */}
           <motion.div
             className="h-0.5 bg-primary rounded-full mb-4"
@@ -111,7 +111,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
             animate={isVisible ? { width: "40%" } : { width: 0 }}
             transition={{ delay: 0.15 + (0.03 * index), duration: 0.25 }}
           />
-          
+
           {/* Action buttons */}
           <div className="flex gap-4">
             {project.liveUrl && (
@@ -147,8 +147,8 @@ ProjectCard.displayName = 'ProjectCard';
 const SkillTag = memo(({ skill, index, isVisible }) => {
   const skillVariants = useMemo(() => ({
     initial: { opacity: 0, scale: 0.9 },
-    animate: { 
-      opacity: 1, 
+    animate: {
+      opacity: 1,
       scale: 1,
       transition: { delay: 0.6 + (index * 0.03), duration: 0.15, ease: "easeOut" }
     },
@@ -172,12 +172,12 @@ SkillTag.displayName = 'SkillTag';
 
 const Home = memo(() => {
   const motionSafe = useMotionSafe();
-  
+
   // Use optimized intersection observer hooks
   const [heroRef, heroVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [projectsRef, projectsVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [experienceRef, experienceVisible] = useIntersectionObserver({ threshold: 0.1 });
-  
+
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Check for dark mode
@@ -237,139 +237,139 @@ const Home = memo(() => {
   const memoizedProjects = useMemo(() => featuredProjects, []);
   return (
     <>
-      <SEOHead 
+      <SEOHead
         title="Harikrishnan V K | Full-Stack Developer Portfolio"
         description="Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences."
         url="/"
       />
       <div className="pt-16 md:pt-24 pb-20 overflow-hidden relative">
-      {/* Waves Background - hero section only */}
-      <div ref={heroRef} className="mb-0 relative overflow-hidden">
-        {/* Hero content container */}
-        <div className="content-container relative">
-          {/* Decorative Elements with conditional loading */}
-          <motion.div
-            className="absolute -right-10 top-20 opacity-80 z-10 hidden md:block"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={sectionsVisible.hero ? { opacity: 0.8, scale: 1 } : {}}
-            transition={{ delay: 0.3, duration: 0.2 }}
-          >
-            <Suspense fallback={<QuickSparkle />}>
-              <SparkleIllustration className="transform rotate-12" size={24} />
-            </Suspense>
-          </motion.div>
+        {/* Waves Background - hero section only */}
+        <div ref={heroRef} className="mb-0 relative overflow-hidden">
+          {/* Hero content container */}
+          <div className="content-container relative">
+            {/* Decorative Elements with conditional loading */}
+            <motion.div
+              className="absolute -right-10 top-20 opacity-80 z-10 hidden md:block"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={sectionsVisible.hero ? { opacity: 0.8, scale: 1 } : {}}
+              transition={{ delay: 0.3, duration: 0.2 }}
+            >
+              <Suspense fallback={<QuickSparkle />}>
+                <SparkleIllustration className="transform rotate-12" size={24} />
+              </Suspense>
+            </motion.div>
 
-          <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
-          <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
+            <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
+            <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
-          <motion.div
-            className="relative mb-16 rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-6 md:p-12 overflow-hidden"
-            initial={{ opacity: 0, y: 20 }}
-            animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.3 }}
-            whileHover={{ scale: 1.005 }}
-          >
-            {/* Waves inside hero card */}
-            <div className="absolute inset-0 -z-10 pointer-events-none select-none">
-              <Waves 
-                lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
-                backgroundColor="transparent"
-                waveSpeedX={0.012}
-                waveSpeedY={0.006}
-                waveAmpX={35}
-                waveAmpY={22}
-                xGap={16}
-                yGap={26}
-              />
-            </div>
+            <motion.div
+              className="relative mb-16 rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-6 md:p-12 overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.3 }}
+              whileHover={{ scale: 1.005 }}
+            >
+              {/* Waves inside hero card */}
+              <div className="absolute inset-0 -z-10 pointer-events-none select-none">
+                <Waves
+                  lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
+                  backgroundColor="transparent"
+                  waveSpeedX={0.012}
+                  waveSpeedY={0.006}
+                  waveAmpX={35}
+                  waveAmpY={22}
+                  xGap={16}
+                  yGap={26}
+                />
+              </div>
 
-            <Suspense fallback={<QuickLoader className="h-1 w-full mb-4" />}>
-              <HeroHighlightLine />
-            </Suspense>
+              <Suspense fallback={<QuickLoader className="h-1 w-full mb-4" />}>
+                <HeroHighlightLine />
+              </Suspense>
 
-            <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-left">
-              {/* Conditional MagnetLines for better performance */}
-              {sectionsVisible.hero && (
-                <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
-                  <Suspense fallback={null}>
-                    <MagnetLines
-                      rows={8}
-                      columns={8}
-                      containerSize="100%"
-                      lineColor="hsl(var(--primary) / 0.06)"
-                      lineWidth="0.2vmin"
-                      lineHeight="2.5vmin"
-                      baseAngle={-15}
-                    />
-                  </Suspense>
-                </div>
-              )}
-
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate={sectionsVisible.hero ? "visible" : "hidden"}
-                className="w-full"
-              >
-                <motion.div
-                  variants={childVariants}
-                  className="flex items-center mb-4"
-                >
-                  <Suspense fallback={<QuickSparkle />}>
-                    <SparkleIllustration className="text-primary mr-3" size={20} />
-                  </Suspense>
-                  {sectionsVisible.hero && (
-                    <BlurText
-                      text="HELLO, I am HARIKRISHNAN"
-                      className="text-2xl md:text-3xl font-bold gradient-last-word"
-                      animateBy="words"
-                      delay={50}
-                    />
-                  )}
-                </motion.div>
-
-                <motion.p
-                  variants={childVariants}
-                  className="mb-6 text-xl text-left"
-                >
-                  I'm a Full Stack Developer based in India.
-                  <br />
-                  <span className="text-primary font-medium animated-underline">Focusing on building innovative digital solutions.</span>
-                </motion.p>
-
-                <motion.p
-                  variants={childVariants}
-                  className="mb-8 text-muted-foreground text-left"
-                >
-                  I create responsive web applications that combine clean design with efficient code.
-                  My expertise ranges from interactive frontend interfaces to scalable backend systems.
-                  I'm constantly learning and implementing new technologies to develop better solutions.
-                </motion.p>
-
-                <motion.div variants={childVariants} className="w-full">
-                  <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
-                  <div className="flex flex-wrap gap-2 justify-start">
-                    {skills.map((skill, index) => (
-                      <SkillTag 
-                        key={skill} 
-                        skill={skill} 
-                        index={index} 
-                        isVisible={sectionsVisible.hero}
+              <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-left">
+                {/* Conditional MagnetLines for better performance */}
+                {sectionsVisible.hero && (
+                  <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
+                    <Suspense fallback={null}>
+                      <MagnetLines
+                        rows={8}
+                        columns={8}
+                        containerSize="100%"
+                        lineColor="hsl(var(--primary) / 0.06)"
+                        lineWidth="0.2vmin"
+                        lineHeight="2.5vmin"
+                        baseAngle={-15}
                       />
-                    ))}
+                    </Suspense>
                   </div>
+                )}
+
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate={sectionsVisible.hero ? "visible" : "hidden"}
+                  className="w-full"
+                >
+                  <motion.div
+                    variants={childVariants}
+                    className="flex items-center mb-4"
+                  >
+                    <Suspense fallback={<QuickSparkle />}>
+                      <SparkleIllustration className="text-primary mr-3" size={20} />
+                    </Suspense>
+                    {sectionsVisible.hero && (
+                      <BlurText
+                        text="HELLO, I am HARIKRISHNAN"
+                        className="text-2xl md:text-3xl font-bold gradient-last-word"
+                        animateBy="words"
+                        delay={50}
+                      />
+                    )}
+                  </motion.div>
+
+                  <motion.p
+                    variants={childVariants}
+                    className="mb-6 text-xl text-left"
+                  >
+                    I'm a Full Stack Developer based in India.
+                    <br />
+                    <span className="text-primary font-medium animated-underline">Focusing on building innovative digital solutions.</span>
+                  </motion.p>
+
+                  <motion.p
+                    variants={childVariants}
+                    className="mb-8 text-muted-foreground text-left"
+                  >
+                    I create responsive web applications that combine clean design with efficient code.
+                    My expertise ranges from interactive frontend interfaces to scalable backend systems.
+                    I'm constantly learning and implementing new technologies to develop better solutions.
+                  </motion.p>
+
+                  <motion.div variants={childVariants} className="w-full">
+                    <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
+                    <div className="flex flex-wrap gap-2 justify-start">
+                      {skills.map((skill, index) => (
+                        <SkillTag
+                          key={skill}
+                          skill={skill}
+                          index={index}
+                          isVisible={sectionsVisible.hero}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Background watermark */}
+            <div className="pointer-events-none select-none absolute inset-0 -z-10">
+              <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -top-20 -left-8">HARI</h1>
+              <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
             </div>
-          </motion.div>
-          
-          {/* Background watermark */}
-          <div className="pointer-events-none select-none absolute inset-0 -z-10">
-            <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -top-20 -left-8">HARI</h1>
-            <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
           </div>
-        </div>
-      </div>        {/* Experience Section */}
+        </div>        {/* Experience Section */}
         <div ref={experienceRef} className="py-12 md:py-16 bg-background">
           <div className="content-container">
             <motion.div
@@ -385,37 +385,62 @@ const Home = memo(() => {
             </motion.div>
 
             {/* Timeline of roles */}
-            <div className="mb-8 space-y-6 pl-8">
+            <div className="relative mb-8">
+              {/* Timeline line */}
+              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent"></div>
+
+              <div className="space-y-8">
                 {experienceItems.map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className="flex flex-col sm:flex-row sm:items-center gap-2 w-full"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.25, delay: 0.1 + idx * 0.05 }}
+                    className="relative flex items-start gap-6 pl-14"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={sectionsVisible.experience ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.4, delay: 0.15 + idx * 0.12, ease: "easeOut" }}
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      {item.logo && (
-                        <img
-                          src={item.logo}
-                          alt={`${item.company} logo`}
-                          className="w-12 h-12 object-cover rounded-md shadow-sm shrink-0"
-                        />
+                    {/* Timeline dot with pulse effect */}
+                    <div className="absolute left-4 top-3 z-10">
+                      <div className="w-4 h-4 bg-primary rounded-full ring-4 ring-background shadow-lg shadow-primary/30"></div>
+                      {idx === 0 && (
+                        <div className="absolute inset-0 w-4 h-4 bg-primary rounded-full animate-ping opacity-40"></div>
                       )}
-                      <div className="text-left">
-                        <h3 className="font-medium text-base text-foreground leading-none mb-0.5">
-                          {item.company}
-                        </h3>
-                        <p className="text-sm text-muted-foreground leading-none">
-                          {item.title}
-                        </p>
+                    </div>
+
+                    {/* Card */}
+                    <div className="flex-1 bg-card/60 backdrop-blur-sm border border-border/60 rounded-xl p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        {item.logo && (
+                          <div className="shrink-0">
+                            <img
+                              src={item.logo}
+                              alt={`${item.company} logo`}
+                              className="w-14 h-14 object-cover rounded-xl shadow-md bg-white p-1"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                              <h3 className="font-bold text-lg text-foreground leading-tight">
+                                {item.title}
+                              </h3>
+                              <p className="text-base text-primary font-medium">
+                                {item.company}
+                              </p>
+                            </div>
+                            <span className="inline-flex items-center text-xs font-mono text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full border border-border/50 whitespace-nowrap">
+                              <svg className="w-3 h-3 mr-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              {item.date}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <span className="text-sm text-muted-foreground whitespace-nowrap ml-auto">
-                      {item.date}
-                    </span>
                   </motion.div>
                 ))}
+              </div>
             </div>
           </div>
         </div>        {/* Projects Preview Section */}
@@ -468,7 +493,7 @@ const Home = memo(() => {
             </motion.div>
           </div>
         </div>
-    </div>
+      </div>
     </>
   );
 });
@@ -516,7 +541,13 @@ const featuredProjects = [
 
 const experienceItems = [
   {
-    date: 'May 2025 - Present',
+    date: 'August 2025 - Present',
+    title: 'Full Stack Software Engineer',
+    company: 'Comini Learning',
+    logo: 'https://i.ibb.co/bM9CVPGj/Image-Editor.png',
+  },
+  {
+    date: 'May 2025 - July 2025',
     title: 'Software Engineering Intern',
     company: 'Comini Learning',
     logo: 'https://i.ibb.co/bM9CVPGj/Image-Editor.png',
