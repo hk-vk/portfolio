@@ -1,66 +1,60 @@
-import React, { useEffect, useState } from 'react';
-import { motion, useCycle, AnimatePresence } from 'framer-motion';
-import SparkleIllustration from './SparkleIllustration';
+import React, { useEffect, useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Radial progress circle calculates circumference later
-const CircleProgress = ({ progress, size = 120, stroke = 4 }) => {
-  const radius = (size - stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
+// Individual letter component that fills based on progress
+const FillLetter = ({ letter, delay, progress, index, totalLetters }) => {
+  // Calculate when this letter should start and finish filling
+  const letterStartProgress = (index / totalLetters) * 100;
+  const letterEndProgress = ((index + 1) / totalLetters) * 100;
+
+  // Calculate fill percentage for this letter (0-100)
+  const letterFillPercent = useMemo(() => {
+    if (progress <= letterStartProgress) return 0;
+    if (progress >= letterEndProgress) return 100;
+    return ((progress - letterStartProgress) / (letterEndProgress - letterStartProgress)) * 100;
+  }, [progress, letterStartProgress, letterEndProgress]);
+
   return (
-    <svg width={size} height={size} className="block">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        stroke="hsl(var(--border))"
-        strokeWidth={stroke}
-        fill="none"
-      />
-      <motion.circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        stroke="hsl(var(--primary))"
-        strokeWidth={stroke}
-        fill="none"
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        animate={{ strokeDashoffset: offset }}
-        transition={{ ease: 'easeInOut', duration: 0.2 }}
-      />
-    </svg>
+    <motion.span
+      className="relative inline-block"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: delay, duration: 0.4, ease: "easeOut" }}
+      style={{
+        fontFamily: "'DM Serif Display', serif",
+      }}
+    >
+      {/* Background letter (unfilled) */}
+      <span
+        className="text-muted-foreground/20"
+        style={{ WebkitTextStroke: '1px hsl(var(--muted-foreground) / 0.3)' }}
+      >
+        {letter}
+      </span>
+
+      {/* Foreground letter (filled with gradient) - clipped based on progress */}
+      <span
+        className="absolute inset-0 bg-clip-text text-transparent"
+        style={{
+          backgroundImage: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 50%, hsl(var(--secondary)) 100%)',
+          clipPath: `inset(0 ${100 - letterFillPercent}% 0 0)`,
+          transition: 'clip-path 0.1s ease-out',
+        }}
+      >
+        {letter}
+      </span>
+    </motion.span>
   );
 };
 
-const generateMiniStars = (count) => {
-  return Array.from({ length: count }, () => ({
-    angle: Math.random() * Math.PI * 2,
-    distance: 60 + Math.random() * 30 // between 60-90px
-  }));
-};
-
 const LoadingScreen = ({ progress }) => {
-  // Simplified animations for better performance
-  const [pulse, cyclePulse] = useCycle(1, 1.08); // Reduced pulse amount
-  const [miniStars, setMiniStars] = useState(generateMiniStars(3)); // Fewer stars
-
-  // Reduced constellation regeneration frequency
-  useEffect(() => {
-    const i = setInterval(() => setMiniStars(generateMiniStars(3)), 2500);
-    return () => clearInterval(i);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(cyclePulse, 800); // Slower pulse
-    return () => clearInterval(interval);
-  }, [cyclePulse]);
+  const name = "HARIKRISHNAN";
+  const letters = name.split('');
 
   // Exit animation controller
   const exitVariants = {
     hidden: { scale: 1, opacity: 1 },
-    exit: { scale: 8, opacity: 0, transition: { duration: 0.6, ease: 'easeInOut' } }
+    exit: { scale: 1.5, opacity: 0, transition: { duration: 0.5, ease: 'easeInOut' } }
   };
 
   return (
@@ -73,74 +67,58 @@ const LoadingScreen = ({ progress }) => {
         exit="exit"
         className="fixed inset-0 flex flex-col items-center justify-center bg-background z-[9999] select-none"
       >
-        {/* Constellation area */}
-        <div className="relative mb-8" style={{ width: 180, height: 180 }}>
-          {/* lines */}
-          <svg className="absolute inset-0" width="180" height="180">
-            {miniStars.map((s, idx) => {
-              const cx = 90 + s.distance * Math.cos(s.angle);
-              const cy = 90 + s.distance * Math.sin(s.angle);
-              return (
-                <motion.line
-                  key={idx}
-                  x1={90}
-                  y1={90}
-                  x2={cx}
-                  y2={cy}
-                  stroke="hsl(var(--primary) / .4)"
-                  strokeWidth={1}
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                />
-              );
-            })}
-          </svg>
-
-          {/* mini stars */}
-          {miniStars.map((s, idx) => {
-            const style = {
-              left: 90 + s.distance * Math.cos(s.angle) - 4,
-              top: 90 + s.distance * Math.sin(s.angle) - 4
-            };
-            return (
-              <motion.div
-                key={"mini-" + idx}
-                className="absolute"
-                style={style}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <SparkleIllustration size={8} className="text-primary" />
-              </motion.div>
-            );
-          })}
-
-          {/* Center star rotates */}
-          <motion.div
-            animate={{ rotate: 360, scale: pulse }}
-            transition={{ repeat: Infinity, duration: 6, ease: 'linear' }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <SparkleIllustration size={48} className="text-primary" />
-          </motion.div>
-
-          {/* Progress Circle */}
-          <CircleProgress progress={progress} size={180} stroke={3} />
+        {/* Name with fill animation */}
+        <div className="flex items-center justify-center mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight flex">
+            {letters.map((letter, index) => (
+              <FillLetter
+                key={index}
+                letter={letter}
+                delay={index * 0.05}
+                progress={progress}
+                index={index}
+                totalLetters={letters.length}
+              />
+            ))}
+          </h1>
         </div>
 
-        {/* Name fade-in */}
-        <motion.h1
-          className="text-3xl md:text-5xl font-serif font-bold gradient-text mb-2"
+        {/* Subtitle */}
+        <motion.p
+          className="text-muted-foreground tracking-widest text-xs uppercase mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
         >
-          Harikrishnan V K
-        </motion.h1>
-        <p className="text-muted-foreground tracking-wider text-xs">Loading {Math.round(progress)}%</p>
+          Full Stack Developer
+        </motion.p>
+
+        {/* Progress bar */}
+        <motion.div
+          className="w-48 h-1 bg-muted/30 rounded-full overflow-hidden"
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ delay: 0.8, duration: 0.3 }}
+        >
+          <motion.div
+            className="h-full rounded-full"
+            style={{
+              backgroundImage: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)))',
+              width: `${progress}%`,
+              transition: 'width 0.15s ease-out',
+            }}
+          />
+        </motion.div>
+
+        {/* Progress text */}
+        <motion.p
+          className="text-muted-foreground/60 text-xs mt-2 font-mono"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.3 }}
+        >
+          {Math.round(progress)}%
+        </motion.p>
       </motion.div>
     </AnimatePresence>
   );

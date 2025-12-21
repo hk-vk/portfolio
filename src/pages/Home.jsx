@@ -312,19 +312,34 @@ const Home = memo(() => {
                   className="w-full"
                 >
                   <motion.div
-                    variants={childVariants}
-                    className="flex items-center mb-4"
+                    className="flex items-center mb-4 flex-wrap"
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 1 }}
                   >
                     <Suspense fallback={<QuickSparkle />}>
                       <SparkleIllustration className="text-primary mr-3" size={20} />
                     </Suspense>
                     {sectionsVisible.hero && (
-                      <BlurText
-                        text="HELLO, I am HARIKRISHNAN"
-                        className="text-2xl md:text-3xl font-bold gradient-last-word"
-                        animateBy="words"
-                        delay={50}
-                      />
+                      <div className="flex flex-col items-start">
+                        {/* "HELLO, I am" - smaller intro text */}
+                        <span className="text-lg md:text-xl font-medium text-muted-foreground mb-1">
+                          HELLO, I am
+                        </span>
+                        {/* "HARIKRISHNAN" - large gradient hero name */}
+                        <span className="inline-flex text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                          {'HARIKRISHNAN'.split('').map((letter, idx) => (
+                            <span 
+                              key={idx}
+                              className="bg-clip-text text-transparent" 
+                              style={{
+                                backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #be185d 50%, #7c3aed 100%)',
+                              }}
+                            >
+                              {letter}
+                            </span>
+                          ))}
+                        </span>
+                      </div>
                     )}
                   </motion.div>
 
