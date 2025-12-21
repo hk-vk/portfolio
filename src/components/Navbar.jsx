@@ -48,32 +48,35 @@ const Navbar = () => {
       opacity: 1,
       transition: {
         type: 'spring',
-        stiffness: 150,
-        damping: 22,
+        stiffness: 120,
+        damping: 20,
+        mass: 0.8,
       },
     },
     hidden: {
-      y: 50,
+      y: 60,
       opacity: 0,
     },
-  };  const navItemVariants = {
+  };
+
+  const navItemVariants = {
     hover: {
-      scale: 1.02,
-      y: -2,
+      scale: 1.04,
+      y: -3,
       transition: {
         type: 'spring',
-        stiffness: 400,
-        damping: 25,
-        mass: 0.5,
+        stiffness: 300,
+        damping: 20,
+        mass: 0.6,
       }
     },
     tap: {
-      scale: 0.98,
+      scale: 0.96,
       y: 0,
       transition: {
         type: 'spring',
-        stiffness: 600,
-        damping: 30,
+        stiffness: 500,
+        damping: 25,
       }
     }
   };
@@ -93,9 +96,9 @@ const Navbar = () => {
       }}
     >
       {/* Floating pill wrapper */}
-      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-md shadow-lg ring-1 ring-border/40 rounded-full px-3 py-2 sm:px-6 sm:py-3 gap-x-2 sm:gap-x-6 pointer-events-auto">
+      <div className="relative inline-flex items-center bg-background/70 backdrop-blur-xl shadow-2xl shadow-black/10 dark:shadow-black/30 ring-1 ring-border/30 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 gap-x-1.5 sm:gap-x-4 pointer-events-auto">
         {/* Navigation Links */}
-        <div className="grid grid-flow-col auto-cols-max gap-1 sm:gap-3 md:gap-4">
+        <div className="grid grid-flow-col auto-cols-max gap-1 sm:gap-2 md:gap-3">
           {mainLinks.map((link, idx) => {
             const isActive = idx === activeIndex;
             const isHovered = idx === hoverIndex;
@@ -127,8 +130,10 @@ const Navbar = () => {
                   {/* Front face with icon */}
                   <motion.div
                     className={`absolute inset-0 flex flex-col items-center justify-center ${
-                      isActive || (link.name === 'Connect' && socialOpen) ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-background/50 text-foreground'
-                    } backdrop-blur-sm border border-border/20 rounded-xl`}
+                      isActive || (link.name === 'Connect' && socialOpen) 
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' 
+                        : 'bg-muted/40 text-foreground hover:bg-muted/60'
+                    } backdrop-blur-sm border border-border/10 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
                       backfaceVisibility: 'hidden',
@@ -138,10 +143,10 @@ const Navbar = () => {
                     }}
                     transition={{
                       type: 'spring',
-                      stiffness: 200,
-                      damping: 20,
-                      mass: 0.8,
-                      restDelta: 0.01,
+                      stiffness: 180,
+                      damping: 18,
+                      mass: 0.7,
+                      restDelta: 0.001,
                     }}
                   >
                     <Icon
@@ -153,8 +158,10 @@ const Navbar = () => {
                   {/* Back face with label */}
                   <motion.div
                     className={`absolute inset-0 flex flex-col items-center justify-center ${
-                      isActive || (link.name === 'Connect' && socialOpen) ? 'bg-primary text-primary-foreground shadow-lg' : 'bg-accent/80 text-accent-foreground'
-                    } backdrop-blur-sm border border-border/20 rounded-xl`}
+                      isActive || (link.name === 'Connect' && socialOpen) 
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' 
+                        : 'bg-accent/60 text-accent-foreground'
+                    } backdrop-blur-sm border border-border/10 rounded-xl`}
                     style={{
                       transformOrigin: 'center center -24px',
                       backfaceVisibility: 'hidden',
@@ -165,10 +172,10 @@ const Navbar = () => {
                     }}
                     transition={{
                       type: 'spring',
-                      stiffness: 200,
-                      damping: 20,
-                      mass: 0.8,
-                      restDelta: 0.01,
+                      stiffness: 180,
+                      damping: 18,
+                      mass: 0.7,
+                      restDelta: 0.001,
                     }}
                   >
                     <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider leading-none text-center px-1">
@@ -195,16 +202,16 @@ const Navbar = () => {
         {/* Theme Toggle */}
         <motion.div
           whileHover={{
-            scale: 1.05,
-            rotate: 3,
-            y: -1
+            scale: 1.08,
+            rotate: 5,
+            y: -2
           }}
-          whileTap={{ scale: 0.95, rotate: 0 }}
+          whileTap={{ scale: 0.92, rotate: 0 }}
           transition={{
-            duration: 0.3,
+            duration: 0.25,
             type: 'spring',
-            stiffness: 300,
-            damping: 25
+            stiffness: 350,
+            damping: 20
           }}
           className="ml-1 sm:ml-2 flex-shrink-0"
         >

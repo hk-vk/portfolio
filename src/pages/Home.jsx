@@ -386,56 +386,62 @@ const Home = memo(() => {
 
             {/* Timeline of roles */}
             <div className="relative mb-8">
-              {/* Timeline line */}
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent"></div>
+              {/* Timeline line - hidden on mobile */}
+              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent hidden sm:block"></div>
 
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {experienceItems.map((item, idx) => (
                   <motion.div
                     key={idx}
-                    className="relative flex items-start gap-6 pl-14"
+                    className="relative flex items-start gap-4 sm:gap-6 sm:pl-14"
                     initial={{ opacity: 0, x: -20 }}
                     animate={sectionsVisible.experience ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.4, delay: 0.15 + idx * 0.12, ease: "easeOut" }}
                   >
-                    {/* Timeline dot with pulse effect */}
-                    <div className="absolute left-4 top-3 z-10">
+                    {/* Timeline dot with pulse effect - hidden on mobile */}
+                    <div className="absolute left-4 top-3 z-10 hidden sm:block">
                       <div className="w-4 h-4 bg-primary rounded-full ring-4 ring-background shadow-lg shadow-primary/30"></div>
                       {idx === 0 && (
                         <div className="absolute inset-0 w-4 h-4 bg-primary rounded-full animate-ping opacity-40"></div>
                       )}
                     </div>
 
-                    {/* Card */}
-                    <div className="flex-1 bg-card/60 backdrop-blur-sm border border-border/60 rounded-xl p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    {/* Card - Mobile optimized */}
+                    <div className="flex-1 bg-card/60 backdrop-blur-sm border border-border/60 rounded-xl p-4 sm:p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                      {/* Mobile: Logo with company info on right */}
+                      <div className="flex items-start gap-3 sm:gap-4">
                         {item.logo && (
                           <div className="shrink-0">
                             <img
                               src={item.logo}
                               alt={`${item.company} logo`}
-                              className="w-14 h-14 object-cover rounded-xl shadow-md bg-white p-1"
+                              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl shadow-md bg-white p-1"
                             />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div>
-                              <h3 className="font-bold text-lg text-foreground leading-tight">
-                                {item.title}
-                              </h3>
-                              <p className="text-base text-primary font-medium">
-                                {item.company}
-                              </p>
-                            </div>
-                            <span className="inline-flex items-center text-xs font-mono text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full border border-border/50 whitespace-nowrap">
-                              <svg className="w-3 h-3 mr-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              {item.date}
-                            </span>
-                          </div>
+                          {/* Title and Company */}
+                          <h3 className="font-bold text-base sm:text-lg text-foreground leading-tight">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm sm:text-base text-primary font-medium mt-0.5">
+                            {item.company}
+                          </p>
+                          {/* Date - on mobile, shown below company name */}
+                          <span className="inline-flex items-center text-xs font-mono text-muted-foreground bg-muted/60 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border/50 whitespace-nowrap mt-2 sm:hidden">
+                            <svg className="w-3 h-3 mr-1 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {item.date}
+                          </span>
                         </div>
+                        {/* Date - on desktop, shown on top right */}
+                        <span className="hidden sm:inline-flex items-center text-xs font-mono text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full border border-border/50 whitespace-nowrap shrink-0">
+                          <svg className="w-3 h-3 mr-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          {item.date}
+                        </span>
                       </div>
                     </div>
                   </motion.div>
