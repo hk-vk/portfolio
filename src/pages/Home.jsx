@@ -312,12 +312,13 @@ const Home = memo(() => {
                   className="w-full"
                 >
                   <motion.div
-                    className="flex items-center mb-4 flex-wrap"
+                    className="relative mb-2"
                     initial={{ opacity: 1 }}
                     animate={{ opacity: 1 }}
                   >
+                    {/* Star icon positioned absolutely to not affect alignment */}
                     <Suspense fallback={<QuickSparkle />}>
-                      <SparkleIllustration className="text-primary mr-3" size={20} />
+                      <SparkleIllustration className="text-primary absolute -left-7 top-1" size={20} />
                     </Suspense>
                     {sectionsVisible.hero && (
                       <div className="flex flex-col items-start">
@@ -326,7 +327,7 @@ const Home = memo(() => {
                           HELLO, I am
                         </span>
                         {/* "HARIKRISHNAN" - large gradient hero name */}
-                        <span className="inline-flex text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                        <span className="inline-flex text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
                           {'HARIKRISHNAN'.split('').map((letter, idx) => (
                             <span 
                               key={idx}
@@ -345,7 +346,7 @@ const Home = memo(() => {
 
                   <motion.p
                     variants={childVariants}
-                    className="mb-6 text-xl text-left"
+                    className="mb-3 text-xl text-left"
                   >
                     I'm a Full Stack Developer based in India.
                     <br />
@@ -363,7 +364,7 @@ const Home = memo(() => {
 
                   <motion.div variants={childVariants} className="w-full">
                     <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
-                    <div className="flex flex-wrap gap-2 justify-start">
+                    <div className="flex flex-wrap gap-2">
                       {skills.map((skill, index) => (
                         <SkillTag
                           key={skill}
