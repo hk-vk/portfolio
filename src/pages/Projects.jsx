@@ -133,12 +133,12 @@ const Projects = () => {
 
         <AnimatedSection>
           {/* Filter categories */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-12 px-4 sm:px-0 max-w-md sm:max-w-none mx-auto">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background ${
                   selectedCategory === category
                     ? 'bg-primary text-primary-foreground shadow-md'
                     : 'bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground'

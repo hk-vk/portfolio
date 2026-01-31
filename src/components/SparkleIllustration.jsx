@@ -1,6 +1,12 @@
 import React from 'react';
 
+/**
+ * SparkleIllustration - Clean 4-point shimmer with elegant gradient
+ */
 const SparkleIllustration = ({ className = '', size = 24 }) => {
+  // Generate unique ID for gradient (prevents conflicts with multiple instances)
+  const id = React.useId?.() || `sparkle-${Math.random().toString(36).slice(2, 9)}`;
+  
   return (
     <svg
       className={className}
@@ -9,10 +15,21 @@ const SparkleIllustration = ({ className = '', size = 24 }) => {
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
     >
+      <defs>
+        {/* Elegant red/rose gradient */}
+        <linearGradient id={`gradient-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FF6B6B" />
+          <stop offset="50%" stopColor="#EE5A5A" />
+          <stop offset="100%" stopColor="#DC3545" />
+        </linearGradient>
+      </defs>
+      
+      {/* Main sparkle with gradient */}
       <path
-        d="M12 17.27L18.18 21 16.54 13.97 22 9.24 14.82 8.63 12 2 9.18 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27Z"
-        fill="currentColor"
+        d="M12 1L9 9L1 12L9 15L12 23L15 15L23 12L15 9L12 1Z"
+        fill={`url(#gradient-${id})`}
       />
     </svg>
   );
