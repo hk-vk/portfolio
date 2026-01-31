@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AnimatePresence } from 'framer-motion';
@@ -8,7 +8,6 @@ import './index.css';
 
 // Only import essential components synchronously
 import Navbar from './components/Navbar';
-import LoadingScreen from './components/LoadingScreen';
 import PageTransition from './components/PageTransition';
 
 // Lazy load all pages for code splitting and faster initial load
@@ -48,10 +47,7 @@ const AnimatedRoutes = () => {
 };
 
 function App() {
-  const [loading, setLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-
-  // Optimized theme initialization with proper cleanup
+  // Theme initialization
   useEffect(() => {
     const initTheme = () => {
       const savedTheme = localStorage.getItem('theme');
@@ -64,79 +60,16 @@ function App() {
 
     initTheme();
 
-    // Preload Home immediately so it's ready when loader finishes
-    import('./pages/Home');
-
-    // Animated loading progress - minimum ~2 seconds
-    let progress = 0;
-    const progressInterval = setInterval(() => {
-      progress += Math.random() * 10 + 3;
-      if (progress >= 100) {
-        progress = 100;
-        setLoadingProgress(100);
-        clearInterval(progressInterval);
-        // Short delay after completion before hiding
-        setTimeout(() => setLoading(false), 500);
-      } else {
-        setLoadingProgress(progress);
-      }
-    }, 70);
-
-    // Preload other routes after a bit
+    // Preload other routes after a bit for faster navigation
     const preloadTimer = setTimeout(() => {
       import('./pages/About');
       import('./pages/Projects');
     }, 500);
 
     return () => {
-      clearInterval(progressInterval);
       clearTimeout(preloadTimer);
     };
   }, []);
-
-  // Simple loading screen - blocks content until done
-  if (loading) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-background z-[9999]">
-        <div className="flex flex-col items-center justify-center gap-4">
-          {/* Name with gradient fill animation */}
-          <h1
-            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight font-display relative overflow-hidden"
-            style={{ opacity: 0, animation: 'fadeIn 0.4s ease-out forwards' }}
-          >
-            {/* Background text (unfilled) */}
-            <span className="text-muted-foreground/15">HARIKRISHNAN</span>
-            {/* Foreground text with gradient (fills based on progress) */}
-            <span
-              className="absolute inset-0 bg-clip-text text-transparent"
-              style={{
-                backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--primary)) 100%)',
-                clipPath: `inset(0 ${100 - loadingProgress}% 0 0)`,
-                transition: 'clip-path 0.1s ease-out',
-              }}
-            >
-              HARIKRISHNAN
-            </span>
-          </h1>
-
-          {/* Progress bar */}
-          <div className="w-32 h-0.5 bg-muted/30 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-foreground to-primary rounded-full transition-all duration-100 ease-out"
-              style={{ width: `${loadingProgress}%` }}
-            />
-          </div>
-        </div>
-
-        <style>{`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-          }
-        `}</style>
-      </div>
-    );
-  }
 
   return (
     <HelmetProvider>

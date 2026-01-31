@@ -9,6 +9,7 @@ import { spring, hover, tap as tapAnim } from "../utils/motionSettings";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -23,6 +24,34 @@ const Navbar = () => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Wait for document to be fully loaded before showing navbar
+  useEffect(() => {
+    const showNavbar = () => {
+      // Use requestIdleCallback if available, otherwise use requestAnimationFrame
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          setIsReady(true);
+        }, { timeout: 500 });
+      } else {
+        // Double requestAnimationFrame ensures DOM is painted
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setIsReady(true);
+          });
+        });
+      }
+    };
+
+    // If document is already complete, show immediately with slight delay
+    if (document.readyState === 'complete') {
+      showNavbar();
+    } else {
+      // Wait for load event
+      window.addEventListener('load', showNavbar);
+      return () => window.removeEventListener('load', showNavbar);
+    }
   }, []);
 
   const mainLinks = [
@@ -50,7 +79,12 @@ const Navbar = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: spring.gentle,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        delay: 0.05,
+      },
     },
     hidden: {
       y: 60,
@@ -76,6 +110,11 @@ const Navbar = () => {
       },
     },
   };
+
+  // Don't render until ready
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <motion.header
