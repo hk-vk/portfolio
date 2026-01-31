@@ -18,8 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['"Space Grotesk Variable"', 'sans-serif'],
-        serif: ['"DM Serif Display"', 'serif'],
+        sans: ['"Plus Jakarta Sans Variable"', 'system-ui', 'sans-serif'],
+        display: ['"Syne Variable"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

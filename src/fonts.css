@@ -1,14 +1,14 @@
 /* Optimized font loading with font-display: swap */
-@import '@fontsource-variable/space-grotesk';
-@import '@fontsource/dm-serif-display';
+@import '@fontsource-variable/syne';
+@import '@fontsource-variable/plus-jakarta-sans';
 
 /* Override font-display for better performance */
 @font-face {
-  font-family: 'Space Grotesk Variable';
+  font-family: 'Plus Jakarta Sans Variable';
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'DM Serif Display';
+  font-family: 'Syne Variable';
   font-display: swap;
 }

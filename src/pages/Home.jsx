@@ -311,38 +311,37 @@ const Home = memo(() => {
                   animate={sectionsVisible.hero ? "visible" : "hidden"}
                   className="w-full"
                 >
-                  <motion.div
-                    className="relative mb-2"
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    {/* Star icon positioned absolutely to not affect alignment */}
-                    <Suspense fallback={<QuickSparkle />}>
-                      <SparkleIllustration className="text-primary absolute -left-7 top-1" size={20} />
-                    </Suspense>
-                    {sectionsVisible.hero && (
-                      <div className="flex flex-col items-start">
-                        {/* "HELLO, I am" - smaller intro text */}
-                        <span className="text-lg md:text-xl font-medium text-muted-foreground mb-1">
-                          HELLO, I am
-                        </span>
-                        {/* "HARIKRISHNAN" - large gradient hero name */}
-                        <span className="inline-flex text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: "'DM Serif Display', serif" }}>
-                          {'HARIKRISHNAN'.split('').map((letter, idx) => (
-                            <span 
-                              key={idx}
-                              className="bg-clip-text text-transparent" 
-                              style={{
-                                backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #be185d 50%, #7c3aed 100%)',
-                              }}
-                            >
-                              {letter}
-                            </span>
-                          ))}
-                        </span>
-                      </div>
-                    )}
-                  </motion.div>
+                  {sectionsVisible.hero && (
+                    <motion.div
+                      className="relative mb-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                    >
+                      {/* Decorative sparkle */}
+                      <Suspense fallback={<QuickSparkle />}>
+                        <SparkleIllustration className="text-primary absolute -left-7 top-1" size={20} />
+                      </Suspense>
+
+                      {/* "HELLO, I am" - smaller intro text */}
+                      <span className="block text-base md:text-lg font-medium text-muted-foreground mb-1">
+                        Hello, I am
+                      </span>
+
+                      {/* "HARIKRISHNAN" - large hero name with subtle gradient */}
+                      <h1
+                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight font-display bg-clip-text text-transparent"
+                        style={{
+                          backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--primary)) 100%)',
+                        }}
+                      >
+                        HARIKRISHNAN
+                      </h1>
+
+                      {/* Subtle accent line under name */}
+                      <div className="mt-2 w-20 h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
+                    </motion.div>
+                  )}
 
                   <motion.p
                     variants={childVariants}

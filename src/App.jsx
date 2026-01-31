@@ -1,8 +1,8 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import '@fontsource-variable/space-grotesk';
-import '@fontsource/dm-serif-display';
+import '@fontsource-variable/syne';
+import '@fontsource-variable/plus-jakarta-sans';
 import './index.css';
 
 // Only import essential components synchronously
@@ -75,50 +75,42 @@ function App() {
 
   // Simple loading screen - blocks content until done
   if (loading) {
-    const letters = 'HARIKRISHNAN'.split('');
-
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-background z-[9999]">
-        <div className="flex items-center justify-center">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight flex" style={{ fontFamily: "'DM Serif Display', serif" }}>
-            {letters.map((letter, index) => {
-              const letterStartProgress = (index / letters.length) * 100;
-              const letterEndProgress = ((index + 1) / letters.length) * 100;
-              let letterFill = 0;
-              if (loadingProgress <= letterStartProgress) letterFill = 0;
-              else if (loadingProgress >= letterEndProgress) letterFill = 100;
-              else letterFill = ((loadingProgress - letterStartProgress) / (letterEndProgress - letterStartProgress)) * 100;
-
-              return (
-                <span
-                  key={index}
-                  className="relative inline-block"
-                  style={{
-                    opacity: 0,
-                    animation: `fadeInLetter 0.35s ease-out ${index * 0.04}s forwards`,
-                  }}
-                >
-                  <span className="text-muted-foreground/15">{letter}</span>
-                  <span
-                    className="absolute inset-0 bg-clip-text text-transparent"
-                    style={{
-                      backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #be185d 50%, #7c3aed 100%)',
-                      clipPath: `inset(0 ${100 - letterFill}% 0 0)`,
-                      transition: 'clip-path 0.08s ease-out',
-                    }}
-                  >
-                    {letter}
-                  </span>
-                </span>
-              );
-            })}
+        <div className="flex flex-col items-center justify-center gap-4">
+          {/* Name with gradient fill animation */}
+          <h1
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight font-display relative overflow-hidden"
+            style={{ opacity: 0, animation: 'fadeIn 0.4s ease-out forwards' }}
+          >
+            {/* Background text (unfilled) */}
+            <span className="text-muted-foreground/15">HARIKRISHNAN</span>
+            {/* Foreground text with gradient (fills based on progress) */}
+            <span
+              className="absolute inset-0 bg-clip-text text-transparent"
+              style={{
+                backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--primary)) 100%)',
+                clipPath: `inset(0 ${100 - loadingProgress}% 0 0)`,
+                transition: 'clip-path 0.1s ease-out',
+              }}
+            >
+              HARIKRISHNAN
+            </span>
           </h1>
+
+          {/* Progress bar */}
+          <div className="w-32 h-0.5 bg-muted/30 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-foreground to-primary rounded-full transition-all duration-100 ease-out"
+              style={{ width: `${loadingProgress}%` }}
+            />
+          </div>
         </div>
 
         <style>{`
-          @keyframes fadeInLetter {
-            from { opacity: 0; transform: translateY(12px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
           }
         `}</style>
       </div>
