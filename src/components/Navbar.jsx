@@ -121,77 +121,129 @@ const Navbar = () => {
                   perspective: '400px',
                 }}
               >
-                <div
-                  className="relative block overflow-hidden w-12 h-10 sm:w-14 sm:h-12 md:w-16 md:h-12"
+                {link.name !== 'Connect' ? (
+                <NavLink
+                  to={link.path}
+                  end={link.path === '/'}
+                  className="relative block w-12 h-10 sm:w-14 sm:h-12 md:w-16 md:h-12"
                   style={{
                     transformStyle: 'preserve-3d',
+                    perspective: '600px',
                   }}
                 >
-                  {/* Front face with icon */}
+                  {/* 3D Cube container */}
                   <motion.div
-                    className={`absolute inset-0 flex flex-col items-center justify-center ${
-                      isActive || (link.name === 'Connect' && socialOpen) 
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' 
-                        : 'bg-muted/40 text-foreground hover:bg-muted/60'
-                    } backdrop-blur-sm border border-border/10 rounded-xl`}
+                    className="relative w-full h-full pointer-events-none"
                     style={{
-                      transformOrigin: 'center center -24px',
-                      backfaceVisibility: 'hidden',
+                      transformStyle: 'preserve-3d',
                     }}
                     animate={{
                       rotateX: isHovered ? -90 : 0,
                     }}
                     transition={{
                       type: 'spring',
-                      stiffness: 180,
-                      damping: 18,
-                      mass: 0.7,
-                      restDelta: 0.001,
+                      stiffness: 200,
+                      damping: 22,
+                      mass: 0.8,
                     }}
                   >
-                    <Icon
-                      icon={link.icon}
-                      className="text-base sm:text-lg md:text-xl"
-                    />
-                  </motion.div>
+                    {/* Front face with icon */}
+                    <div
+                      className={`absolute inset-0 flex items-center justify-center ${
+                        isActive
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted/40 text-foreground'
+                      } border border-border/10 rounded-xl`}
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(20px)',
+                      }}
+                    >
+                      <Icon
+                        icon={link.icon}
+                        className="text-base sm:text-lg md:text-xl"
+                      />
+                    </div>
 
-                  {/* Back face with label */}
+                    {/* Top face with label (rotates into view) */}
+                    <div
+                      className={`absolute inset-0 flex items-center justify-center ${
+                        isActive
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-accent/60 text-accent-foreground'
+                      } border border-border/10 rounded-xl`}
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'rotateX(90deg) translateZ(20px)',
+                      }}
+                    >
+                      <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider">
+                        {link.name}
+                      </span>
+                    </div>
+                  </motion.div>
+                </NavLink>
+              ) : (
+                <div
+                  className="relative block w-12 h-10 sm:w-14 sm:h-12 md:w-16 md:h-12 cursor-pointer"
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    perspective: '600px',
+                  }}
+                >
+                  {/* 3D Cube container */}
                   <motion.div
-                    className={`absolute inset-0 flex flex-col items-center justify-center ${
-                      isActive || (link.name === 'Connect' && socialOpen) 
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' 
-                        : 'bg-accent/60 text-accent-foreground'
-                    } backdrop-blur-sm border border-border/10 rounded-xl`}
+                    className="relative w-full h-full pointer-events-none"
                     style={{
-                      transformOrigin: 'center center -24px',
-                      backfaceVisibility: 'hidden',
-                      transform: 'rotateX(90deg)',
+                      transformStyle: 'preserve-3d',
                     }}
                     animate={{
-                      rotateX: isHovered ? 0 : 90,
+                      rotateX: isHovered ? -90 : 0,
                     }}
                     transition={{
                       type: 'spring',
-                      stiffness: 180,
-                      damping: 18,
-                      mass: 0.7,
-                      restDelta: 0.001,
+                      stiffness: 200,
+                      damping: 22,
+                      mass: 0.8,
                     }}
                   >
-                    <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider leading-none text-center px-1">
-                      {link.name}
-                    </span>
-                  </motion.div>
+                    {/* Front face with icon */}
+                    <div
+                      className={`absolute inset-0 flex items-center justify-center ${
+                        socialOpen
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted/40 text-foreground'
+                      } border border-border/10 rounded-xl`}
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(20px)',
+                      }}
+                    >
+                      <Icon
+                        icon={link.icon}
+                        className="text-base sm:text-lg md:text-xl"
+                      />
+                    </div>
 
-                  {/* Clickable overlay */}
-                  {link.name !== 'Connect' && (
-                    <NavLink
-                      to={link.path}
-                      end={link.path === '/'}
-                      className="absolute inset-0 z-10"
-                    />
-                  )}
+                    {/* Top face with label (rotates into view) */}
+                    <div
+                      className={`absolute inset-0 flex items-center justify-center ${
+                        socialOpen
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-accent/60 text-accent-foreground'
+                      } border border-border/10 rounded-xl`}
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'rotateX(90deg) translateZ(20px)',
+                      }}
+                    >
+                      <span className="text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider">
+                        {link.name}
+                      </span>
+                    </div>
+                  </motion.div>
                 </div>
+              )}
 
                 {/* Social popover is no longer here */}
               </motion.div>
