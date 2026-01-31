@@ -96,9 +96,9 @@ const Navbar = () => {
       }}
     >
       {/* Floating pill wrapper */}
-      <div className="relative inline-flex items-center bg-background/70 backdrop-blur-xl shadow-2xl shadow-black/10 dark:shadow-black/30 ring-1 ring-border/30 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 gap-x-1.5 sm:gap-x-4 pointer-events-auto">
+      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-xl shadow-xl ring-1 ring-border/20 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 gap-x-2 sm:gap-x-3 pointer-events-auto">
         {/* Navigation Links */}
-        <div className="grid grid-flow-col auto-cols-max gap-1 sm:gap-2 md:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 md:gap-4">
           {mainLinks.map((link, idx) => {
             const isActive = idx === activeIndex;
             const isHovered = idx === hoverIndex;
@@ -109,7 +109,7 @@ const Navbar = () => {
                 whileHover="hover"
                 whileTap="tap"
                 variants={navItemVariants}
-                className={`relative flex flex-col items-center justify-center min-w-[48px] sm:min-w-[56px] md:min-w-[64px] cursor-pointer ${link.name === 'Connect' && socialOpen ? 'z-20' : ''}`}
+                className={`relative cursor-pointer ${link.name === 'Connect' && socialOpen ? 'z-20' : ''}`}
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
                 onClick={() => {
@@ -125,7 +125,7 @@ const Navbar = () => {
                 <NavLink
                   to={link.path}
                   end={link.path === '/'}
-                  className="relative block w-12 h-10 sm:w-14 sm:h-12 md:w-16 md:h-12"
+                  className="relative block w-10 h-9 sm:w-14 sm:h-11 md:w-16 md:h-12"
                   style={{
                     transformStyle: 'preserve-3d',
                     perspective: '600px',
@@ -185,7 +185,7 @@ const Navbar = () => {
                 </NavLink>
               ) : (
                 <div
-                  className="relative block w-12 h-10 sm:w-14 sm:h-12 md:w-16 md:h-12 cursor-pointer"
+                  className="relative block w-10 h-9 sm:w-14 sm:h-11 md:w-16 md:h-12 cursor-pointer"
                   style={{
                     transformStyle: 'preserve-3d',
                     perspective: '600px',

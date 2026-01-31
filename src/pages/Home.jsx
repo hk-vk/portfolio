@@ -367,7 +367,7 @@ const Home = memo(() => {
             <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
             <motion.div
-              className="relative mb-16 rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-6 md:p-12 overflow-hidden"
+              className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-3 sm:p-6 md:p-10 overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.3 }}
@@ -391,7 +391,7 @@ const Home = memo(() => {
                 <HeroHighlightLine />
               </Suspense>
 
-              <div className="relative p-6 md:p-12 flex flex-col items-start justify-center text-left">
+              <div className="relative px-0 py-2 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
                 {/* Conditional MagnetLines for better performance */}
                 {sectionsVisible.hero && (
                   <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
@@ -422,52 +422,52 @@ const Home = memo(() => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
                     >
-                      {/* Decorative sparkle */}
+                      {/* Decorative sparkle - hidden on mobile */}
                       <Suspense fallback={<QuickSparkle />}>
-                        <SparkleIllustration className="text-primary absolute -left-7 top-1" size={20} />
+                        <SparkleIllustration className="text-primary absolute -left-7 top-1 hidden sm:block" size={20} />
                       </Suspense>
 
                       {/* "HELLO, I am" - smaller intro text */}
-                      <span className="block text-base md:text-lg font-medium text-muted-foreground mb-1">
+                      <span className="block text-sm sm:text-base md:text-lg font-medium text-muted-foreground mb-1">
                         Hello, I am
                       </span>
 
-                      {/* "HARIKRISHNAN" - large hero name with subtle gradient */}
+                      {/* "HARIKRISHNAN" - dynamically sized hero name */}
                       <h1
-                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight font-display bg-clip-text text-transparent"
+                        className="font-bold tracking-tighter font-display bg-clip-text text-transparent w-full"
                         style={{
                           backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--primary)) 100%)',
+                          fontSize: 'clamp(1.5rem, 7vw, 4rem)',
                         }}
                       >
                         HARIKRISHNAN
                       </h1>
 
                       {/* Subtle accent line under name */}
-                      <div className="mt-2 w-20 h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
+                      <div className="mt-2 w-16 sm:w-20 h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
                     </motion.div>
                   )}
 
                   <motion.p
                     variants={childVariants}
-                    className="mb-3 text-xl text-left"
+                    className="mb-2 sm:mb-3 text-base sm:text-lg md:text-xl text-left"
                   >
                     I'm a Full Stack Developer based in India.
-                    <br />
-                    <span className="text-primary font-medium animated-underline">Focusing on building innovative digital solutions.</span>
+                    <br className="hidden sm:block" />
+                    <span className="text-primary font-medium"> Focusing on building innovative digital solutions.</span>
                   </motion.p>
 
                   <motion.p
                     variants={childVariants}
-                    className="mb-8 text-muted-foreground text-left"
+                    className="mb-6 sm:mb-8 text-sm sm:text-base text-muted-foreground text-left"
                   >
                     I create responsive web applications that combine clean design with efficient code.
-                    My expertise ranges from interactive frontend interfaces to scalable backend systems.
-                    I'm constantly learning and implementing new technologies to develop better solutions.
+                    <span className="hidden sm:inline"> My expertise ranges from interactive frontend interfaces to scalable backend systems.</span>
                   </motion.p>
 
                   <motion.div variants={childVariants} className="w-full">
-                    <h3 className="text-sm uppercase tracking-widest mb-3 text-left">Main Skills</h3>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {skills.map((skill, index) => (
                         <SkillTag
                           key={skill.name}
