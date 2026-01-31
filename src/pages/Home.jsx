@@ -6,6 +6,7 @@ import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
 import SEOHead from '../components/SEOHead';
 import { Icon } from '@iconify/react';
+import { HoverPreviewProvider, HoverPreviewLink } from '../components/HoverPreview';
 
 // Direct import Waves - no lazy loading to ensure immediate visibility
 import Waves from '../components/Waves/Waves';
@@ -194,6 +195,86 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
 });
 
 SkillTag.displayName = 'SkillTag';
+
+// Experience item with expandable details
+const ExperienceItem = memo(({ item, index, isVisible }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.3, delay: 0.1 + index * 0.08 }}
+    >
+      {/* Header row */}
+      <div
+        className="flex items-center justify-between gap-4 py-4 cursor-pointer border-b border-border/20 hover:border-border/40 transition-colors"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {/* Role at Company - single line with bullet */}
+        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+          <span className="font-medium text-foreground">{item.title}</span>
+          <span className="text-muted-foreground/60">at</span>
+          <HoverPreviewLink previewKey={item.companyKey}>
+            {item.company}
+          </HoverPreviewLink>
+        </div>
+
+        {/* Date + Expand */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs text-muted-foreground hidden sm:block">
+            {item.date}
+          </span>
+          <Icon
+            icon="tabler:chevron-down"
+            className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+          />
+        </div>
+      </div>
+
+      {/* Expandable bullet points */}
+      <AnimatePresence>
+        {isExpanded && item.details && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="py-3 pl-4">
+              {item.details.map((detail, idx) => (
+                <div key={idx} className="text-sm text-muted-foreground">
+                  <span>{detail.text}</span>
+                  {detail.link && (
+                    <>
+                      {' — '}
+                      <HoverPreviewLink previewKey={detail.previewKey}>
+                        <a
+                          href={detail.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {detail.linkText}
+                          <Icon icon="tabler:external-link" className="w-3 h-3" />
+                        </a>
+                      </HoverPreviewLink>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+});
+
+ExperienceItem.displayName = 'ExperienceItem';
 
 const Home = memo(() => {
   const motionSafe = useMotionSafe();
@@ -410,56 +491,32 @@ const Home = memo(() => {
         </div>
 
         {/* Experience Section */}
-        <div ref={experienceRef} className="py-16 md:py-20">
+        <div ref={experienceRef} className="py-12 md:py-16">
           <div className="content-container">
             <motion.div
-              className="mb-8"
+              className="mb-8 flex items-center"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight">Experience</h2>
-              <div className="mt-2 w-12 h-1 bg-primary rounded-full" />
+              <Suspense fallback={<QuickSparkle />}>
+                <SparkleIllustration className="text-primary mr-3" size={20} />
+              </Suspense>
+              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight">EXPERIENCE</h2>
             </motion.div>
 
-            <div className="space-y-4">
-              {experienceItems.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  className="group flex items-center gap-4 p-4 rounded-xl border border-border/40 bg-card/30 hover:bg-card/60 hover:border-primary/20 transition-all duration-300"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.3, delay: 0.1 + idx * 0.1 }}
-                >
-                  {/* Logo */}
-                  {item.logo && (
-                    <img
-                      src={item.logo}
-                      alt={`${item.company} logo`}
-                      className="w-12 h-12 object-cover rounded-lg bg-white p-1.5 shrink-0"
-                    />
-                  )}
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground">{item.title}</h3>
-                    <p className="text-sm text-primary">{item.company}</p>
-                  </div>
-
-                  {/* Date */}
-                  <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:block">
-                    {item.date}
-                  </span>
-
-                  {/* Current indicator for first item */}
-                  {idx === 0 && (
-                    <span className="px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full hidden sm:block">
-                      Current
-                    </span>
-                  )}
-                </motion.div>
-              ))}
-            </div>
+            <HoverPreviewProvider data={companyPreviews}>
+              <div className="space-y-3">
+                {experienceItems.map((item, idx) => (
+                  <ExperienceItem
+                    key={idx}
+                    item={item}
+                    index={idx}
+                    isVisible={sectionsVisible.experience}
+                  />
+                ))}
+              </div>
+            </HoverPreviewProvider>
           </div>
         </div>        {/* Projects Preview Section */}
         <div ref={projectsRef} className="mb-12">
@@ -557,18 +614,53 @@ const featuredProjects = [
   },
 ];
 
+// Preview data for hover effect on links
+const companyPreviews = {
+  comini: {
+    image: 'https://i.ibb.co/bM9CVPGj/Image-Editor.png',
+    title: 'Comini Learning',
+    subtitle: 'Play-based microschool in Mumbai for ages 2-13',
+  },
+  labComini: {
+    image: 'https://lab.comini.in/social-media-assets/bake-store-default.png',
+    title: 'Comini Lab',
+    subtitle: 'Hands-on learning games for children',
+  },
+  tryRipples: {
+    image: '/images/tryripples-preview.png',
+    title: 'Try Ripples',
+    subtitle: 'Math learning platform for children',
+  },
+};
+
 const experienceItems = [
   {
-    date: 'August 2025 - Present',
+    date: 'Aug 2025 - Present',
     title: 'Full Stack Software Engineer',
     company: 'Comini Learning',
-    logo: 'https://i.ibb.co/bM9CVPGj/Image-Editor.png',
+    companyKey: 'comini',
+    details: [
+      {
+        text: 'Building end-to-end interactive learning games for children',
+        link: 'https://lab.comini.in/',
+        linkText: 'lab.comini.in',
+        previewKey: 'labComini',
+      },
+    ],
   },
   {
-    date: 'May 2025 - July 2025',
+    date: 'May 2025 - Jul 2025',
     title: 'Software Engineering Intern',
     company: 'Comini Learning',
-    logo: 'https://i.ibb.co/bM9CVPGj/Image-Editor.png',
+    companyKey: 'comini',
+    details: [
+      {
+        text: 'Worked on games and worksheets for child learning on our math learning platform',
+        link: 'https://tryripples.comini.in/',
+        linkText: 'tryripples.comini.in',
+        previewKey: 'tryRipples',
+      },
+    ],
   },
 ];
 
