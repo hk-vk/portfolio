@@ -15,6 +15,8 @@
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
     "@fontsource-variable/syne": "^5.2.7",
+    "@iconify-json/simple-icons": "^1.2.68",
+    "@iconify-json/tabler": "^1.2.26",
     "@vercel/og": "^0.6.8",
     "canvas": "^3.1.2",
     "framer-motion": "^12.18.1",

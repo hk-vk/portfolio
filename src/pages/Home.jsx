@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
 import SEOHead from '../components/SEOHead';
+import { Icon } from '@iconify/react';
 
 // Direct import Waves - no lazy loading to ensure immediate visibility
 import Waves from '../components/Waves/Waves';
@@ -144,7 +145,21 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
 ProjectCard.displayName = 'ProjectCard';
 
 // Ultra-fast skill tag with reduced animations
+// Skills data with icons and brand colors
+const skillsData = [
+  { name: "React", icon: "simple-icons:react", color: "#61DAFB" },
+  { name: "TypeScript", icon: "simple-icons:typescript", color: "#3178C6" },
+  { name: "JavaScript", icon: "simple-icons:javascript", color: "#F7DF1E" },
+  { name: "Python", icon: "simple-icons:python", color: "#3776AB" },
+  { name: "FastAPI", icon: "simple-icons:fastapi", color: "#009688" },
+  { name: "Vue", icon: "simple-icons:vuedotjs", color: "#4FC08D" },
+  { name: "Node.js", icon: "simple-icons:nodedotjs", color: "#339933" },
+  { name: "Tailwind", icon: "simple-icons:tailwindcss", color: "#06B6D4" },
+];
+
 const SkillTag = memo(({ skill, index, isVisible }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const skillVariants = useMemo(() => ({
     initial: { opacity: 0, scale: 0.9 },
     animate: {
@@ -157,13 +172,23 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
 
   return (
     <motion.span
-      className="skill-tag"
+      className="skill-tag inline-flex items-center gap-1.5 cursor-default"
       variants={skillVariants}
       initial="initial"
       animate={isVisible ? "animate" : "initial"}
       whileHover="hover"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        borderColor: isHovered ? `${skill.color}50` : undefined,
+      }}
     >
-      {skill}
+      <Icon
+        icon={skill.icon}
+        className="w-3.5 h-3.5 transition-colors duration-200"
+        style={{ color: isHovered ? skill.color : undefined, opacity: isHovered ? 1 : 0.6 }}
+      />
+      {skill.name}
     </motion.span>
   );
 });
@@ -228,10 +253,8 @@ const Home = memo(() => {
     }
   }), []);
 
-  // Cached skills array
-  const skills = useMemo(() => [
-    "React", "TypeScript", "JavaScript", "Node.js", "UI/UX Design"
-  ], []);
+  // Use skills data
+  const skills = useMemo(() => skillsData, []);
 
   // Memoized featured projects for this component
   const memoizedProjects = useMemo(() => featuredProjects, []);
@@ -366,7 +389,7 @@ const Home = memo(() => {
                     <div className="flex flex-wrap gap-2">
                       {skills.map((skill, index) => (
                         <SkillTag
-                          key={skill}
+                          key={skill.name}
                           skill={skill}
                           index={index}
                           isVisible={sectionsVisible.hero}
@@ -384,84 +407,58 @@ const Home = memo(() => {
               <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
             </div>
           </div>
-        </div>        {/* Experience Section */}
-        <div ref={experienceRef} className="py-12 md:py-16 bg-background">
+        </div>
+
+        {/* Experience Section */}
+        <div ref={experienceRef} className="py-16 md:py-20">
           <div className="content-container">
             <motion.div
-              className="mb-6 flex items-center"
+              className="mb-8"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.3 }}
             >
-              <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="text-primary mr-3" size={20} />
-              </Suspense>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">EXPERIENCE</h2>
+              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight">Experience</h2>
+              <div className="mt-2 w-12 h-1 bg-primary rounded-full" />
             </motion.div>
 
-            {/* Timeline of roles */}
-            <div className="relative mb-8">
-              {/* Timeline line - hidden on mobile */}
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent hidden sm:block"></div>
+            <div className="space-y-4">
+              {experienceItems.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  className="group flex items-center gap-4 p-4 rounded-xl border border-border/40 bg-card/30 hover:bg-card/60 hover:border-primary/20 transition-all duration-300"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.3, delay: 0.1 + idx * 0.1 }}
+                >
+                  {/* Logo */}
+                  {item.logo && (
+                    <img
+                      src={item.logo}
+                      alt={`${item.company} logo`}
+                      className="w-12 h-12 object-cover rounded-lg bg-white p-1.5 shrink-0"
+                    />
+                  )}
 
-              <div className="space-y-6 sm:space-y-8">
-                {experienceItems.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    className="relative flex items-start gap-4 sm:gap-6 sm:pl-14"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={sectionsVisible.experience ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.4, delay: 0.15 + idx * 0.12, ease: "easeOut" }}
-                  >
-                    {/* Timeline dot with pulse effect - hidden on mobile */}
-                    <div className="absolute left-4 top-3 z-10 hidden sm:block">
-                      <div className="w-4 h-4 bg-primary rounded-full ring-4 ring-background shadow-lg shadow-primary/30"></div>
-                      {idx === 0 && (
-                        <div className="absolute inset-0 w-4 h-4 bg-primary rounded-full animate-ping opacity-40"></div>
-                      )}
-                    </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground">{item.title}</h3>
+                    <p className="text-sm text-primary">{item.company}</p>
+                  </div>
 
-                    {/* Card - Mobile optimized */}
-                    <div className="flex-1 bg-card/60 backdrop-blur-sm border border-border/60 rounded-xl p-4 sm:p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                      {/* Mobile: Logo with company info on right */}
-                      <div className="flex items-start gap-3 sm:gap-4">
-                        {item.logo && (
-                          <div className="shrink-0">
-                            <img
-                              src={item.logo}
-                              alt={`${item.company} logo`}
-                              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl shadow-md bg-white p-1"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          {/* Title and Company */}
-                          <h3 className="font-bold text-base sm:text-lg text-foreground leading-tight">
-                            {item.title}
-                          </h3>
-                          <p className="text-sm sm:text-base text-primary font-medium mt-0.5">
-                            {item.company}
-                          </p>
-                          {/* Date - on mobile, shown below company name */}
-                          <span className="inline-flex items-center text-xs font-mono text-muted-foreground bg-muted/60 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-border/50 whitespace-nowrap mt-2 sm:hidden">
-                            <svg className="w-3 h-3 mr-1 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {item.date}
-                          </span>
-                        </div>
-                        {/* Date - on desktop, shown on top right */}
-                        <span className="hidden sm:inline-flex items-center text-xs font-mono text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full border border-border/50 whitespace-nowrap shrink-0">
-                          <svg className="w-3 h-3 mr-1.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          {item.date}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                  {/* Date */}
+                  <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:block">
+                    {item.date}
+                  </span>
+
+                  {/* Current indicator for first item */}
+                  {idx === 0 && (
+                    <span className="px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full hidden sm:block">
+                      Current
+                    </span>
+                  )}
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>        {/* Projects Preview Section */}
