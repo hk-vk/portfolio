@@ -308,6 +308,48 @@ const Waves = ({
       const touch = e.touches[0];
       updateMouse(touch.clientX, touch.clientY);
     }
+    
+    // Device motion/gyroscope handler for mobile
+    let lastGamma = 0;
+    let lastBeta = 0;
+    function onDeviceOrientation(e) {
+      const mouse = mouseRef.current;
+      const b = boundingRef.current;
+      
+      // gamma is left-right tilt (-90 to 90)
+      // beta is front-back tilt (-180 to 180)
+      const gamma = e.gamma || 0;
+      const beta = e.beta || 0;
+      
+      // Smooth the values
+      lastGamma = lastGamma + (gamma - lastGamma) * 0.1;
+      lastBeta = lastBeta + (beta - lastBeta) * 0.1;
+      
+      // Map tilt to cursor position (center of screen + offset based on tilt)
+      // Sensitivity multiplier controls how much the waves react
+      const sensitivity = 8;
+      const centerX = b.width / 2;
+      const centerY = b.height / 2;
+      
+      // Calculate position based on tilt
+      const targetX = centerX + (lastGamma * sensitivity);
+      const targetY = centerY + ((lastBeta - 45) * sensitivity); // Subtract 45 as phones are usually held at ~45 degrees
+      
+      // Only update if we have valid tilt data
+      if (Math.abs(gamma) > 0.5 || Math.abs(beta) > 0.5) {
+        mouse.x = Math.max(0, Math.min(b.width, targetX));
+        mouse.y = Math.max(0, Math.min(b.height, targetY));
+        
+        if (!mouse.set) {
+          mouse.sx = mouse.x;
+          mouse.sy = mouse.y;
+          mouse.lx = mouse.x;
+          mouse.ly = mouse.y;
+          mouse.set = true;
+        }
+      }
+    }
+    
     function updateMouse(x, y) {
       const mouse = mouseRef.current,
         b = boundingRef.current;
@@ -322,20 +364,46 @@ const Waves = ({
       }
     }
 
+    // Request permission for device orientation (required on iOS 13+)
+    async function requestDeviceOrientationPermission() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && 
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const permission = await DeviceOrientationEvent.requestPermission();
+          if (permission === 'granted') {
+            window.addEventListener('deviceorientation', onDeviceOrientation);
+          }
+        } catch (err) {
+          console.log('Device orientation permission denied');
+        }
+      } else if (typeof DeviceOrientationEvent !== 'undefined') {
+        // For Android and older iOS
+        window.addEventListener('deviceorientation', onDeviceOrientation);
+      }
+    }
+
     setSize();
     setLines();
     frameIdRef.current = requestAnimationFrame(tick);
     window.addEventListener("resize", onResize);
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("touchmove", onTouchMove, { passive: false });
+    
+    // Add device motion support for mobile
+    requestDeviceOrientationPermission();
 
     return () => {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener('deviceorientation', onDeviceOrientation);
       cancelAnimationFrame(frameIdRef.current);
     };
   }, []);
+
+  // Check if device is mobile/touch device
+  const isTouchDevice = typeof window !== 'undefined' && 
+    ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   return (
     <div
@@ -346,14 +414,17 @@ const Waves = ({
       }}
       className={`absolute top-0 left-0 w-full h-full overflow-hidden ${className}`}
     >
-      <div
-        className="absolute top-0 left-0 bg-[#160000] rounded-full w-[0.5rem] h-[0.5rem]"
-        style={{
-          transform:
-            "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
-          willChange: "transform",
-        }}
-      />
+      {/* Hide cursor dot on touch/mobile devices */}
+      {!isTouchDevice && (
+        <div
+          className="absolute top-0 left-0 bg-[#160000] rounded-full w-[0.5rem] h-[0.5rem]"
+          style={{
+            transform:
+              "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
+            willChange: "transform",
+          }}
+        />
+      )}
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );
