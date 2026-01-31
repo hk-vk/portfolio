@@ -1,86 +1,81 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
+import { duration, entrance, stagger as staggerConfig } from '../utils/motionSettings';
 
-const AnimatedSection = memo(({ 
-  children, 
-  className = "", 
-  animation = "fadeUp", 
-  delay = 0, 
-  once = true, 
+const AnimatedSection = memo(({
+  children,
+  className = "",
+  animation = "fadeUp",
+  delay = 0,
+  once = true,
   threshold = 0.1,
-  ...props 
+  ...props
 }) => {
-  // Simplified and optimized animation variants
+  // Animation variants using Temporal Precision system
   const variants = {
     fadeUp: {
-      hidden: { y: 20, opacity: 0 },
-      visible: { 
-        y: 0, 
-        opacity: 1,
-        transition: { 
-          duration: 0.3, 
+      hidden: entrance.fadeUp.initial,
+      visible: {
+        ...entrance.fadeUp.animate,
+        transition: {
+          duration: duration.standard / 1000,
           ease: "easeOut",
-          delay 
+          delay
         }
       }
     },
     fadeIn: {
-      hidden: { opacity: 0 },
-      visible: { 
-        opacity: 1,
-        transition: { 
-          duration: 0.25,
-          delay 
+      hidden: entrance.fade.initial,
+      visible: {
+        ...entrance.fade.animate,
+        transition: {
+          duration: duration.quick / 1000,
+          delay
         }
       }
     },
     slideInLeft: {
-      hidden: { x: -30, opacity: 0 },
-      visible: { 
-        x: 0, 
-        opacity: 1,
-        transition: { 
-          duration: 0.3,
+      hidden: entrance.slideLeft.initial,
+      visible: {
+        ...entrance.slideLeft.animate,
+        transition: {
+          duration: duration.standard / 1000,
           ease: "easeOut",
-          stiffness: 180,
-          damping: 25,
-          delay 
+          delay
         }
       }
     },
     slideInRight: {
-      hidden: { x: 30, opacity: 0 },
-      visible: { 
-        x: 0, 
-        opacity: 1,
-        transition: { 
-          duration: 0.3,
+      hidden: entrance.slideRight.initial,
+      visible: {
+        ...entrance.slideRight.animate,
+        transition: {
+          duration: duration.standard / 1000,
           ease: "easeOut",
-          delay 
+          delay
         }
       }
     },
     zoomIn: {
       hidden: { scale: 0.98, opacity: 0 },
-      visible: { 
-        scale: 1, 
+      visible: {
+        scale: 1,
         opacity: 1,
-        transition: { 
-          duration: 0.25,
+        transition: {
+          duration: duration.quick / 1000,
           ease: "easeOut",
-          delay 
+          delay
         }
       }
     },
     scale: {
-      hidden: { scale: 0.95, opacity: 0 },
-      visible: { 
-        scale: 1, 
-        opacity: 1,
-        transition: { 
-          duration: 0.3,
+      hidden: entrance.scaleUp.initial,
+      visible: {
+        ...entrance.scaleUp.animate,
+        transition: {
+          duration: duration.standard / 1000,
           ease: "easeOut",
-          delay 
+          delay
         }
       }
     }
@@ -102,16 +97,16 @@ const AnimatedSection = memo(({
 
 AnimatedSection.displayName = 'AnimatedSection';
 
-// Optimized Animated Grid Component
-export const AnimatedGrid = memo(({ 
-  children, 
-  className = "", 
-  columns = { sm: 1, md: 2, lg: 3 }, 
+// Optimized Animated Grid Component with Temporal Precision
+export const AnimatedGrid = memo(({
+  children,
+  className = "",
+  columns = { sm: 1, md: 2, lg: 3 },
   gap = 6,
-  stagger = 0.03,
+  stagger = staggerConfig.quick.staggerChildren,
   once = true,
   threshold = 0.1,
-  ...props 
+  ...props
 }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -119,18 +114,17 @@ export const AnimatedGrid = memo(({
       opacity: 1,
       transition: {
         staggerChildren: stagger,
-        delayChildren: 0.05
+        delayChildren: staggerConfig.standard.delayChildren
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 15, opacity: 0 },
+    hidden: entrance.fadeUp.initial,
     visible: {
-      y: 0,
-      opacity: 1,
+      ...entrance.fadeUp.animate,
       transition: {
-        duration: 0.3,
+        duration: duration.standard / 1000,
         ease: "easeOut"
       }
     }

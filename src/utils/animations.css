@@ -1,0 +1,294 @@
+/**
+ * TEMPORAL PRECISION - CSS Animation System
+ *
+ * Provides CSS custom properties and classes for consistent animations
+ * across the application. Use these for CSS-only animations.
+ */
+
+:root {
+  /* === DURATION HARMONICS === */
+  --duration-instant: 0.1s;
+  --duration-quick: 0.15s;
+  --duration-standard: 0.3s;
+  --duration-moderate: 0.45s;
+  --duration-slow: 0.6s;
+  --duration-prolonged: 0.9s;
+  --duration-extended: 1.2s;
+
+  /* === EASING CURVES === */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in: cubic-bezier(0.32, 0, 0.67, 0);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-back: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+}
+
+/* === REDUCED MOTION SUPPORT === */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* Override all durations to instant */
+    --duration-instant: 0.1s;
+    --duration-quick: 0.1s;
+    --duration-standard: 0.1s;
+    --duration-moderate: 0.1s;
+    --duration-slow: 0.1s;
+    --duration-prolonged: 0.1s;
+    --duration-extended: 0.1s;
+  }
+
+  /* Disable transforms, only allow opacity changes */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.1s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.1s !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Remove transforms in reduced motion */
+  .motion-safe-transform {
+    transform: none !important;
+  }
+}
+
+/* === UTILITY CLASSES === */
+
+/* Transitions */
+.transition-instant {
+  transition-duration: var(--duration-instant);
+  transition-timing-function: var(--ease-out);
+}
+
+.transition-quick {
+  transition-duration: var(--duration-quick);
+  transition-timing-function: var(--ease-out);
+}
+
+.transition-standard {
+  transition-duration: var(--duration-standard);
+  transition-timing-function: var(--ease-out);
+}
+
+.transition-slow {
+  transition-duration: var(--duration-slow);
+  transition-timing-function: var(--ease-out);
+}
+
+/* Hover states */
+.hover-lift {
+  transition: transform var(--duration-instant) var(--ease-out),
+              box-shadow var(--duration-instant) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+.hover-scale {
+  transition: transform var(--duration-instant) var(--ease-out);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-subtle {
+  transition: transform var(--duration-instant) var(--ease-out);
+}
+
+.hover-subtle:hover {
+  transform: scale(1.02);
+}
+
+/* Press states */
+.active-press:active {
+  transform: scale(0.97);
+  transition: transform var(--duration-instant) var(--ease-in-out);
+}
+
+/* === KEYFRAME ANIMATIONS === */
+
+/* Fade up entrance */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp var(--duration-quick) var(--ease-out) both;
+}
+
+/* Fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-quick) var(--ease-out) both;
+}
+
+/* Scale up entrance */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-up {
+  animation: scaleUp var(--duration-standard) var(--ease-out) both;
+}
+
+/* Slide from left */
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-left {
+  animation: slideLeft var(--duration-standard) var(--ease-out) both;
+}
+
+/* Slide from right */
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-right {
+  animation: slideRight var(--duration-standard) var(--ease-out) both;
+}
+
+/* Pulse (for attention) */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.animate-pulse {
+  animation: pulse var(--duration-slow) var(--ease-in-out) infinite;
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s var(--ease-in-out) infinite;
+}
+
+/* === STAGGER UTILITIES === */
+
+/* Quick stagger (30ms) */
+.stagger-quick > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-quick > *:nth-child(2) { animation-delay: 30ms; }
+.stagger-quick > *:nth-child(3) { animation-delay: 60ms; }
+.stagger-quick > *:nth-child(4) { animation-delay: 90ms; }
+.stagger-quick > *:nth-child(5) { animation-delay: 120ms; }
+.stagger-quick > *:nth-child(6) { animation-delay: 150ms; }
+.stagger-quick > *:nth-child(7) { animation-delay: 180ms; }
+.stagger-quick > *:nth-child(8) { animation-delay: 210ms; }
+.stagger-quick > *:nth-child(9) { animation-delay: 240ms; }
+.stagger-quick > *:nth-child(10) { animation-delay: 270ms; }
+
+/* Standard stagger (50ms) */
+.stagger-standard > *:nth-child(1) { animation-delay: 100ms; }
+.stagger-standard > *:nth-child(2) { animation-delay: 150ms; }
+.stagger-standard > *:nth-child(3) { animation-delay: 200ms; }
+.stagger-standard > *:nth-child(4) { animation-delay: 250ms; }
+.stagger-standard > *:nth-child(5) { animation-delay: 300ms; }
+.stagger-standard > *:nth-child(6) { animation-delay: 350ms; }
+.stagger-standard > *:nth-child(7) { animation-delay: 400ms; }
+.stagger-standard > *:nth-child(8) { animation-delay: 450ms; }
+
+/* Slow stagger (100ms) */
+.stagger-slow > *:nth-child(1) { animation-delay: 200ms; }
+.stagger-slow > *:nth-child(2) { animation-delay: 300ms; }
+.stagger-slow > *:nth-child(3) { animation-delay: 400ms; }
+.stagger-slow > *:nth-child(4) { animation-delay: 500ms; }
+.stagger-slow > *:nth-child(5) { animation-delay: 600ms; }
+.stagger-slow > *:nth-child(6) { animation-delay: 700ms; }
+
+/* === ACCESSIBILITY === */
+
+/* Motion-safe class - only shows on motion-safe devices */
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe-only {
+    display: none !important;
+  }
+}
+
+/* Reduced-motion class - only shows on reduced motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  .reduced-motion-only {
+    display: none !important;
+  }
+}
+
+/* === PERFORMANCE OPTIMIZATION === */
+
+/* Optimize animated elements */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+.will-animate-transform {
+  will-change: transform;
+}
+
+.will-animate-opacity {
+  will-change: opacity;
+}
+
+/* Remove will-change after animation completes (do this via JS) */
+.animation-complete {
+  will-change: auto;
+}

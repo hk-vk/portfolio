@@ -157,7 +157,7 @@ const About = () => {
                   className="h-full bg-gradient-to-r from-secondary to-primary"
                   initial={{ width: 0 }}
                   animate={{ width: `${skill.level}%` }}
-                  transition={{ duration: 1, delay: index * 0.1 + 0.3 }}
+                  transition={{ duration: 0.8, delay: index * 0.08 + 0.3, ease: [0.16, 1, 0.3, 1] }}
                 ></motion.div>
               </div>
             </AnimatedSection>

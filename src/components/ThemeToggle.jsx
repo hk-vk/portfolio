@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { themeToggle } from '../utils/themeToggle';
+import { spring, tap } from '../utils/motionSettings';
 
 /**
  * Theme toggle button component that allows switching between light and dark mode
@@ -78,7 +79,7 @@ const ThemeToggle = () => {
   return (
     <motion.button
       whileHover={{ rotate: isDark ? -20 : 20, scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
+      whileTap={tap.press}
       onClick={handleToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       className="text-foreground hover:text-primary transition-colors"
@@ -90,7 +91,7 @@ const ThemeToggle = () => {
             initial={{ y: -10, opacity: 0, rotate: -90 }}
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             exit={{ y: 10, opacity: 0, rotate: 90 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+            transition={spring.snappy}
           >
             <MoonIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.span>
@@ -100,7 +101,7 @@ const ThemeToggle = () => {
             initial={{ y: -10, opacity: 0, rotate: 90 }}
             animate={{ y: 0, opacity: 1, rotate: 0 }}
             exit={{ y: 10, opacity: 0, rotate: -90 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+            transition={spring.snappy}
           >
             <SunIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.span>

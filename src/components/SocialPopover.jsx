@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
+import { spring } from '../utils/motionSettings';
 
 /**
  * SocialPopover – A small pop-up with social media links.
@@ -61,10 +62,10 @@ const SocialPopover = ({ isOpen, onClose, triggerRef }) => {
         <motion.div
           ref={panelRef}
           className="absolute bottom-full right-6 mb-2 z-[60] pointer-events-auto bg-background/90 backdrop-blur-md ring-1 ring-border/30 shadow-xl rounded-xl px-4 py-3 flex gap-4"
-          initial={{ opacity: 0, y: 8, scale: 0.95 }}
+          initial={{ opacity: 0, y: 6, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 8, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+          exit={{ opacity: 0, y: 6, scale: 0.96 }}
+          transition={spring.smooth}
         >
           {links.map((l) => (
             <a

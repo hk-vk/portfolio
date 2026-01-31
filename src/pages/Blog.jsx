@@ -9,10 +9,10 @@ import SEOHead from '../components/SEOHead';
 const BlogPostCard = ({ post }) => (
   <motion.div
     className="group h-full"
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    whileHover={{ y: -4 }}
+    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    whileHover={{ y: -3, transition: { duration: 0.15 } }}
   >
     <Link to={`/blog/${post.id}`} className="block h-full">
       <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
@@ -119,9 +119,9 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
         <div className="content-container text-center mb-20">
           <motion.div
             className="flex items-center justify-center mb-6"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <SparkleIllustration className="text-primary mr-3" size={24} />
             <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider">
@@ -132,7 +132,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
             className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             Thoughts, stories, and ideas worth sharing.
           </motion.p>
@@ -140,7 +140,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
             className="w-16 h-px bg-primary/40 mx-auto mt-6"
             initial={{ width: 0 }}
             animate={{ width: "4rem" }}
-            transition={{ delay: 0.4, duration: 0.8 }}
+            transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           />
         </div>
       </AnimatedSection>
@@ -152,9 +152,9 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
               {blogPosts.map((post, index) => (
                 <motion.div
                   key={post.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index, duration: 0.6 }}
+                  transition={{ delay: 0.08 * index, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <BlogPostCard post={post} />
                 </motion.div>
@@ -162,19 +162,19 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
             </div>
           ) : (
             <div className="text-center py-12">
-              <motion.h2 
+              <motion.h2
                 className="text-2xl font-semibold text-muted-foreground mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
+                transition={{ delay: 0.4, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 No blog posts yet.
               </motion.h2>
-              <motion.p 
+              <motion.p
                 className="text-muted-foreground"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
+                transition={{ delay: 0.5, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 Check back soon for new articles!
               </motion.p>

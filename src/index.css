@@ -1,5 +1,6 @@
 @import '@fontsource-variable/syne';
 @import '@fontsource-variable/plus-jakarta-sans';
+@import './utils/animations.css';
 
 @tailwind base;
 @tailwind components;

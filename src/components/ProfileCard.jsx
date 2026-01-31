@@ -13,9 +13,9 @@ const ProfileCard = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto"
     >
       <div className="relative">
@@ -41,19 +41,19 @@ const ProfileCard = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
               {/* Name and Title Overlay */}
               <div className="absolute bottom-0 left-0 p-4 sm:p-5 md:p-6">
-                <motion.h2 
+                <motion.h2
                   className="text-xl sm:text-2xl md:text-3xl font-bold text-white shadow-sm"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
+              transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
                 Harikrishnan V K
                 </motion.h2>
-                <motion.p 
+                <motion.p
                   className="text-sm sm:text-md font-medium text-gray-200 shadow-sm"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
+                  transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 >
                 Full Stack Developer & Student
                 </motion.p>
@@ -63,11 +63,11 @@ const ProfileCard = () => {
             {/* Content Section Below Image */}
             <div className="p-4 sm:p-5 md:p-6 flex flex-col items-center text-center">
             {/* Bio with subtle highlight */}
-            <motion.div 
+            <motion.div
                 className="mb-5 sm:mb-6 relative"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
                 <div className="w-16 h-1 bg-gradient-to-r from-primary/50 to-accent/50 mx-auto mb-3 sm:mb-4 rounded-full"></div>
                 <p className="text-xs sm:text-sm text-foreground/70 max-w-xs mx-auto leading-relaxed">
@@ -76,11 +76,11 @@ const ProfileCard = () => {
             </motion.div>
 
             {/* Skills */}
-            <motion.div 
+            <motion.div
                 className="mb-5 sm:mb-6 w-full max-w-xs mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
+              transition={{ delay: 0.4, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 font-semibold">Key Skills</h3>
               <div className="flex flex-wrap justify-center gap-2">
@@ -100,11 +100,11 @@ const ProfileCard = () => {
             </motion.div>
 
             {/* Social links */}
-            <motion.div 
+            <motion.div
                 className="flex justify-center space-x-2 sm:space-x-3 mb-5 sm:mb-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
+              transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               {socialLinks.map((social, index) => (
                 <motion.a
@@ -133,7 +133,7 @@ const ProfileCard = () => {
               className="button-primary inline-flex items-center group"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.7, duration: 0.5, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.7, duration: 0.6, type: 'spring', stiffness: 200 }}
               whileHover={{ scale: 1.03 }}
             >
               <span className="relative z-10">Get in Touch</span>

@@ -1,5 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { spring } from '../utils/motionSettings';
+import {
+  duration,
+  spring,
+  entrance,
+  hover,
+  tap,
+  stagger,
+  container,
+  getTransition,
+  getSpring
+} from '../utils/motionSettings';
 import { useMotionSafe } from '../utils/useMotionSafe';
 import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
@@ -34,21 +44,27 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const cardVariants = useMemo(() => ({
-    hidden: { opacity: 0, y: 15 },
+    hidden: entrance.fadeUp.initial,
     visible: {
-      opacity: 1,
-      y: 0,
-      transition: { delay: 0.05 * index, duration: 0.25, ease: "easeOut" }
+      ...entrance.fadeUp.animate,
+      transition: {
+        delay: stagger.quick.staggerChildren * index,
+        duration: duration.quick / 1000,
+        ease: "easeOut"
+      }
     }
   }), [index]);
 
-  const hoverVariants = useMemo(() => ({
-    y: -2,
-    rotateX: motionSafe ? -1 : 0,
-    rotateY: motionSafe ? 1 : 0,
-    scale: motionSafe ? 1.01 : 1,
-    transition: { duration: 0.15, ease: "easeOut" }
-  }), [motionSafe]);
+  const hoverVariants = useMemo(() =>
+    motionSafe ? {
+      ...hover.lift,
+      rotateX: -1,
+      rotateY: 1,
+    } : {
+      scale: 1,
+      transition: getTransition('instant', 'easeOut', false)
+    }
+  , [motionSafe]);
 
   return (
     <motion.div
@@ -162,13 +178,20 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const skillVariants = useMemo(() => ({
-    initial: { opacity: 0, scale: 0.9 },
+    initial: entrance.scaleUp.initial,
     animate: {
-      opacity: 1,
-      scale: 1,
-      transition: { delay: 0.6 + (index * 0.03), duration: 0.15, ease: "easeOut" }
+      ...entrance.scaleUp.animate,
+      transition: {
+        delay: index * stagger.quick.staggerChildren,
+        duration: duration.quick / 1000,
+        ease: "easeOut"
+      }
     },
-    hover: { scale: 1.03, y: -1, transition: { duration: 0.1 } }
+    hover: {
+      scale: 1.03,
+      y: -2,
+      transition: { duration: duration.instant / 1000 }
+    }
   }), [index]);
 
   return (
@@ -202,9 +225,12 @@ const ExperienceItem = memo(({ item, index, isVisible }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={isVisible ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.3, delay: 0.1 + index * 0.08 }}
+      initial={entrance.fadeUp.initial}
+      animate={isVisible ? entrance.fadeUp.animate : entrance.fadeUp.initial}
+      transition={{
+        duration: duration.quick / 1000,
+        delay: index * stagger.quick.staggerChildren
+      }}
     >
       {/* Header row */}
       <div
@@ -240,7 +266,7 @@ const ExperienceItem = memo(({ item, index, isVisible }) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: duration.standard / 1000 }}
             className="overflow-hidden"
           >
             <div className="py-3 pl-4">
@@ -313,25 +339,15 @@ const Home = memo(() => {
     experience: experienceVisible
   }), [heroVisible, projectsVisible, experienceVisible]);
 
-  // Ultra-fast animation variants
+  // Animation variants using Temporal Precision system
   const containerVariants = useMemo(() => ({
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.03,
-        delayChildren: 0.05
-      }
-    }
+    hidden: container.hidden,
+    visible: container.visible(stagger.quick)
   }), []);
 
   const childVariants = useMemo(() => ({
-    hidden: { y: 10, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.2, ease: "easeOut" }
-    }
+    hidden: entrance.fadeUp.initial,
+    visible: entrance.fadeUp.animate
   }), []);
 
   // Use skills data
@@ -354,9 +370,9 @@ const Home = memo(() => {
             {/* Decorative Elements with conditional loading */}
             <motion.div
               className="absolute -right-10 top-20 opacity-80 z-10 hidden md:block"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={sectionsVisible.hero ? { opacity: 0.8, scale: 1 } : {}}
-              transition={{ delay: 0.3, duration: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={sectionsVisible.hero ? { opacity: 0.8 } : {}}
+              transition={{ delay: 0.5, duration: 0.8 }}
             >
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="transform rotate-12" size={24} />
@@ -368,10 +384,10 @@ const Home = memo(() => {
 
             <motion.div
               className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-3 sm:p-6 md:p-10 overflow-hidden"
-              initial={{ opacity: 0, y: 20 }}
-              animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.3 }}
-              whileHover={{ scale: 1.005 }}
+              initial={{ opacity: 0, y: 6 }}
+              animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={hover.subtle}
             >
               {/* Waves inside hero card */}
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
@@ -418,9 +434,9 @@ const Home = memo(() => {
                   {sectionsVisible.hero && (
                     <motion.div
                       className="relative mb-4"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.6, delay: 0.15 }}
                     >
                       {/* Decorative sparkle - hidden on mobile */}
                       <Suspense fallback={<QuickSparkle />}>
@@ -482,11 +498,6 @@ const Home = memo(() => {
               </div>
             </motion.div>
 
-            {/* Background watermark */}
-            <div className="pointer-events-none select-none absolute inset-0 -z-10">
-              <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -top-20 -left-8">HARI</h1>
-              <h1 className="font-serif font-bold text-foreground/5 text-[22vw] leading-none absolute -bottom-16 left-1/2 -translate-x-1/2">KRISHNAN</h1>
-            </div>
           </div>
         </div>
 
@@ -495,9 +506,9 @@ const Home = memo(() => {
           <div className="content-container">
             <motion.div
               className="mb-8 flex items-center"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="text-primary mr-3" size={20} />
@@ -523,9 +534,9 @@ const Home = memo(() => {
           <div className="content-container mt-4">
             <motion.div
               className="mb-12 flex items-center"
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="text-primary mr-4" size={24} />

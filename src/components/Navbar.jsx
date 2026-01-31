@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import ThemeToggle from './ThemeToggle';
 import SocialPopover from './SocialPopover';
 import { useSocialPopover } from '../context/SocialPopoverContext';
+import { spring, hover, tap as tapAnim } from '../utils/motionSettings';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -41,17 +42,12 @@ const Navbar = () => {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
   );
 
-  // Animation variants (slide in from bottom instead of top)
+  // Animation variants using Temporal Precision system
   const headerVariants = {
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 120,
-        damping: 20,
-        mass: 0.8,
-      },
+      transition: spring.gentle,
     },
     hidden: {
       y: 60,
@@ -61,22 +57,19 @@ const Navbar = () => {
 
   const navItemVariants = {
     hover: {
-      scale: 1.04,
-      y: -3,
+      scale: 1.02,
+      y: -1,
       transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 20,
-        mass: 0.6,
+        duration: 0.1,
+        ease: 'easeOut',
       }
     },
     tap: {
-      scale: 0.96,
+      scale: 0.98,
       y: 0,
       transition: {
-        type: 'spring',
-        stiffness: 500,
-        damping: 25,
+        duration: 0.08,
+        ease: 'easeInOut',
       }
     }
   };
@@ -142,9 +135,9 @@ const Navbar = () => {
                     }}
                     transition={{
                       type: 'spring',
-                      stiffness: 200,
-                      damping: 22,
-                      mass: 0.8,
+                      stiffness: 180,
+                      damping: 24,
+                      mass: 1,
                     }}
                   >
                     {/* Front face with icon */}
@@ -202,9 +195,9 @@ const Navbar = () => {
                     }}
                     transition={{
                       type: 'spring',
-                      stiffness: 200,
-                      damping: 22,
-                      mass: 0.8,
+                      stiffness: 180,
+                      damping: 24,
+                      mass: 1,
                     }}
                   >
                     {/* Front face with icon */}
@@ -254,16 +247,14 @@ const Navbar = () => {
         {/* Theme Toggle */}
         <motion.div
           whileHover={{
-            scale: 1.08,
-            rotate: 5,
-            y: -2
+            scale: 1.05,
+            rotate: 3,
+            y: -1
           }}
-          whileTap={{ scale: 0.92, rotate: 0 }}
+          whileTap={{ scale: 0.96, rotate: 0 }}
           transition={{
-            duration: 0.25,
-            type: 'spring',
-            stiffness: 350,
-            damping: 20
+            duration: 0.15,
+            ease: 'easeOut'
           }}
           className="ml-1 sm:ml-2 flex-shrink-0"
         >

@@ -113,9 +113,9 @@ const Projects = () => {
           <div className="text-center mb-16">
             <motion.h1
               className="text-3xl md:text-4xl font-bold uppercase mb-6"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
               PROJECTS
             </motion.h1>
@@ -123,7 +123,7 @@ const Projects = () => {
               className="text-muted-foreground max-w-2xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
               A collection of my work across various fields and technologies.
               Each project represents a unique challenge and solution.
@@ -155,10 +155,11 @@ const Projects = () => {
               <motion.div
                 key={project.id}
                 className="fancy-border cursor-pointer"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
+                transition={{ delay: index * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => openModal(project)}
+                whileHover={{ y: -3, transition: { duration: 0.15 } }}
               >
                 <div className="border border-border p-6 h-full flex flex-col">
                   <div className="flex justify-between items-start mb-4 pointer-events-none">

@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { AnimatePresence } from 'framer-motion';
 import '@fontsource-variable/syne';
 import '@fontsource-variable/plus-jakarta-sans';
 import './index.css';
@@ -8,6 +9,7 @@ import './index.css';
 // Only import essential components synchronously
 import Navbar from './components/Navbar';
 import LoadingScreen from './components/LoadingScreen';
+import PageTransition from './components/PageTransition';
 
 // Lazy load all pages for code splitting and faster initial load
 const Home = lazy(() => import('./pages/Home'));
@@ -25,6 +27,25 @@ const ScrollToTop = lazy(() => import('./utils/ScrollToTop'));
 const PageLoader = () => (
   <div className="min-h-screen bg-background" />
 );
+
+// AnimatedRoutes component to handle page transitions
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/projects" element={<PageTransition><Projects /></PageTransition>} />
+        <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
+        <Route path="/blog/:postId" element={<PageTransition><BlogPostPage /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+        <Route path="/og-preview" element={<PageTransition><OGPreview /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -125,15 +146,7 @@ function App() {
           <main className="relative">
             <Suspense fallback={<PageLoader />}>
               <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/projects" element={<Projects />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:postId" element={<BlogPostPage />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/og-preview" element={<OGPreview />} />
-              </Routes>
+              <AnimatedRoutes />
             </Suspense>
           </main>
         </div>
