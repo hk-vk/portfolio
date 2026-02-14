@@ -225,7 +225,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
           {/* Left: Title + Company */}
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-medium text-foreground">{item.title}</h3>
+              <p className="font-semibold text-foreground leading-[1.25] pb-[0.05em]">{item.title}</p>
               {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded hidden sm:inline-block">Current</span>}
             </div>
             <div className="mt-0.5">
@@ -440,7 +440,7 @@ const Home = memo(() => {
 
                       {/* "HARIKRISHNAN" - dynamically sized hero name */}
                       <h1
-                        className="font-bold tracking-tighter font-display bg-clip-text text-transparent w-full"
+                        className="font-bold tracking-tighter font-display bg-clip-text text-transparent w-full leading-[1.12] pb-[0.08em]"
                         style={{
                           backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--primary)) 100%)',
                           fontSize: 'clamp(1.5rem, 7vw, 4rem)',
@@ -507,7 +507,7 @@ const Home = memo(() => {
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="text-primary mr-3" size={20} />
               </Suspense>
-              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight">EXPERIENCE</h2>
+              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight leading-[1.12] pb-[0.08em]">EXPERIENCE</h2>
             </motion.div>
 
             <HoverPreviewProvider data={companyPreviews}>
@@ -538,7 +538,7 @@ const Home = memo(() => {
                 <SparkleIllustration className="text-primary mr-4" size={24} />
               </Suspense>
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight">FEATURED PROJECTS</h2>
+                <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-[1.12] pb-[0.08em]">FEATURED PROJECTS</h2>
               </div>
             </motion.div>
 
