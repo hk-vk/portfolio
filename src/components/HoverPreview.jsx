@@ -67,6 +67,10 @@ export function HoverPreviewProvider({
 
   const handleHoverStart = useCallback(
     (key, e) => {
+      if (hideTimeout.current) {
+        clearTimeout(hideTimeout.current);
+        hideTimeout.current = null;
+      }
       const previewData = data[key];
       if (previewData) {
         setActivePreview(previewData);
@@ -86,7 +90,22 @@ export function HoverPreviewProvider({
     [isVisible, updatePosition]
   );
 
+  const hideTimeout = useRef(null);
+
   const handleHoverEnd = useCallback(() => {
+    hideTimeout.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 150);
+  }, []);
+
+  const handleCardEnter = useCallback(() => {
+    if (hideTimeout.current) {
+      clearTimeout(hideTimeout.current);
+      hideTimeout.current = null;
+    }
+  }, []);
+
+  const handleCardLeave = useCallback(() => {
     setIsVisible(false);
   }, []);
 
@@ -99,6 +118,8 @@ export function HoverPreviewProvider({
     handleHoverStart,
     handleHoverMove,
     handleHoverEnd,
+    handleCardEnter,
+    handleCardLeave,
   };
 
   return (
@@ -130,23 +151,25 @@ export function HoverPreviewLink({ previewKey, children, className = "" }) {
 
 // Preview Card
 const HoverPreviewCard = forwardRef((_, ref) => {
-  const { activePreview, position, isVisible, cardWidth } = useHoverPreview();
+  const { activePreview, position, isVisible, cardWidth, handleCardEnter, handleCardLeave } = useHoverPreview();
 
   if (!activePreview) return null;
 
   return (
     <div
       ref={ref}
-      className={`pointer-events-none fixed z-50 transition-all duration-200 ease-out ${
+      className={`fixed z-50 transition-all duration-200 ease-out ${
         isVisible
-          ? "scale-100 opacity-100"
-          : "translate-y-2 scale-95 opacity-0"
+          ? "scale-100 opacity-100 pointer-events-auto"
+          : "translate-y-2 scale-95 opacity-0 pointer-events-none"
       }`}
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
         width: cardWidth,
       }}
+      onMouseEnter={handleCardEnter}
+      onMouseLeave={handleCardLeave}
     >
       <div className="overflow-hidden rounded-xl border border-border/50 bg-card/95 p-2 shadow-2xl backdrop-blur-md">
         <img
@@ -154,14 +177,26 @@ const HoverPreviewCard = forwardRef((_, ref) => {
           alt={activePreview.title || ""}
           className="aspect-video w-full rounded-lg object-cover"
         />
-        <div className="px-2 pt-2 pb-1">
-          <div className="font-semibold text-foreground text-sm">
-            {activePreview.title}
-          </div>
-          {activePreview.subtitle && (
-            <div className="mt-0.5 text-muted-foreground text-xs">
-              {activePreview.subtitle}
+        <div className="px-2 pt-2 pb-1 flex items-start justify-between gap-2">
+          <div>
+            <div className="font-semibold text-foreground text-sm">
+              {activePreview.title}
             </div>
+            {activePreview.subtitle && (
+              <div className="mt-0.5 text-muted-foreground text-xs">
+                {activePreview.subtitle}
+              </div>
+            )}
+          </div>
+          {activePreview.url && (
+            <a
+              href={activePreview.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 mt-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground px-1.5 py-0.5 rounded border border-border/50 hover:border-border transition-colors"
+            >
+              Visit ↗
+            </a>
           )}
         </div>
       </div>

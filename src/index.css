@@ -31,7 +31,7 @@
   .dark {
     --background: 240 10% 10%;
     --foreground: 240 15% 95%;
-    --card: 240 10% 15%;
+    --card: 240 10% 13%;
     --card-foreground: 240 15% 95%;
     --primary: 349 75% 55%;
     --primary-foreground: 60 9% 98%;
@@ -43,8 +43,8 @@
     --muted-foreground: 240 5% 75%;
     --popover: 240 10% 15%;
     --popover-foreground: 240 15% 95%;
-    --border: 240 5% 25%;
-    --input: 240 5% 25%;
+    --border: 240 8% 28%;
+    --input: 240 8% 28%;
     --ring: 349 75% 55%;
   }
 
@@ -110,8 +110,47 @@
   }
 
   .skill-tag {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-background/90 text-foreground border border-border shadow-sm dark:bg-muted/20 dark:text-muted-foreground;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-background/90 text-foreground border border-border shadow-sm dark:bg-muted/40 dark:text-muted-foreground;
     backdrop-filter: blur(2px);
+    flex-shrink: 0;
+  }
+
+  .skill-marquee {
+    --marquee-speed: 25s;
+    overflow: clip;
+    overflow-clip-margin: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-top: -4px;
+    margin-bottom: -4px;
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .skill-marquee-track {
+    display: flex;
+    gap: 0.5rem;
+    width: max-content;
+    animation: skill-scroll var(--marquee-speed) linear infinite;
+  }
+
+  @media (hover: hover) {
+    .skill-marquee:hover .skill-marquee-track {
+      animation-play-state: paused;
+    }
+  }
+
+  .skill-marquee.is-paused .skill-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes skill-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-25%);
+    }
   }
 
   .portfolio-item {

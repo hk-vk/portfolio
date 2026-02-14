@@ -7,7 +7,7 @@ export default defineConfig({
   assetsInclude: ['**/*.glb', '**/*.png'],
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['aimed-wallace-average-eric.trycloudflare.com', '.trycloudflare.com'],
+    allowedHosts: ['.trycloudflare.com'],
   },
   base: '/',
   build: {

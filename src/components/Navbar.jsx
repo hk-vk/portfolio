@@ -131,9 +131,9 @@ const Navbar = () => {
       }}
     >
       {/* Floating pill wrapper */}
-      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-xl shadow-xl ring-1 ring-border/20 rounded-full px-4 py-2.5 sm:px-5 sm:py-2.5 gap-x-2.5 sm:gap-x-3 pointer-events-auto">
+      <div className="relative inline-flex items-center bg-background/80 backdrop-blur-xl shadow-xl ring-1 ring-border/20 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 gap-x-2 sm:gap-x-3 pointer-events-auto">
         {/* Navigation Links */}
-        <div className="flex items-center gap-1.5 sm:gap-3 md:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-3 md:gap-4">
           {mainLinks.map((link, idx) => {
             const isActive = idx === activeIndex;
             const isHovered = idx === hoverIndex;

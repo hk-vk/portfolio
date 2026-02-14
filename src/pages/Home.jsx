@@ -96,7 +96,10 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <span className="text-4xl font-bold text-primary/40">{project.id}</span>
+              <div className="text-center">
+                <span className="text-4xl font-bold text-primary/40">{project.id}</span>
+                <p className="text-xs text-muted-foreground mt-1">Loading...</p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -166,11 +169,11 @@ ProjectCard.displayName = 'ProjectCard';
 const skillsData = [
   { name: "React", icon: "simple-icons:react", color: "#61DAFB" },
   { name: "TypeScript", icon: "simple-icons:typescript", color: "#3178C6" },
-  { name: "JavaScript", icon: "simple-icons:javascript", color: "#F7DF1E" },
   { name: "Python", icon: "simple-icons:python", color: "#3776AB" },
-  { name: "FastAPI", icon: "simple-icons:fastapi", color: "#009688" },
+  { name: "JavaScript", icon: "simple-icons:javascript", color: "#F7DF1E" },
   { name: "Vue", icon: "simple-icons:vuedotjs", color: "#4FC08D" },
   { name: "Node.js", icon: "simple-icons:nodedotjs", color: "#339933" },
+  { name: "FastAPI", icon: "simple-icons:fastapi", color: "#009688" },
   { name: "Tailwind", icon: "simple-icons:tailwindcss", color: "#06B6D4" },
 ];
 
@@ -219,12 +222,13 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
 
 SkillTag.displayName = 'SkillTag';
 
-// Experience item with expandable details
-const ExperienceItem = memo(({ item, index, isVisible }) => {
+// Experience item with collapsible details
+const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.div
+      className="pb-6 last:pb-0"
       initial={entrance.fadeUp.initial}
       animate={isVisible ? entrance.fadeUp.animate : entrance.fadeUp.initial}
       transition={{
@@ -232,70 +236,72 @@ const ExperienceItem = memo(({ item, index, isVisible }) => {
         delay: index * stagger.quick.staggerChildren
       }}
     >
-      {/* Header row */}
-      <div
-        className="flex items-center justify-between gap-4 py-4 cursor-pointer border-b border-border/20 hover:border-border/40 transition-colors"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {/* Role at Company - single line with bullet */}
-        <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-          <span className="font-medium text-foreground">{item.title}</span>
-          <span className="text-muted-foreground/60">at</span>
-          <HoverPreviewLink previewKey={item.companyKey}>
-            {item.company}
-          </HoverPreviewLink>
-        </div>
-
-        {/* Date + Expand */}
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-muted-foreground hidden sm:block">
-            {item.date}
-          </span>
-          <Icon
-            icon="tabler:chevron-down"
-            className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-          />
-        </div>
-      </div>
-
-      {/* Expandable bullet points */}
-      <AnimatePresence>
-        {isExpanded && item.details && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: duration.standard / 1000 }}
-            className="overflow-hidden"
-          >
-            <div className="py-3 pl-4">
-              {item.details.map((detail, idx) => (
-                <div key={idx} className="text-sm text-muted-foreground">
-                  <span>{detail.text}</span>
-                  {detail.link && (
-                    <>
-                      {' — '}
-                      <HoverPreviewLink previewKey={detail.previewKey}>
-                        <a
-                          href={detail.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 hover:underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {detail.linkText}
-                          <Icon icon="tabler:external-link" className="w-3 h-3" />
-                        </a>
-                      </HoverPreviewLink>
-                    </>
-                  )}
-                </div>
-              ))}
+      <div className="rounded-lg p-4 border border-border/30 hover:border-border/60 transition-colors">
+        <div className="flex items-start justify-between gap-4">
+          {/* Left: Title + Company */}
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium text-foreground">{item.title}</h3>
+              {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded hidden sm:inline-block">Current</span>}
             </div>
-          </motion.div>
+            <div className="mt-0.5">
+              <span className="text-muted-foreground/60 text-sm">at </span>
+              <HoverPreviewLink previewKey={item.companyKey}>
+                {item.company}
+              </HoverPreviewLink>
+            </div>
+          </div>
+
+          {/* Right: Date + Current label on mobile */}
+          <div className="flex flex-col items-end shrink-0 pt-0.5 gap-1">
+            <span className="text-xs text-muted-foreground">{item.date}</span>
+            {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded sm:hidden">Current</span>}
+          </div>
+        </div>
+
+        {/* Collapsible details */}
+        {item.details && (
+          <>
+            <button
+              className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              <Icon
+                icon={isExpanded ? "tabler:chevron-up" : "tabler:chevron-down"}
+                className="w-3.5 h-3.5"
+              />
+              <span>{isExpanded ? 'Less' : 'Details'}</span>
+            </button>
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: duration.standard / 1000 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-2 space-y-1.5">
+                    {item.details.map((detail, idx) => (
+                      <div key={idx} className="text-sm text-muted-foreground">
+                        <span>{detail.text}</span>
+                        {detail.linkText && (
+                          <>
+                            {' — '}
+                            <HoverPreviewLink previewKey={detail.previewKey}>
+                              {detail.linkText}
+                            </HoverPreviewLink>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
         )}
-      </AnimatePresence>
+      </div>
     </motion.div>
   );
 });
@@ -383,7 +389,7 @@ const Home = memo(() => {
             <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
             <motion.div
-              className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-3 sm:p-6 md:p-10 overflow-hidden"
+              className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-4 sm:p-6 md:p-10 overflow-hidden"
               initial={{ opacity: 0, y: 6 }}
               animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -407,7 +413,7 @@ const Home = memo(() => {
                 <HeroHighlightLine />
               </Suspense>
 
-              <div className="relative px-0 py-2 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
+              <div className="relative px-1 py-4 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
                 {/* Conditional MagnetLines for better performance */}
                 {sectionsVisible.hero && (
                   <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
@@ -477,21 +483,25 @@ const Home = memo(() => {
                     variants={childVariants}
                     className="mb-6 sm:mb-8 text-sm sm:text-base text-muted-foreground text-left"
                   >
-                    I create responsive web applications that combine clean design with efficient code.
-                    <span className="hidden sm:inline"> My expertise ranges from interactive frontend interfaces to scalable backend systems.</span>
+                    I create responsive web applications that combine clean design with efficient code. My expertise ranges from interactive frontend interfaces to scalable backend systems.
                   </motion.p>
 
                   <motion.div variants={childVariants} className="w-full">
                     <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
-                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                      {skills.map((skill, index) => (
-                        <SkillTag
-                          key={skill.name}
-                          skill={skill}
-                          index={index}
-                          isVisible={sectionsVisible.hero}
-                        />
-                      ))}
+                    <div
+                      className="skill-marquee"
+                      onTouchStart={(e) => e.currentTarget.classList.toggle('is-paused')}
+                    >
+                      <div className="skill-marquee-track">
+                        {[...skills, ...skills, ...skills, ...skills].map((skill, index) => (
+                          <SkillTag
+                            key={`${skill.name}-${index}`}
+                            skill={skill}
+                            index={index % skills.length}
+                            isVisible={sectionsVisible.hero}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 </motion.div>
@@ -524,6 +534,7 @@ const Home = memo(() => {
                     item={item}
                     index={idx}
                     isVisible={sectionsVisible.experience}
+                    isCurrent={idx === 0}
                   />
                 ))}
               </div>
@@ -636,11 +647,13 @@ const companyPreviews = {
     image: 'https://lab.comini.in/social-media-assets/bake-store-default.png',
     title: 'Comini Lab',
     subtitle: 'Hands-on learning games for children',
+    url: 'https://lab.comini.in/',
   },
   tryRipples: {
     image: '/images/tryripples-preview.png',
     title: 'Try Ripples',
     subtitle: 'Math learning platform for children',
+    url: 'https://tryripples.comini.in/',
   },
 };
 
@@ -653,8 +666,7 @@ const experienceItems = [
     details: [
       {
         text: 'Building end-to-end interactive learning games for children',
-        link: 'https://lab.comini.in/',
-        linkText: 'lab.comini.in',
+        linkText: 'Comini Lab',
         previewKey: 'labComini',
       },
     ],
@@ -667,8 +679,7 @@ const experienceItems = [
     details: [
       {
         text: 'Worked on games and worksheets for child learning on our math learning platform',
-        link: 'https://tryripples.comini.in/',
-        linkText: 'tryripples.comini.in',
+        linkText: 'Ripples',
         previewKey: 'tryRipples',
       },
     ],

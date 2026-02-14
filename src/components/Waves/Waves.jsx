@@ -289,8 +289,6 @@ const Waves = ({
       mouse.lx = mouse.x;
       mouse.ly = mouse.y;
       mouse.a = Math.atan2(dy, dx);
-      container.style.setProperty("--x", `${mouse.sx}px`);
-      container.style.setProperty("--y", `${mouse.sy}px`);
 
       movePoints(t);
       drawLines();
@@ -401,10 +399,6 @@ const Waves = ({
     };
   }, []);
 
-  // Check if device is mobile/touch device
-  const isTouchDevice = typeof window !== 'undefined' && 
-    ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-
   return (
     <div
       ref={containerRef}
@@ -414,17 +408,6 @@ const Waves = ({
       }}
       className={`absolute top-0 left-0 w-full h-full overflow-hidden ${className}`}
     >
-      {/* Hide cursor dot on touch/mobile devices */}
-      {!isTouchDevice && (
-        <div
-          className="absolute top-0 left-0 bg-[#160000] rounded-full w-[0.5rem] h-[0.5rem]"
-          style={{
-            transform:
-              "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
-            willChange: "transform",
-          }}
-        />
-      )}
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );
