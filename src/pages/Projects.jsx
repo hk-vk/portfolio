@@ -11,6 +11,21 @@ const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 const projects = [
   {
     id: '01',
+    title: 'TXTSKILLS',
+    description: 'Convert llms.txt documentation into installable agent skills for Claude Code, Cursor, Windsurf, Copilot, and more.',
+    fullDescription: 'txtskills is a developer tool that transforms llms.txt documentation into installable skills for AI agents. It streamlines the workflow from docs ingestion to generated skill output, with a web interface, CLI packaging, and publishing-ready outputs for agent ecosystems.',
+    category: 'Web App',
+    tags: ['Next.js', 'TypeScript', 'Cloudflare', 'AI Agents', 'CLI'],
+    image: 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev/Screenshot%20from%202026-02-14%2023-14-57.png',
+    liveUrl: 'https://txtskills.hari.works/',
+    githubUrl: 'https://github.com/hk-vk/txtskills',
+    techStack: ['Next.js', 'TypeScript', 'Cloudflare Workers', 'Turborepo', 'pnpm Workspaces'],
+    features: ['llms.txt Parsing', 'Skill Generation', 'Install Command Output', 'Web + CLI Workflow', 'Publishing Pipeline'],
+    challenges: 'Maintaining reliable conversion quality across different llms.txt structures while keeping generation and publish flow simple for developers.',
+    solutions: 'Implemented structured parsing, validation-first generation steps, and a clean web workflow that maps directly to installable skill artifacts.'
+  },
+  {
+    id: '02',
     title: 'YEAH - Fake News Detector',
     description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
     fullDescription: 'A comprehensive fake news detection system that combines multiple AI technologies including natural language processing, computer vision, and web scraping to analyze and verify news content across different media formats.',
@@ -26,7 +41,7 @@ const projects = [
     solutions: 'Implemented efficient caching, parallel processing, and progressive enhancement for optimal user experience.'
   },
   {
-    id: '02',
+    id: '03',
     title: 'CommitStoryGen',
     description: 'A web App that generates a storyline based on the commit history of a github repo',
     fullDescription: 'An innovative tool that transforms boring commit histories into engaging narratives, helping developers showcase their project journey in a more compelling way.',
@@ -42,7 +57,7 @@ const projects = [
     solutions: 'Implemented smart filtering, natural language processing, and progressive loading for better performance.'
   },
   {
-    id: '03',
+    id: '04',
     title: 'PDFx - Offline PDF Toolkit',
     description: 'A fully offline PDF manipulation toolkit with all processing done in your browser',
     fullDescription: 'A privacy-focused PDF manipulation suite that runs entirely in the browser, ensuring your documents never leave your device while providing professional-grade PDF editing capabilities.',
@@ -58,7 +73,7 @@ const projects = [
     solutions: 'Leveraged WebAssembly for heavy computations and implemented chunked processing for large files.'
   },
   {
-    id: '04',
+    id: '05',
     title: 'Cricket Score Widget',
     description: 'An always-on-top Windows desktop application for live cricket scores built with Electron and React',
     fullDescription: 'A simple system tray widget for Windows that displays live cricket scores from Cricbuzz. Features include fetching live match lists, detailed scorecards, match status updates, pinning functionality, light/dark theme toggling, and auto-refresh capabilities.',
@@ -71,7 +86,7 @@ const projects = [
     features: ['Live Cricket Scores', 'System Tray Integration', 'Always-on-Top Window', 'Light/Dark Theme', 'Auto-refresh', 'Draggable Interface'],
     challenges: 'Creating a system tray application with real-time data fetching while maintaining performance and user experience.',
     solutions: 'Implemented efficient data scraping, optimized refresh intervals, and created an intuitive always-on-top interface.'
-  }
+  },
 ];
 
 const SectionDivider = () => (

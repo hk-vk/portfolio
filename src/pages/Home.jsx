@@ -590,21 +590,21 @@ const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 const featuredProjects = [
   {
     id: '01',
+    title: 'TXTSKILLS',
+    description: 'Convert any llms.txt documentation into installable skills for AI agents like Claude Code, Cursor, Windsurf, and Copilot.',
+    tags: ['Next.js', 'TypeScript', 'Cloudflare', 'AI Agents', 'Developer Tooling'],
+    image: 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev/Screenshot%20from%202026-02-14%2023-14-57.png',
+    liveUrl: 'https://txtskills.hari.works/',
+    githubUrl: 'https://github.com/hk-vk/txtskills',
+  },
+  {
+    id: '02',
     title: 'YEAH - Fake News Detector',
     description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
     tags: ['TypeScript', 'React', 'Fake News Detection', 'AI/ML', 'Computer Vision'],
     image: `${R2_BASE_URL}/yeahpreview.png`,
     liveUrl: 'https://www.yeahml.live',
     githubUrl: 'https://github.com/hk-vk/yeah',
-  },
-  {
-    id: '02',
-    title: 'CommitStoryGen',
-    description: 'A web App that generates a storyline based on the commit history of a github repo',
-    tags: ['JavaScript', 'Node.js', 'GitHub API', 'Story Generation', 'Data Visualization'],
-    image: 'https://i.ibb.co/3mZDXJPg/image.png',
-    liveUrl: 'https://commitstorygen.vercel.app/',
-    githubUrl: 'https://github.com/hk-vk/commitstorygen',
   },
   {
     id: '03',
