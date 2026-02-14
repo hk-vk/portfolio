@@ -11,6 +11,7 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const { toggleSocialPopover } = useSocialPopover();
   const contactButtonRef = useRef(null);
+  const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 
   const categories = ['All', 'Web App', 'Mobile App', 'Desktop App', 'DevOps', 'AI/ML', 'Blockchain'];
 
@@ -22,7 +23,7 @@ const Projects = () => {
       fullDescription: 'A comprehensive fake news detection system that combines multiple AI technologies including natural language processing, computer vision, and web scraping to analyze and verify news content across different media formats.',
       category: 'Web App',
       tags: ['TypeScript', 'React', 'Fake News Detection', 'AI/ML', 'Computer Vision'],
-      image: 'https://i.ibb.co/8L95n5wZ/yeahpreview.png',
+      image: `${R2_BASE_URL}/yeahpreview.png`,
       video: '/projects/videos/yeah-demo.mp4',
       liveUrl: 'https://www.yeahml.live',
       githubUrl: 'https://github.com/hk-vk/yeah',
@@ -54,7 +55,7 @@ const Projects = () => {
       fullDescription: 'A privacy-focused PDF manipulation suite that runs entirely in the browser, ensuring your documents never leave your device while providing professional-grade PDF editing capabilities.',
       category: 'Web App',
       tags: ['TypeScript', 'WebAssembly', 'PDF', 'Privacy', 'Offline-First'],
-      image: 'https://i.ibb.co/pvwgtwFx/image.png',
+      image: `${R2_BASE_URL}/image.png`,
       video: '/projects/videos/pdfx-demo.mp4',
       liveUrl: 'https://pdfx-8su.pages.dev/',
       githubUrl: 'https://github.com/hk-vk/pdfX',
@@ -70,7 +71,7 @@ const Projects = () => {
       fullDescription: 'A simple system tray widget for Windows that displays live cricket scores from Cricbuzz. Features include fetching live match lists, detailed scorecards, match status updates, pinning functionality, light/dark theme toggling, and auto-refresh capabilities.',
       category: 'Desktop App',
       tags: ['Electron', 'React', 'JavaScript', 'Desktop', 'System Tray', 'Windows'],
-      image: 'https://i.ibb.co/7dDSnW5j/Screenshot-2025-07-06-020503.png',
+      image: `${R2_BASE_URL}/Screenshot-2025-07-06-020503.png`,
       video: '/projects/videos/cricket-widget-demo.mp4',
       githubUrl: 'https://github.com/hk-vk/cricket-score-widget',
       techStack: ['Electron', 'React', 'Vite', 'Node.js', 'Cheerio', 'CSS'],
