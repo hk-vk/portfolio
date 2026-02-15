@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 const SEOHead = ({
   title = "Harikrishnan V K | Portfolio",
   description = "Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey.",
-  image = "/og.png",
+  image = "/og.jpg",
   url = "",
   type = "website",
   author = "Harikrishnan V K",
@@ -27,6 +27,7 @@ const SEOHead = ({
       <meta property="og:description" content={description} />
       <meta property="og:image" content={fullImageUrl} />
       <meta property="og:image:secure_url" content={fullImageUrl} />
+      <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:alt" content={`Preview image for ${title}`} />

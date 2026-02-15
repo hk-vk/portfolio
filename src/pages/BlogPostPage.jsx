@@ -578,7 +578,7 @@ const BlogPostPage = () => {
         description={post.excerpt || stripMarkdown(post.content).substring(0, 160) + '...'}
         url={`/blog/${post.id}`}
         type="article"
-        image={post.imageUrl || "/og.png"}
+        image={post.imageUrl || "/og.jpg"}
       />
       <div className="pt-32 pb-20">
       <AnimatedSection animation="fadeUp">

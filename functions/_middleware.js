@@ -21,7 +21,7 @@ export async function onRequest(context) {
   // Generate appropriate meta tags based on the route
   let title = "Harikrishnan V K | Portfolio";
   let description = "Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey.";
-  let image = `${url.origin}/og.png`;
+  let image = `${url.origin}/og.jpg`;
   let type = "website";
   
   // Route-specific meta tags
@@ -29,29 +29,29 @@ export async function onRequest(context) {
     // Homepage - use defaults
     title = "Harikrishnan V K | Full-Stack Developer Portfolio";
     description = "Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences.";
-    image = `${url.origin}/og.png`;
+    image = `${url.origin}/og.jpg`;
   } else if (pathname === '/about') {
     title = "About | Harikrishnan V K";
     description = "Learn about Harikrishnan V K - a passionate full-stack developer with expertise in React, Node.js, and modern web technologies. Discover my journey, skills, and experience.";
-    image = `${url.origin}/og.png`;
+    image = `${url.origin}/og.jpg`;
   } else if (pathname === '/projects') {
     title = "Projects | Harikrishnan V K";
     description = "Explore my portfolio of web applications, mobile apps, and development projects. Built with React, Node.js, Python, and modern technologies.";
-    image = `${url.origin}/og.png`;
+    image = `${url.origin}/og.jpg`;
   } else if (pathname === '/contact') {
     title = "Contact | Harikrishnan V K";
     description = "Get in touch with Harikrishnan V K. Let's discuss your next project, collaborate on exciting opportunities, or just have a chat about web development.";
-    image = `${url.origin}/og.png`;
+    image = `${url.origin}/og.jpg`;
   } else if (pathname === '/blog') {
     title = "Blog | Harikrishnan V K";
     description = "Read my thoughts on web development, programming, and technology. Discover insights about React, Node.js, and modern web development practices.";
-    image = `${url.origin}/og.png`;
+    image = `${url.origin}/og.jpg`;
   } else if (pathname.startsWith('/blog/')) {
     // Extract blog post ID
     const postId = pathname.split('/blog/')[1];
     title = `Blog Post | Harikrishnan V K`;
     description = "Read my thoughts on web development, programming, and technology.";
-    image = `${url.origin}/og.png`;
+    image = `${url.origin}/og.jpg`;
     type = "article";
   }
 
@@ -74,6 +74,7 @@ export async function onRequest(context) {
   <meta property="og:description" content="${description}" />
   <meta property="og:image" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Preview image for ${title}" />
