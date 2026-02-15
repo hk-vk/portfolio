@@ -21,7 +21,7 @@ export async function onRequest(context) {
   // Generate appropriate meta tags based on the route
   let title = "Harikrishnan V K | Portfolio";
   let description = "Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey.";
-  let image = `${url.origin}/api/og?type=homepage`;
+  let image = `${url.origin}/og.png`;
   let type = "website";
   
   // Route-specific meta tags
@@ -29,29 +29,29 @@ export async function onRequest(context) {
     // Homepage - use defaults
     title = "Harikrishnan V K | Full-Stack Developer Portfolio";
     description = "Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences.";
-    image = `${url.origin}/api/og?type=homepage`;
+    image = `${url.origin}/og.png`;
   } else if (pathname === '/about') {
     title = "About | Harikrishnan V K";
     description = "Learn about Harikrishnan V K - a passionate full-stack developer with expertise in React, Node.js, and modern web technologies. Discover my journey, skills, and experience.";
-    image = `${url.origin}/api/og?type=homepage&title=${encodeURIComponent('About Harikrishnan V K')}&subtitle=${encodeURIComponent('Full-Stack Developer')}&description=${encodeURIComponent('Learn about my journey, skills, and experience')}`;
+    image = `${url.origin}/og.png`;
   } else if (pathname === '/projects') {
     title = "Projects | Harikrishnan V K";
     description = "Explore my portfolio of web applications, mobile apps, and development projects. Built with React, Node.js, Python, and modern technologies.";
-    image = `${url.origin}/api/og?type=homepage&title=${encodeURIComponent('My Projects')}&subtitle=${encodeURIComponent('Web & Mobile Applications')}&description=${encodeURIComponent('Built with React, Node.js, Python, and modern technologies')}`;
+    image = `${url.origin}/og.png`;
   } else if (pathname === '/contact') {
     title = "Contact | Harikrishnan V K";
     description = "Get in touch with Harikrishnan V K. Let's discuss your next project, collaborate on exciting opportunities, or just have a chat about web development.";
-    image = `${url.origin}/api/og?type=homepage&title=${encodeURIComponent('Contact Me')}&subtitle=${encodeURIComponent('Let\'s Work Together')}&description=${encodeURIComponent('Get in touch for your next project or collaboration')}`;
+    image = `${url.origin}/og.png`;
   } else if (pathname === '/blog') {
     title = "Blog | Harikrishnan V K";
     description = "Read my thoughts on web development, programming, and technology. Discover insights about React, Node.js, and modern web development practices.";
-    image = `${url.origin}/api/og?type=blog`;
+    image = `${url.origin}/og.png`;
   } else if (pathname.startsWith('/blog/')) {
     // Extract blog post ID
     const postId = pathname.split('/blog/')[1];
     title = `Blog Post | Harikrishnan V K`;
     description = "Read my thoughts on web development, programming, and technology.";
-    image = `${url.origin}/api/og?type=blog-post&blogTitle=${encodeURIComponent('Blog Post')}&blogExcerpt=${encodeURIComponent('Read my thoughts on web development and technology')}&date=${encodeURIComponent('2025')}&readTime=${encodeURIComponent('2 min read')}`;
+    image = `${url.origin}/og.png`;
     type = "article";
   }
 

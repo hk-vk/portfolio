@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 const SEOHead = ({
   title = "Harikrishnan V K | Portfolio",
   description = "Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey.",
-  image = "/api/og?type=homepage",
+  image = "/og.png",
   url = "",
   type = "website",
   author = "Harikrishnan V K",
