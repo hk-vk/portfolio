@@ -14,14 +14,39 @@ export async function onRequest(context) {
     return next();
   }
 
+  const getSocialImageForCrawler = (ua, origin) => {
+    if (/Twitterbot/i.test(ua)) {
+      return { image: `${origin}/social/x-1200x675.jpg`, width: 1200, height: 675 };
+    }
+    if (/LinkedInBot/i.test(ua)) {
+      return { image: `${origin}/social/linkedin-1200x627.jpg`, width: 1200, height: 627 };
+    }
+    if (/facebookexternalhit|Facebot/i.test(ua)) {
+      return { image: `${origin}/social/facebook-1200x630.jpg`, width: 1200, height: 630 };
+    }
+    if (/WhatsApp/i.test(ua)) {
+      return { image: `${origin}/social/whatsapp-1200x630.jpg`, width: 1200, height: 630 };
+    }
+    if (/Telegram/i.test(ua)) {
+      return { image: `${origin}/social/telegram-1200x630.jpg`, width: 1200, height: 630 };
+    }
+    if (/Discord/i.test(ua)) {
+      return { image: `${origin}/social/discord-1200x630.jpg`, width: 1200, height: 630 };
+    }
+    return { image: `${origin}/og.jpg`, width: 1200, height: 630 };
+  };
+
   // Extract route information
   const url = new URL(request.url);
   const pathname = url.pathname;
+  const selectedSocialImage = getSocialImageForCrawler(userAgent, url.origin);
   
   // Generate appropriate meta tags based on the route
   let title = "Harikrishnan V K | Portfolio";
   let description = "Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey.";
-  let image = `${url.origin}/og.jpg`;
+  let image = selectedSocialImage.image;
+  let imageWidth = selectedSocialImage.width;
+  let imageHeight = selectedSocialImage.height;
   let type = "website";
   
   // Route-specific meta tags
@@ -29,29 +54,29 @@ export async function onRequest(context) {
     // Homepage - use defaults
     title = "Harikrishnan V K | Full-Stack Developer Portfolio";
     description = "Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences.";
-    image = `${url.origin}/og.jpg`;
+    image = selectedSocialImage.image;
   } else if (pathname === '/about') {
     title = "About | Harikrishnan V K";
     description = "Learn about Harikrishnan V K - a passionate full-stack developer with expertise in React, Node.js, and modern web technologies. Discover my journey, skills, and experience.";
-    image = `${url.origin}/og.jpg`;
+    image = selectedSocialImage.image;
   } else if (pathname === '/projects') {
     title = "Projects | Harikrishnan V K";
     description = "Explore my portfolio of web applications, mobile apps, and development projects. Built with React, Node.js, Python, and modern technologies.";
-    image = `${url.origin}/og.jpg`;
+    image = selectedSocialImage.image;
   } else if (pathname === '/contact') {
     title = "Contact | Harikrishnan V K";
     description = "Get in touch with Harikrishnan V K. Let's discuss your next project, collaborate on exciting opportunities, or just have a chat about web development.";
-    image = `${url.origin}/og.jpg`;
+    image = selectedSocialImage.image;
   } else if (pathname === '/blog') {
     title = "Blog | Harikrishnan V K";
     description = "Read my thoughts on web development, programming, and technology. Discover insights about React, Node.js, and modern web development practices.";
-    image = `${url.origin}/og.jpg`;
+    image = selectedSocialImage.image;
   } else if (pathname.startsWith('/blog/')) {
     // Extract blog post ID
     const postId = pathname.split('/blog/')[1];
     title = `Blog Post | Harikrishnan V K`;
     description = "Read my thoughts on web development, programming, and technology.";
-    image = `${url.origin}/og.jpg`;
+    image = selectedSocialImage.image;
     type = "article";
   }
 
@@ -75,8 +100,8 @@ export async function onRequest(context) {
   <meta property="og:image" content="${image}" />
   <meta property="og:image:secure_url" content="${image}" />
   <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+  <meta property="og:image:width" content="${imageWidth}" />
+  <meta property="og:image:height" content="${imageHeight}" />
   <meta property="og:image:alt" content="Preview image for ${title}" />
   <meta property="og:url" content="${url.href}" />
   <meta property="og:type" content="${type}" />
