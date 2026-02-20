@@ -2,13 +2,11 @@ import { motion, AnimatePresence } from '../lib/motion';
 import {
   duration,
   entrance,
-  hover,
   stagger,
-  container,
-  getTransition
+  container
 } from '../utils/motionSettings';
 import { useMotionSafe } from '../utils/useMotionSafe';
-import { motionTransition, sequenceDelay } from '../utils/motionContract';
+import { cardMotion, motionTransition, sequenceDelay } from '../utils/motionContract';
 import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useState, useEffect } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
@@ -37,39 +35,19 @@ const QuickLoader = memo(({ className }) => (
 QuickLoader.displayName = 'QuickLoader';
 
 // Optimized project card with intersection observer and image loading
-const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
+const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const cardVariants = useMemo(() => ({
-    hidden: entrance.fadeUp.initial,
-    visible: {
-      ...entrance.fadeUp.animate,
-      transition: {
-        delay: sequenceDelay(index),
-        duration: duration.quick / 1000,
-        ease: motionTransition.componentEnter.ease
-      }
-    }
-  }), [index]);
-
-  const hoverVariants = useMemo(() =>
-    motionSafe ? {
-      ...hover.lift,
-      rotateX: -1,
-      rotateY: 1,
-    } : {
-      scale: 1,
-      transition: getTransition('instant', 'easeOut', false)
-    }
-  , [motionSafe]);
+  const cardVariants = cardMotion.itemVariants;
 
   return (
     <motion.div
-      className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-[border-color,box-shadow,transform] duration-200"
+      className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-[border-color,box-shadow,transform] duration-200"
       variants={cardVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
-      whileHover={hoverVariants}
+      whileHover={motionSafe ? cardMotion.hover : undefined}
+      whileTap={motionSafe ? cardMotion.press : undefined}
       layout
     >
       <div className="relative overflow-hidden aspect-video bg-muted">
@@ -539,17 +517,21 @@ const Home = memo(() => {
               </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {memoizedProjects.map((project, index) => (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+              variants={cardMotion.gridVariants}
+              initial="hidden"
+              animate={sectionsVisible.projects ? "visible" : "hidden"}
+            >
+              {memoizedProjects.map((project) => (
                 <ProjectCard
                   key={project.id}
                   project={project}
-                  index={index}
                   motionSafe={motionSafe}
                   isVisible={sectionsVisible.projects}
                 />
               ))}
-            </div>
+            </motion.div>
 
             <motion.div
               className="mt-12 text-center"

@@ -6,7 +6,7 @@ import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
-import { motionInteraction, motionTransition } from '../utils/motionContract';
+import { cardMotion, motionTransition } from '../utils/motionContract';
 
 const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 
@@ -124,33 +124,6 @@ const Projects = () => {
     [filteredProjects, selectedProject]
   );
 
-  const projectGridVariants = useMemo(
-    () => ({
-      hidden: { opacity: 0 },
-      visible: {
-        opacity: 1,
-        transition: {
-          staggerChildren: 0.04,
-          delayChildren: 0.04,
-        },
-      },
-    }),
-    []
-  );
-
-  const projectCardVariants = useMemo(
-    () => ({
-      hidden: { opacity: 0, y: 12, scale: 0.985 },
-      visible: {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: motionTransition.componentEnter,
-      },
-    }),
-    []
-  );
-
   const moveModal = (direction) => {
     if (!selectedProject || filteredProjects.length <= 1) return;
     const nextIndex = (selectedProjectIndex + direction + filteredProjects.length) % filteredProjects.length;
@@ -202,23 +175,22 @@ const Projects = () => {
             </div>
           </div>
 
-          <AnimatedSection>
-            <motion.div
-              key={selectedCategory}
-              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-              variants={projectGridVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {filteredProjects.map((project) => (
-                <motion.article
-                  key={project.id}
-                  className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-[border-color,box-shadow,transform] duration-200 cursor-pointer"
-                  variants={projectCardVariants}
-                  whileHover={{ ...motionInteraction.hoverLift }}
-                  whileTap={motionInteraction.press}
-                  onClick={() => setSelectedProjectId(project.id)}
-                >
+          <motion.div
+            key={selectedCategory}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+            variants={cardMotion.gridVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {filteredProjects.map((project) => (
+              <motion.article
+                key={project.id}
+                className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-[border-color,box-shadow,transform] duration-200 cursor-pointer"
+                variants={cardMotion.itemVariants}
+                whileHover={cardMotion.hover}
+                whileTap={cardMotion.press}
+                onClick={() => setSelectedProjectId(project.id)}
+              >
                   <div className="relative overflow-hidden aspect-video bg-muted">
                     <img
                       src={project.image}
@@ -269,10 +241,9 @@ const Projects = () => {
                       )}
                     </div>
                   </div>
-                </motion.article>
-              ))}
-            </motion.div>
-          </AnimatedSection>
+              </motion.article>
+            ))}
+          </motion.div>
 
           <SectionDivider />
 

@@ -5,19 +5,18 @@ import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
+import { cardMotion, motionTransition } from '../utils/motionContract';
 
-// Enhanced Blog Post Card component with improved aesthetics
 const BlogPostCard = ({ post }) => (
   <motion.div
     className="group h-full"
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: duration.moderate / 1000, ease: 'easeOut' }}
-    whileHover={{ y: -3, transition: { duration: duration.quick / 1000, ease: 'easeOut' } }}
+    variants={cardMotion.itemVariants}
+    whileHover={cardMotion.hover}
+    whileTap={cardMotion.press}
   >
     <Link to={`/blog/${post.id}`} className="block h-full">
       <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
-                      hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 
+                      hover:border-primary/30 hover:shadow-lg 
                       transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl 
                       group-hover:bg-card/90">
         {post.imageUrl ? (
@@ -150,18 +149,16 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
       <AnimatedSection animation="fadeIn" delay={0.3}>
         <div className="content-container">
           {blogPosts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-              {blogPosts.map((post, index) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.04 * index, duration: duration.moderate / 1000, ease: 'easeOut' }}
-                >
-                  <BlogPostCard post={post} />
-                </motion.div>
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
+              variants={cardMotion.gridVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {blogPosts.map((post) => (
+                <BlogPostCard key={post.id} post={post} />
               ))}
-            </div>
+            </motion.div>
           ) : (
             <div className="text-center py-12">
               <motion.h2

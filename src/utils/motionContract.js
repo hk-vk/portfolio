@@ -13,8 +13,8 @@ export const motionTransition = {
 
 export const motionInteraction = {
   hoverLift: {
-    y: -2,
-    scale: 1.01,
+    y: -1,
+    scale: 1,
     transition: motionTransition.microEnter,
   },
   hoverIcon: {
@@ -23,9 +23,32 @@ export const motionInteraction = {
     transition: motionTransition.microEnter,
   },
   press: {
-    scale: 0.98,
+    scale: 0.97,
     transition: { duration: ms(duration.instant), ease: 'easeInOut' },
   },
 };
 
 export const sequenceDelay = (index, offset = 0) => offset + index * 0.04;
+
+export const cardMotion = {
+  gridVariants: {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.04,
+        delayChildren: 0.04,
+      },
+    },
+  },
+  itemVariants: {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: motionTransition.componentEnter,
+    },
+  },
+  hover: motionInteraction.hoverLift,
+  press: motionInteraction.press,
+};
