@@ -11,42 +11,31 @@ import { spring } from '../utils/motionSettings';
  *  onClose  – function called to close the popover
  *  triggerRef – React ref to the element that triggered the popover
  */
-const SocialPopover = ({ isOpen, onClose, triggerRef }) => {
+const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   const panelRef = useRef(null);
 
   // Close on outside click or ESC key
   useEffect(() => {
     if (!isOpen) return;
 
-    // Delay adding the event listeners until after the popover is mounted
-    const timeout = setTimeout(() => {
-      function handleKey(e) {
-        if (e.key === 'Escape') onClose();
-      }
-      function handleClick(e) {
-        // Ignore clicks that originated from the trigger element itself
-        if (triggerRef.current && triggerRef.current.contains(e.target)) {
-          return;
-        }
-        if (panelRef.current && !panelRef.current.contains(e.target)) {
-          onClose();
-        }
-      }
-      window.addEventListener('keydown', handleKey);
-      window.addEventListener('click', handleClick);
-      // Clean up
-      panelRef.current._cleanup = () => {
-        window.removeEventListener('keydown', handleKey);
-        window.removeEventListener('click', handleClick);
-      };
-    }, 0);
+    function handleKey(e) {
+      if (e.key === 'Escape') onClose();
+    }
 
-    return () => {
-      clearTimeout(timeout);
-      if (panelRef.current && panelRef.current._cleanup) {
-        panelRef.current._cleanup();
-        delete panelRef.current._cleanup;
+    function handlePointerDown(e) {
+      if (triggerRef.current && triggerRef.current.contains(e.target)) {
+        return;
       }
+      if (panelRef.current && !panelRef.current.contains(e.target)) {
+        onClose();
+      }
+    }
+
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('pointerdown', handlePointerDown);
     };
   }, [isOpen, onClose, triggerRef]);
 
@@ -60,6 +49,9 @@ const SocialPopover = ({ isOpen, onClose, triggerRef }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          id={id}
+          role="dialog"
+          aria-label="Social links"
           ref={panelRef}
           className="absolute bottom-full right-6 mb-2 z-[60] pointer-events-auto bg-background/90 backdrop-blur-md ring-1 ring-border/30 shadow-xl rounded-xl px-4 py-3 flex gap-4"
           initial={{ opacity: 0, y: 6, scale: 0.96 }}

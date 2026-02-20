@@ -8,12 +8,9 @@ import { spring, tap } from '../utils/motionSettings';
  */
 const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
-  const { initializeTheme, toggleTheme } = themeToggle();
+  const { toggleTheme } = themeToggle();
   
   useEffect(() => {
-    // Initialize theme on component mount
-    initializeTheme();
-    
     // Set initial state based on current theme
     const currentTheme = document.documentElement.classList.contains('dark');
     setIsDark(currentTheme);
@@ -29,7 +26,6 @@ const ThemeToggle = () => {
     };
 
     if (!document.startViewTransition) {
-      console.warn("View Transition API not supported, falling back.");
       performToggle();
       return;
     }

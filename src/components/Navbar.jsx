@@ -1,58 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
 import { useSocialPopover } from "../context/SocialPopoverContext";
-import { spring, hover, tap as tapAnim } from "../utils/motionSettings";
 
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isReady, setIsReady] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      if (scrollPosition > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Wait for document to be fully loaded before showing navbar
-  useEffect(() => {
-    const showNavbar = () => {
-      // Use requestIdleCallback if available, otherwise use requestAnimationFrame
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-          setIsReady(true);
-        }, { timeout: 500 });
-      } else {
-        // Double requestAnimationFrame ensures DOM is painted
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setIsReady(true);
-          });
-        });
-      }
-    };
-
-    // If document is already complete, show immediately with slight delay
-    if (document.readyState === 'complete') {
-      showNavbar();
-    } else {
-      // Wait for load event
-      window.addEventListener('load', showNavbar);
-      return () => window.removeEventListener('load', showNavbar);
-    }
-  }, []);
+  const [canHover, setCanHover] = useState(false);
 
   const mainLinks = [
     { name: "Home", path: "/", icon: "tabler:home" },
@@ -66,6 +22,26 @@ const Navbar = () => {
   // Use context for social popover state
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } =
     useSocialPopover();
+  const socialPopoverId = useMemo(() => "navbar-social-popover", []);
+
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const mediaQuery = window.matchMedia("(hover: hover)");
+    const updateHoverSupport = () => setCanHover(mediaQuery.matches);
+    updateHoverSupport();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", updateHoverSupport);
+      return () => mediaQuery.removeEventListener("change", updateHoverSupport);
+    }
+    mediaQuery.addListener(updateHoverSupport);
+    return () => mediaQuery.removeListener(updateHoverSupport);
+  }, []);
+
+  useEffect(() => {
+    closeSocialPopover();
+    // Only close on route change, not on function identity changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   // Determine which link should be marked active (supports nested URLs)
   const activeIndex = mainLinks.findIndex(({ path }) =>
@@ -111,24 +87,12 @@ const Navbar = () => {
     },
   };
 
-  // Don't render until ready
-  if (!isReady) {
-    return null;
-  }
-
   return (
     <motion.header
       initial="hidden"
       animate="visible"
       variants={headerVariants}
-      className="fixed bottom-4 sm:bottom-6 inset-x-0 z-50 flex justify-center pointer-events-auto px-4 sm:px-0"
-      style={{
-        position: "fixed",
-        bottom: "1rem",
-        left: "0",
-        right: "0",
-        zIndex: 50,
-      }}
+      className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] sm:bottom-[max(1.5rem,env(safe-area-inset-bottom))] inset-x-0 z-50 flex justify-center pointer-events-auto px-4 sm:px-0"
     >
       {/* Floating pill wrapper */}
       <div className="relative inline-flex items-center bg-background/80 backdrop-blur-xl shadow-xl ring-1 ring-border/20 rounded-full px-3 py-2 sm:px-5 sm:py-2.5 gap-x-2 sm:gap-x-3 pointer-events-auto">
@@ -147,11 +111,6 @@ const Navbar = () => {
                 className={`relative cursor-pointer ${link.name === "Connect" && socialOpen ? "z-20" : ""}`}
                 onMouseEnter={() => setHoverIndex(idx)}
                 onMouseLeave={() => setHoverIndex(null)}
-                onClick={() => {
-                  if (link.name === "Connect") {
-                    toggleSocialPopover();
-                  }
-                }}
                 style={{
                   perspective: "400px",
                 }}
@@ -173,7 +132,7 @@ const Navbar = () => {
                         transformStyle: "preserve-3d",
                       }}
                       animate={{
-                        rotateX: isHovered ? -90 : 0,
+                        rotateX: canHover && isHovered ? -90 : 0,
                       }}
                       transition={{
                         type: "spring",
@@ -219,12 +178,17 @@ const Navbar = () => {
                     </motion.div>
                   </NavLink>
                 ) : (
-                  <div
+                  <button
+                    type="button"
+                    aria-label="Open contact links"
+                    aria-expanded={socialOpen}
+                    aria-controls={socialPopoverId}
                     className="relative block w-11 h-10 sm:w-14 sm:h-11 md:w-16 md:h-12 cursor-pointer"
                     style={{
                       transformStyle: "preserve-3d",
                       perspective: "600px",
                     }}
+                    onClick={() => toggleSocialPopover()}
                   >
                     {/* 3D Cube container */}
                     <motion.div
@@ -233,7 +197,7 @@ const Navbar = () => {
                         transformStyle: "preserve-3d",
                       }}
                       animate={{
-                        rotateX: isHovered ? -90 : 0,
+                        rotateX: canHover && isHovered ? -90 : 0,
                       }}
                       transition={{
                         type: "spring",
@@ -277,7 +241,7 @@ const Navbar = () => {
                         </span>
                       </div>
                     </motion.div>
-                  </div>
+                  </button>
                 )}
 
                 {/* Social popover is no longer here */}
@@ -305,6 +269,7 @@ const Navbar = () => {
 
         {/* Social Popover is now a direct child of the main pill */}
         <SocialPopover
+          id={socialPopoverId}
           isOpen={socialOpen}
           onClose={closeSocialPopover}
           triggerRef={triggerRef}
