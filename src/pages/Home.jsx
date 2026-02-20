@@ -433,9 +433,9 @@ const Home = memo(() => {
                     variants={childVariants}
                     className="mb-2 sm:mb-3 text-base sm:text-lg md:text-xl text-left"
                   >
-                    I'm a Full Stack Developer based in India.
+                    Full-stack developer from India.
                     <br className="hidden sm:block" />
-                    <span className="text-primary font-medium"> Focusing on building innovative digital solutions.</span>
+                    <span className="block sm:inline text-primary/85 font-medium"> I build simple, useful products from idea to deployment.</span>
                   </motion.p>
 
                   <motion.p

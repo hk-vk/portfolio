@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from '../lib/motion';
+import { motion } from '../lib/motion';
 import { themeToggle } from '../utils/themeToggle';
 import { spring } from '../utils/motionSettings';
 import { motionInteraction } from '../utils/motionContract';
@@ -79,31 +79,32 @@ const ThemeToggle = () => {
       whileTap={motionInteraction.press}
       onClick={handleToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="text-foreground hover:text-primary transition-colors"
+      className="relative text-foreground hover:text-primary transition-colors"
     >
-      <AnimatePresence mode="wait" initial={false}>
-        {isDark ? (
-          <motion.span
-            key="moon"
-            initial={{ y: -10, opacity: 0, rotate: -90 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: 10, opacity: 0, rotate: 90 }}
-            transition={spring.snappy}
-          >
-            <MoonIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-          </motion.span>
-        ) : (
-          <motion.span
-            key="sun"
-            initial={{ y: -10, opacity: 0, rotate: 90 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            exit={{ y: 10, opacity: 0, rotate: -90 }}
-            transition={spring.snappy}
-          >
-            <SunIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-          </motion.span>
-        )}
-      </AnimatePresence>
+      <motion.span
+        className="block"
+        animate={{
+          opacity: isDark ? 0 : 1,
+          rotate: isDark ? -90 : 0,
+          y: isDark ? 8 : 0,
+          scale: isDark ? 0.9 : 1,
+        }}
+        transition={spring.snappy}
+      >
+        <SunIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+      </motion.span>
+      <motion.span
+        className="absolute inset-0 flex items-center justify-center"
+        animate={{
+          opacity: isDark ? 1 : 0,
+          rotate: isDark ? 0 : 90,
+          y: isDark ? 0 : -8,
+          scale: isDark ? 1 : 0.9,
+        }}
+        transition={spring.snappy}
+      >
+        <MoonIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+      </motion.span>
     </motion.button>
   );
 };
