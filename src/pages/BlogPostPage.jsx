@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
-import { motion } from 'framer-motion';
+import { motion } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import SEOHead from '../components/SEOHead';
+import { duration } from '../utils/motionSettings';
 
 // Utility function to strip Markdown syntax
 const stripMarkdown = (markdownText) => {
@@ -263,7 +264,7 @@ const SpeedReader = ({ content, isActive, wordsPerMinute, chunkSize }) => {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: duration.standard / 1000, ease: 'easeOut' }}
                 className="text-3xl sm:text-4xl font-serif font-bold text-primary truncate"
               >
                 {currentChunkText}
@@ -326,7 +327,7 @@ const HighlightableMarkdown = ({ content, currentWordIndex, wordRefs }) => {
                 wordRefs.current[wordId] = { current: el };
               }
             }}
-            className={`guided-word cursor-pointer transition-all duration-200 ease-in-out ${
+            className={`guided-word cursor-pointer transition-[background-color,color,box-shadow,transform] duration-150 ease-out ${
               isHighlighted 
                 ? 'bg-primary/40 text-primary-foreground rounded-md px-1 py-0.5 shadow-md font-medium' 
                 : 'hover:bg-muted/20 rounded-sm'
@@ -338,7 +339,7 @@ const HighlightableMarkdown = ({ content, currentWordIndex, wordRefs }) => {
               scale: 1,
               boxShadow: '0 0px 0px rgba(var(--primary), 0)'
             }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: duration.quick / 1000, ease: 'easeOut' }}
           >
             {part}
           </motion.span>
@@ -495,9 +496,10 @@ const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
         <div className="w-full bg-muted/30 rounded-full h-2 overflow-hidden">
           <motion.div
             className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: progress / 100 }}
+            transition={{ duration: duration.standard / 1000, ease: 'easeOut' }}
+            style={{ originX: 0 }}
           />
         </div>
         <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
@@ -587,7 +589,7 @@ const BlogPostPage = () => {
             className="text-3xl md:text-4xl font-bold uppercase mb-4 text-primary font-serif"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
             {post.title}
           </motion.h1>
@@ -595,7 +597,7 @@ const BlogPostPage = () => {
             className="text-sm text-muted-foreground mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.04, duration: duration.standard / 1000, ease: 'easeOut' }}
           >
             Published on {post.date}
           </motion.p>
@@ -607,14 +609,14 @@ const BlogPostPage = () => {
               className="w-full h-auto max-h-[400px] object-cover rounded-lg shadow-lg mb-8"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ delay: 0.08, duration: duration.moderate / 1000, ease: 'easeOut' }}
             />
           )}
           
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.12, duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
             <SpeedReaderControls 
               isActive={isSpeedReadingActive}
@@ -650,7 +652,7 @@ const BlogPostPage = () => {
               className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ delay: 0.12, duration: duration.moderate / 1000, ease: 'easeOut' }}
             >
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
             </motion.div>

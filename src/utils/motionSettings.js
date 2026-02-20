@@ -12,12 +12,12 @@
 // Base timing system following harmonic ratios
 export const duration = {
   instant: 100,    // Immediate feedback (hover, focus)
-  quick: 150,      // Micro-interactions (buttons, toggles)
-  standard: 300,   // Content transitions (cards, modals)
-  moderate: 450,   // Section reveals
-  slow: 600,       // Major state changes (page transitions)
-  prolonged: 900,  // Decorative animations
-  extended: 1200,  // Hero animations
+  quick: 160,      // Micro-interactions (buttons, toggles)
+  standard: 220,   // Content transitions (cards, modals)
+  moderate: 260,   // Section reveals
+  slow: 280,       // Major state changes (page transitions)
+  prolonged: 300,  // Decorative animations
+  extended: 300,   // Hero animations
 };
 
 // Convert to seconds for CSS
@@ -246,14 +246,14 @@ export const stagger = {
 
   // Standard succession (cards)
   standard: {
-    staggerChildren: 0.05,  // 50ms between items
-    delayChildren: 0.1,
+    staggerChildren: 0.04,  // 40ms between items
+    delayChildren: 0.04,
   },
 
   // Slow succession (major sections)
   slow: {
-    staggerChildren: 0.1,   // 100ms between items
-    delayChildren: 0.2,
+    staggerChildren: 0.05,   // 50ms between items
+    delayChildren: 0.05,
   },
 };
 
@@ -314,7 +314,7 @@ export const pageTransition = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: duration.slow / 1000,
+      duration: duration.moderate / 1000,
       ease: easingFramer.easeOut,
     },
   },

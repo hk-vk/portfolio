@@ -1,18 +1,16 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '../lib/motion';
 import {
   duration,
-  spring,
   entrance,
   hover,
-  tap,
   stagger,
   container,
-  getTransition,
-  getSpring
+  getTransition
 } from '../utils/motionSettings';
 import { useMotionSafe } from '../utils/useMotionSafe';
+import { motionTransition, sequenceDelay } from '../utils/motionContract';
 import { Link } from 'react-router-dom';
-import { lazy, Suspense, memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
+import { lazy, Suspense, memo, useMemo, useState, useEffect } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
 import SEOHead from '../components/SEOHead';
 import { Icon } from '@iconify/react';
@@ -26,7 +24,6 @@ const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
 const SparkleIllustration = lazy(() => import('../components/SparkleIllustration'));
 const HeroHighlightLine = lazy(() => import('../components/HeroHighlightLine'));
 const MagnetLines = lazy(() => import('../components/MagnetLines'));
-const BlurText = lazy(() => import('../components/BlurText/BlurText'));
 
 // Lightweight fallback components for instant loading
 const QuickSparkle = memo(() => (
@@ -48,9 +45,9 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
     visible: {
       ...entrance.fadeUp.animate,
       transition: {
-        delay: stagger.quick.staggerChildren * index,
+        delay: sequenceDelay(index),
         duration: duration.quick / 1000,
-        ease: "easeOut"
+        ease: motionTransition.componentEnter.ease
       }
     }
   }), [index]);
@@ -68,7 +65,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
 
   return (
     <motion.div
-      className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+      className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-[border-color,box-shadow,transform] duration-200"
       variants={cardVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
@@ -79,7 +76,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
         <img
           src={project.image}
           alt={project.title}
-          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
           onLoad={() => setImageLoaded(true)}
         />
 
@@ -89,7 +86,7 @@ const ProjectCard = memo(({ project, index, motionSafe, isVisible }) => {
               className="absolute inset-0 bg-gradient-to-br from-muted to-muted/80 flex items-center justify-center"
               initial={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: duration.quick / 1000, ease: "easeIn" }}
             >
               <div className="text-center">
                 <span className="text-4xl font-bold text-primary/40">{project.id}</span>
@@ -169,9 +166,9 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
     animate: {
       ...entrance.scaleUp.animate,
       transition: {
-        delay: index * stagger.quick.staggerChildren,
+        delay: sequenceDelay(index),
         duration: duration.quick / 1000,
-        ease: "easeOut"
+        ease: motionTransition.componentEnter.ease
       }
     },
     hover: {
@@ -217,7 +214,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
       animate={isVisible ? entrance.fadeUp.animate : entrance.fadeUp.initial}
       transition={{
         duration: duration.quick / 1000,
-        delay: index * stagger.quick.staggerChildren
+        delay: sequenceDelay(index)
       }}
     >
       <div className="rounded-lg p-4 border border-border/30 hover:border-border/60 transition-colors">
@@ -259,10 +256,11 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
             <AnimatePresence>
               {isExpanded && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: duration.standard / 1000 }}
+                  initial={{ opacity: 0, scaleY: 0.96 }}
+                  animate={{ opacity: 1, scaleY: 1 }}
+                  exit={{ opacity: 0, scaleY: 0.96 }}
+                  transition={{ duration: duration.standard / 1000, ease: "easeOut" }}
+                  style={{ originY: 0 }}
                   className="overflow-hidden"
                 >
                   <div className="mt-2 space-y-1.5">
@@ -362,7 +360,7 @@ const Home = memo(() => {
               className="absolute -right-10 top-20 opacity-80 z-10 hidden md:block"
               initial={{ opacity: 0 }}
               animate={sectionsVisible.hero ? { opacity: 0.8 } : {}}
-              transition={{ delay: 0.5, duration: 0.8 }}
+              transition={{ delay: sequenceDelay(1), duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease }}
             >
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="transform rotate-12" size={24} />
@@ -376,8 +374,7 @@ const Home = memo(() => {
               className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-4 sm:p-6 md:p-10 overflow-hidden"
               initial={{ opacity: 0, y: 6 }}
               animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={hover.subtle}
+              transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
               {/* Waves inside hero card */}
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
@@ -426,7 +423,7 @@ const Home = memo(() => {
                       className="relative mb-4"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ duration: 0.6, delay: 0.15 }}
+                      transition={{ duration: duration.standard / 1000, delay: sequenceDelay(1), ease: motionTransition.componentEnter.ease }}
                     >
                       {/* Decorative sparkle - hidden on mobile */}
                       <Suspense fallback={<QuickSparkle />}>
@@ -502,7 +499,7 @@ const Home = memo(() => {
               className="mb-8 flex items-center"
               initial={{ opacity: 0, y: 6 }}
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="text-primary mr-3" size={20} />
@@ -532,7 +529,7 @@ const Home = memo(() => {
               className="mb-10 md:mb-12 flex items-center"
               initial={{ opacity: 0, y: 6 }}
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
               <Suspense fallback={<QuickSparkle />}>
                 <SparkleIllustration className="text-primary mr-4" size={24} />
@@ -558,7 +555,7 @@ const Home = memo(() => {
               className="mt-12 text-center"
               initial={{ opacity: 0, y: 15 }}
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2, duration: 0.25 }}
+              transition={{ delay: sequenceDelay(1), duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease }}
             >
               <Link
                 to="/projects"

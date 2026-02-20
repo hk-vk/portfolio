@@ -1,10 +1,12 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
 import AnimatedSection from '../components/AnimatedSection';
 import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
 import SEOHead from '../components/SEOHead';
+import { duration } from '../utils/motionSettings';
+import { motionInteraction, motionTransition } from '../utils/motionContract';
 
 const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 
@@ -122,6 +124,33 @@ const Projects = () => {
     [filteredProjects, selectedProject]
   );
 
+  const projectGridVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.04,
+          delayChildren: 0.04,
+        },
+      },
+    }),
+    []
+  );
+
+  const projectCardVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0, y: 12, scale: 0.985 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: motionTransition.componentEnter,
+      },
+    }),
+    []
+  );
+
   const moveModal = (direction) => {
     if (!selectedProject || filteredProjects.length <= 1) return;
     const nextIndex = (selectedProjectIndex + direction + filteredProjects.length) % filteredProjects.length;
@@ -143,7 +172,7 @@ const Projects = () => {
               className="text-center mb-8"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
               <div className="flex items-center justify-center mb-4">
                 <SparkleIllustration className="text-primary mr-3" size={22} />
@@ -160,7 +189,7 @@ const Projects = () => {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium active:scale-[0.97] transition-[background-color,color,transform] duration-150 ${
                       selectedCategory === category
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/70'
@@ -174,22 +203,27 @@ const Projects = () => {
           </div>
 
           <AnimatedSection>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {filteredProjects.map((project, index) => (
+            <motion.div
+              key={selectedCategory}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
+              variants={projectGridVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {filteredProjects.map((project) => (
                 <motion.article
                   key={project.id}
-                  className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 cursor-pointer"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.06, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  whileHover={{ y: -3, transition: { duration: 0.15 } }}
+                  className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-[border-color,box-shadow,transform] duration-200 cursor-pointer"
+                  variants={projectCardVariants}
+                  whileHover={{ ...motionInteraction.hoverLift }}
+                  whileTap={motionInteraction.press}
                   onClick={() => setSelectedProjectId(project.id)}
                 >
                   <div className="relative overflow-hidden aspect-video bg-muted">
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-150"
                     />
                     <div className="absolute top-3 left-3 text-[10px] font-semibold tracking-[0.18em] text-foreground/80 bg-background/80 border border-border/60 rounded px-2 py-1">
                       {project.id}
@@ -237,7 +271,7 @@ const Projects = () => {
                   </div>
                 </motion.article>
               ))}
-            </div>
+            </motion.div>
           </AnimatedSection>
 
           <SectionDivider />
@@ -251,7 +285,7 @@ const Projects = () => {
               <button
                 ref={contactButtonRef}
                 onClick={() => toggleSocialPopover(contactButtonRef)}
-                className="button-primary inline-flex items-center"
+                className="button-primary inline-flex items-center active:scale-[0.97] transition-transform duration-150"
               >
                 Get in Touch
                 <Icon icon="tabler:arrow-right" className="ml-2 w-4 h-4" />
@@ -266,16 +300,25 @@ const Projects = () => {
           <motion.div
             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4 md:p-8"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease } }}
+            exit={{ opacity: 0, transition: { duration: duration.quick / 1000, ease: motionTransition.componentExit.ease } }}
             onClick={() => setSelectedProjectId(null)}
           >
             <motion.div
               className="bg-background border border-border/60 rounded-2xl max-w-5xl mx-auto h-full md:h-auto md:max-h-[92vh] overflow-y-auto"
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
+              animate={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: { duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease },
+              }}
+              exit={{
+                opacity: 0,
+                y: 8,
+                scale: 0.98,
+                transition: { duration: duration.quick / 1000, ease: motionTransition.componentExit.ease },
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-5 md:p-7">
@@ -286,7 +329,7 @@ const Projects = () => {
                   </div>
                   <button
                     onClick={() => setSelectedProjectId(null)}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-foreground active:scale-[0.97] transition-[color,transform] duration-150"
                     aria-label="Close project details"
                   >
                     <Icon icon="tabler:x" className="w-6 h-6" />
@@ -339,7 +382,7 @@ const Projects = () => {
                 <div className="mt-7 pt-4 border-t border-border/40 flex items-center justify-between">
                   <button
                     onClick={() => moveModal(-1)}
-                    className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
+                    className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 active:scale-[0.97] transition-[color,transform] duration-150"
                     disabled={filteredProjects.length <= 1}
                   >
                     <Icon icon="tabler:arrow-left" className="w-4 h-4" />
@@ -347,7 +390,7 @@ const Projects = () => {
                   </button>
                   <button
                     onClick={() => moveModal(1)}
-                    className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
+                    className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 active:scale-[0.97] transition-[color,transform] duration-150"
                     disabled={filteredProjects.length <= 1}
                   >
                     Next

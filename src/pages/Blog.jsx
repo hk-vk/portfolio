@@ -1,9 +1,10 @@
 import React from 'react';
 import AnimatedSection from '../components/AnimatedSection';
-import { motion } from 'framer-motion';
+import { motion } from '../lib/motion';
 import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
 import SEOHead from '../components/SEOHead';
+import { duration } from '../utils/motionSettings';
 
 // Enhanced Blog Post Card component with improved aesthetics
 const BlogPostCard = ({ post }) => (
@@ -11,13 +12,13 @@ const BlogPostCard = ({ post }) => (
     className="group h-full"
     initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-    whileHover={{ y: -3, transition: { duration: 0.15 } }}
+    transition={{ duration: duration.moderate / 1000, ease: 'easeOut' }}
+    whileHover={{ y: -3, transition: { duration: duration.quick / 1000, ease: 'easeOut' } }}
   >
     <Link to={`/blog/${post.id}`} className="block h-full">
       <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
                       hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 
-                      transition-all duration-300 rounded-xl 
+                      transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl 
                       group-hover:bg-card/90">
         {post.imageUrl ? (
           <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover rounded-md mb-4" />
@@ -26,7 +27,7 @@ const BlogPostCard = ({ post }) => (
                           flex flex-col items-center justify-center 
                           bg-gradient-to-br from-muted/30 via-background to-muted/10 
                           border border-border/30 group-hover:border-primary/20 
-                          transition-all duration-300">
+                          transition-[border-color] duration-200">
             
             {/* Subtle decorative elements */}
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/[0.02] to-accent/[0.02]"></div>
@@ -42,12 +43,12 @@ const BlogPostCard = ({ post }) => (
               <h3 className="text-sm font-medium text-muted-foreground/80 text-center leading-relaxed">
                 {post.title}
               </h3>
-              <div className="w-8 h-px bg-primary/30 mx-auto mt-3 group-hover:w-12 group-hover:bg-primary/50 transition-all duration-300"></div>
+              <div className="w-8 h-px bg-primary/30 mx-auto mt-3 group-hover:scale-x-125 group-hover:bg-primary/50 transition-[transform,background-color] duration-200 origin-center"></div>
             </div>
           </div>
         )}
         <div className="flex-grow">
-          <h2 className="text-lg font-semibold mb-3 text-foreground group-hover:text-primary/90 transition-colors duration-300">
+          <h2 className="text-lg font-semibold mb-3 text-foreground group-hover:text-primary/90 transition-colors duration-200">
             {post.title}
           </h2>
           <p className="text-xs text-muted-foreground/80 mb-3 uppercase tracking-wider font-medium">
@@ -59,9 +60,9 @@ const BlogPostCard = ({ post }) => (
         </div>
         <div className="mt-auto pt-4 border-t border-border/30">
           <span className="inline-flex items-center text-primary/80 hover:text-primary text-sm font-medium 
-                           group-hover:translate-x-1 transition-all duration-300">
+                           group-hover:translate-x-1 transition-[color,transform] duration-200">
             Read Article
-            <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
+            <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" 
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m7-5H6" />
             </svg>
@@ -121,7 +122,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
             className="flex items-center justify-center mb-6"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
             <SparkleIllustration className="text-primary mr-3" size={24} />
             <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider">
@@ -132,15 +133,16 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
             className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.04, duration: duration.standard / 1000, ease: 'easeOut' }}
           >
             Thoughts, stories, and ideas worth sharing.
           </motion.p>
           <motion.div
             className="w-16 h-px bg-primary/40 mx-auto mt-6"
-            initial={{ width: 0 }}
-            animate={{ width: "4rem" }}
-            transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.08, duration: duration.standard / 1000, ease: 'easeOut' }}
+            style={{ originX: 0.5 }}
           />
         </div>
       </AnimatedSection>
@@ -154,7 +156,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
                   key={post.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.08 * index, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 0.04 * index, duration: duration.moderate / 1000, ease: 'easeOut' }}
                 >
                   <BlogPostCard post={post} />
                 </motion.div>
@@ -166,7 +168,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
                 className="text-2xl font-semibold text-muted-foreground mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: 0.08, duration: duration.standard / 1000, ease: 'easeOut' }}
               >
                 No blog posts yet.
               </motion.h2>
@@ -174,7 +176,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
                 className="text-muted-foreground"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: 0.12, duration: duration.standard / 1000, ease: 'easeOut' }}
               >
                 Check back soon for new articles!
               </motion.p>

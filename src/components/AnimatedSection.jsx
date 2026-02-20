@@ -1,6 +1,7 @@
 import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '../lib/motion';
 import { duration, entrance, stagger as staggerConfig } from '../utils/motionSettings';
+import { motionTransition } from '../utils/motionContract';
 
 const AnimatedSection = memo(({
   children,
@@ -19,7 +20,7 @@ const AnimatedSection = memo(({
         ...entrance.fadeUp.animate,
         transition: {
           duration: duration.standard / 1000,
-          ease: "easeOut",
+          ease: motionTransition.componentEnter.ease,
           delay
         }
       }
@@ -30,6 +31,7 @@ const AnimatedSection = memo(({
         ...entrance.fade.animate,
         transition: {
           duration: duration.quick / 1000,
+          ease: motionTransition.componentEnter.ease,
           delay
         }
       }
@@ -40,7 +42,7 @@ const AnimatedSection = memo(({
         ...entrance.slideLeft.animate,
         transition: {
           duration: duration.standard / 1000,
-          ease: "easeOut",
+          ease: motionTransition.componentEnter.ease,
           delay
         }
       }
@@ -51,7 +53,7 @@ const AnimatedSection = memo(({
         ...entrance.slideRight.animate,
         transition: {
           duration: duration.standard / 1000,
-          ease: "easeOut",
+          ease: motionTransition.componentEnter.ease,
           delay
         }
       }
@@ -63,7 +65,7 @@ const AnimatedSection = memo(({
         opacity: 1,
         transition: {
           duration: duration.quick / 1000,
-          ease: "easeOut",
+          ease: motionTransition.componentEnter.ease,
           delay
         }
       }
@@ -74,7 +76,7 @@ const AnimatedSection = memo(({
         ...entrance.scaleUp.animate,
         transition: {
           duration: duration.standard / 1000,
-          ease: "easeOut",
+          ease: motionTransition.componentEnter.ease,
           delay
         }
       }
@@ -125,7 +127,7 @@ export const AnimatedGrid = memo(({
       ...entrance.fadeUp.animate,
       transition: {
         duration: duration.standard / 1000,
-        ease: "easeOut"
+        ease: motionTransition.componentEnter.ease
       }
     }
   };

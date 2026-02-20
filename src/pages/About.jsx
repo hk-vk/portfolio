@@ -1,7 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion } from '../lib/motion';
 import AnimatedSection, { AnimatedGrid } from '../components/AnimatedSection';
 import ProfileCard from '../components/ProfileCard';
 import SEOHead from '../components/SEOHead';
+import { duration } from '../utils/motionSettings';
 
 const About = () => {
   // Skills with progress levels
@@ -133,7 +134,7 @@ const About = () => {
             <AnimatedSection
               key={index}
               animation="fadeUp"
-              delay={index * 0.1}
+              delay={index * 0.04}
               className="space-y-2"
             >
               <div className="flex justify-between items-center">
@@ -155,9 +156,10 @@ const About = () => {
               <div className="w-full h-2 bg-accent/20 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-secondary to-primary"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${skill.level}%` }}
-                  transition={{ duration: 0.8, delay: index * 0.08 + 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: skill.level / 100 }}
+                  transition={{ duration: duration.standard / 1000, delay: index * 0.04 + 0.04, ease: 'easeOut' }}
+                  style={{ originX: 0 }}
                 ></motion.div>
               </div>
             </AnimatedSection>
@@ -175,7 +177,7 @@ const About = () => {
         </AnimatedSection>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <AnimatedSection animation="fadeUp" delay={0.1} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+          <AnimatedSection animation="fadeUp" delay={0.04} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
             <h3 className="text-xl font-bold mb-2">YEAH</h3>
             <p className="text-sm text-muted-foreground mb-4">React • FastAPI • PyTorch</p>
             <p className="text-muted-foreground">
@@ -184,7 +186,7 @@ const About = () => {
             </p>
           </AnimatedSection>
           
-          <AnimatedSection animation="fadeUp" delay={0.2} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+          <AnimatedSection animation="fadeUp" delay={0.08} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
             <h3 className="text-xl font-bold mb-2">MedVault</h3>
             <p className="text-sm text-muted-foreground mb-4">Next.js • MongoDB • Clerk</p>
             <p className="text-muted-foreground">
@@ -193,7 +195,7 @@ const About = () => {
             </p>
           </AnimatedSection>
           
-          <AnimatedSection animation="fadeUp" delay={0.3} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+          <AnimatedSection animation="fadeUp" delay={0.12} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
             <h3 className="text-xl font-bold mb-2">Commit Story Gen</h3>
             <p className="text-sm text-muted-foreground mb-4">React • Next.js • Gemini API</p>
             <p className="text-muted-foreground">
@@ -217,7 +219,7 @@ const About = () => {
               <div className="space-y-8">
                 <AnimatedSection
                   animation="fadeUp"
-                  delay={0.1}
+                  delay={0.04}
                   className="relative pl-6 border-l-2 border-accent/20"
                 >
                   <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
@@ -232,7 +234,7 @@ const About = () => {
 
                 <AnimatedSection
                   animation="fadeUp"
-                  delay={0.2}
+                  delay={0.08}
                   className="relative pl-6 border-l-2 border-accent/20"
                 >
                   <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>
@@ -247,7 +249,7 @@ const About = () => {
 
                 <AnimatedSection
                   animation="fadeUp"
-                  delay={0.3}
+                  delay={0.12}
                   className="relative pl-6 border-l-2 border-accent/20"
                 >
                   <div className="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-0"></div>

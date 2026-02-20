@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
-import { spring } from '../utils/motionSettings';
+import { motionTransition } from '../utils/motionContract';
 
 /**
  * SocialPopover – A small pop-up with social media links.
@@ -53,11 +53,14 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
           role="dialog"
           aria-label="Social links"
           ref={panelRef}
-          className="absolute bottom-full right-6 mb-2 z-[60] pointer-events-auto bg-background/90 backdrop-blur-md ring-1 ring-border/30 shadow-xl rounded-xl px-4 py-3 flex gap-4"
-          initial={{ opacity: 0, y: 6, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 6, scale: 0.96 }}
-          transition={spring.smooth}
+          className="absolute bottom-full right-6 mb-2 z-50 pointer-events-auto bg-background/90 backdrop-blur-md ring-1 ring-border/30 shadow-xl rounded-xl px-4 py-3 flex gap-4"
+          initial={false}
+          exit={{
+            opacity: 0,
+            y: 6,
+            scale: 0.97,
+            transition: motionTransition.componentExit,
+          }}
         >
           {links.map((l) => (
             <a
@@ -65,7 +68,7 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
               href={l.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-2xl text-foreground hover:text-primary transition-colors"
+              className="text-2xl text-foreground hover:text-primary active:scale-95 transition-[color,transform] duration-150 ease-out"
             >
               <Icon icon={l.icon} aria-label={l.label} />
             </a>

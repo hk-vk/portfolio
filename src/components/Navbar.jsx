@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion } from "../lib/motion";
 import { Icon } from "@iconify/react";
 import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
 import { useSocialPopover } from "../context/SocialPopoverContext";
+import { motionInteraction, motionTransition } from "../utils/motionContract";
 
 const Navbar = () => {
   const location = useLocation();
-  const [canHover, setCanHover] = useState(false);
 
   const mainLinks = [
     { name: "Home", path: "/", icon: "tabler:home" },
@@ -23,19 +23,6 @@ const Navbar = () => {
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } =
     useSocialPopover();
   const socialPopoverId = useMemo(() => "navbar-social-popover", []);
-
-  useEffect(() => {
-    if (!window.matchMedia) return;
-    const mediaQuery = window.matchMedia("(hover: hover)");
-    const updateHoverSupport = () => setCanHover(mediaQuery.matches);
-    updateHoverSupport();
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", updateHoverSupport);
-      return () => mediaQuery.removeEventListener("change", updateHoverSupport);
-    }
-    mediaQuery.addListener(updateHoverSupport);
-    return () => mediaQuery.removeListener(updateHoverSupport);
-  }, []);
 
   useEffect(() => {
     closeSocialPopover();
@@ -72,18 +59,12 @@ const Navbar = () => {
     hover: {
       scale: 1.02,
       y: -1,
-      transition: {
-        duration: 0.1,
-        ease: "easeOut",
-      },
+      transition: motionTransition.microEnter,
     },
     tap: {
       scale: 0.98,
       y: 0,
-      transition: {
-        duration: 0.08,
-        ease: "easeInOut",
-      },
+      transition: motionInteraction.press.transition,
     },
   };
 
@@ -132,7 +113,7 @@ const Navbar = () => {
                         transformStyle: "preserve-3d",
                       }}
                       animate={{
-                        rotateX: canHover && isHovered ? -90 : 0,
+                        rotateX: isHovered ? -90 : 0,
                       }}
                       transition={{
                         type: "spring",
@@ -197,7 +178,7 @@ const Navbar = () => {
                         transformStyle: "preserve-3d",
                       }}
                       animate={{
-                        rotateX: canHover && isHovered ? -90 : 0,
+                        rotateX: isHovered ? -90 : 0,
                       }}
                       transition={{
                         type: "spring",
@@ -252,16 +233,9 @@ const Navbar = () => {
 
         {/* Theme Toggle */}
         <motion.div
-          whileHover={{
-            scale: 1.05,
-            rotate: 3,
-            y: -1,
-          }}
-          whileTap={{ scale: 0.96, rotate: 0 }}
-          transition={{
-            duration: 0.15,
-            ease: "easeOut",
-          }}
+          whileHover={{ ...motionInteraction.hoverIcon, rotate: 2 }}
+          whileTap={motionInteraction.press}
+          transition={motionTransition.microEnter}
           className="ml-1 sm:ml-2 flex-shrink-0"
         >
           <ThemeToggle />

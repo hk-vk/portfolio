@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import { duration } from '../utils/motionSettings';
+import { motion } from '../lib/motion';
 import { useLocation } from 'react-router-dom';
+import { motionTransition } from '../utils/motionContract';
 
 /**
  * PageTransition Component
@@ -15,14 +15,13 @@ const PageTransition = ({ children }) => {
     <motion.div
       key={location.pathname}
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{
-        duration: duration.quick / 1000,
-        ease: [0.4, 0, 0.2, 1], // Material Design easing
+      animate={{
+        opacity: 1,
+        transition: motionTransition.pageEnter,
       }}
-      style={{
-        willChange: 'opacity',
+      exit={{
+        opacity: 0,
+        transition: motionTransition.pageExit,
       }}
     >
       {children}

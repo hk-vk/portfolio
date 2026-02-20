@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import SEOHead from '../components/SEOHead';const Contact = () => {  const [formData, setFormData] = useState({
+import { motion } from '../lib/motion';
+import SEOHead from '../components/SEOHead';
+import { duration } from '../utils/motionSettings';
+
+const Contact = () => {
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
@@ -63,7 +67,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
           className="text-center mb-16"
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: duration.moderate / 1000, ease: 'easeOut' }}
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Let's Work Together
@@ -78,7 +82,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
           <motion.div
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: duration.moderate / 1000, delay: 0.04, ease: 'easeOut' }}
           >
             <h2 className="text-2xl font-semibold mb-6">Send a Message</h2>
             
@@ -115,7 +119,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-[border-color,box-shadow] duration-150"
                     placeholder="Your name"
                   />
                 </div>
@@ -131,7 +135,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-[border-color,box-shadow] duration-150"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -147,7 +151,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:border-transparent transition-[border-color,box-shadow] duration-150 resize-none"
                     placeholder="Tell me about your project or just say hello!"
                   />
                 </div>
@@ -155,7 +159,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition-[background-color,transform,opacity] duration-150 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -176,7 +180,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
           <motion.div
             initial={{ opacity: 0, x: 8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.08, duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
             <h2 className="text-2xl font-semibold mb-6">Get in Touch</h2>
             
@@ -209,7 +213,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 0.08 + index * 0.04, duration: duration.standard / 1000, ease: 'easeOut' }}
                   whileHover={{ x: 3 }}
                 >
                   <span className="text-xl">{link.icon}</span>
@@ -229,7 +233,7 @@ import SEOHead from '../components/SEOHead';const Contact = () => {  const [form
           className="mt-16 text-center"
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.12, duration: duration.moderate / 1000, ease: 'easeOut' }}
         >
           <h3 className="text-lg font-medium mb-4">Quick Actions</h3>
           <div className="flex flex-wrap justify-center gap-4">

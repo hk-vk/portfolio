@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '../lib/motion';
 import { themeToggle } from '../utils/themeToggle';
-import { spring, tap } from '../utils/motionSettings';
+import { spring } from '../utils/motionSettings';
+import { motionInteraction } from '../utils/motionContract';
 
 /**
  * Theme toggle button component that allows switching between light and dark mode
@@ -74,8 +75,8 @@ const ThemeToggle = () => {
   
   return (
     <motion.button
-      whileHover={{ rotate: isDark ? -20 : 20, scale: 1.1 }}
-      whileTap={tap.press}
+      whileHover={{ rotate: isDark ? -12 : 12, ...motionInteraction.hoverIcon }}
+      whileTap={motionInteraction.press}
       onClick={handleToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       className="text-foreground hover:text-primary transition-colors"
