@@ -10,6 +10,7 @@ import './index.css';
 import Navbar from './components/Navbar';
 import PageTransition from './components/PageTransition';
 import MotionProvider from './components/MotionProvider';
+import { SmoothScrollProvider } from './context/SmoothScrollContext';
 
 // Lazy load all pages for code splitting and faster initial load
 const Home = lazy(() => import('./pages/Home'));
@@ -76,15 +77,17 @@ function App() {
     <HelmetProvider>
       <MotionProvider>
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <div className="min-h-screen bg-background">
-            <Navbar />
-            <main className="relative">
-              <Suspense fallback={<PageLoader />}>
-                <ScrollToTop />
-                <AnimatedRoutes />
-              </Suspense>
-            </main>
-          </div>
+          <SmoothScrollProvider>
+            <div className="min-h-screen bg-background">
+              <Navbar />
+              <main className="relative">
+                <Suspense fallback={<PageLoader />}>
+                  <ScrollToTop />
+                  <AnimatedRoutes />
+                </Suspense>
+              </main>
+            </div>
+          </SmoothScrollProvider>
         </Router>
       </MotionProvider>
     </HelmetProvider>

@@ -308,9 +308,26 @@
   transform: translateY(0);
 }
 
-/* Add smooth scrolling */
+/* Native smooth scrolling is disabled because Lenis controls scroll behavior. */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 /* Custom scrollbar */
