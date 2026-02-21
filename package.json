@@ -33,6 +33,7 @@
     "react-router-dom": "^6.30.1",
     "remark-gfm": "^4.0.1",
     "swiper": "^11.2.10",
+    "swr": "^2.4.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {

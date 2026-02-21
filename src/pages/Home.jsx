@@ -87,8 +87,8 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
         )}
 
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {project.tags.slice(0, 3).map((tag, i) => (
-            <span key={i} className="skill-tag text-[10px]">
+          {project.tags.slice(0, 3).map((tag) => (
+            <span key={`${project.id}-${tag}`} className="skill-tag text-[10px]">
               {tag}
             </span>
           ))}
@@ -260,8 +260,8 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
                   className="overflow-hidden"
                 >
                   <div className="mt-2 space-y-1.5">
-                    {item.details.map((detail, idx) => (
-                      <div key={idx} className="text-sm text-muted-foreground">
+                    {item.details.map((detail) => (
+                      <div key={detail.text} className="text-sm text-muted-foreground">
                         <span>{detail.text}</span>
                         {detail.linkText && (
                           <>
@@ -335,11 +335,19 @@ const Home = memo(() => {
     visible: entrance.fadeUp.animate
   }), []);
 
-  // Use skills data
-  const skills = useMemo(() => skillsData, []);
-
-  // Memoized featured projects for this component
-  const memoizedProjects = useMemo(() => featuredProjects, []);
+  const skills = skillsData;
+  const memoizedProjects = featuredProjects;
+  const repeatedSkills = useMemo(
+    () =>
+      Array.from({ length: 4 }).flatMap((_, cycle) =>
+        skills.map((skill, skillIndex) => ({
+          ...skill,
+          marqueeKey: `${cycle}-${skill.name}`,
+          baseIndex: skillIndex,
+        })),
+      ),
+    [skills],
+  );
   return (
     <>
       <SEOHead
@@ -471,11 +479,11 @@ const Home = memo(() => {
                       onTouchStart={(e) => e.currentTarget.classList.toggle('is-paused')}
                     >
                       <div className="skill-marquee-track">
-                        {[...skills, ...skills, ...skills, ...skills].map((skill, index) => (
+                        {repeatedSkills.map((skill) => (
                           <SkillTag
-                            key={`${skill.name}-${index}`}
+                            key={skill.marqueeKey}
                             skill={skill}
-                            index={index % skills.length}
+                            index={skill.baseIndex}
                             isVisible={sectionsVisible.hero}
                           />
                         ))}
@@ -508,7 +516,7 @@ const Home = memo(() => {
               <div className="space-y-3">
                 {experienceItems.map((item, idx) => (
                   <ExperienceItem
-                    key={idx}
+                    key={item.title}
                     item={item}
                     index={idx}
                     isVisible={sectionsVisible.experience}

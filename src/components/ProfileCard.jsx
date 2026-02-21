@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '../lib/motion';
 import SparkleIllustration from './SparkleIllustration';
 
 const ProfileCard = () => {
@@ -86,7 +86,7 @@ const ProfileCard = () => {
               <div className="flex flex-wrap justify-center gap-2">
                 {skills.map((skill, index) => (
                   <motion.span 
-                    key={index} 
+                    key={skill}
                     className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 text-primary hover:text-primary-foreground text-xs font-medium border border-primary/20 transition-colors duration-200"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -106,9 +106,9 @@ const ProfileCard = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             >
-              {socialLinks.map((social, index) => (
+              {socialLinks.map((social) => (
                 <motion.a
-                  key={index}
+                  key={social.href}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"

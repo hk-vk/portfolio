@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { Children, memo } from 'react';
 import { motion } from '../lib/motion';
 import { duration, entrance, stagger as staggerConfig } from '../utils/motionSettings';
 import { motionTransition } from '../utils/motionContract';
@@ -151,12 +151,11 @@ export const AnimatedGrid = memo(({
       variants={containerVariants}
       {...props}
     >
-      {Array.isArray(children) && children.map((child, index) => (
-        <motion.div key={index} variants={itemVariants}>
+      {Children.map(children, (child) => (
+        <motion.div key={child?.key ?? undefined} variants={itemVariants}>
           {child}
         </motion.div>
       ))}
-      {!Array.isArray(children) && children}
     </motion.div>
   );
 });

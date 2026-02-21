@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import "./MagnetLines.css";
 
+const EMPTY_STYLE = {};
+
 export default function MagnetLines({
   rows = 9,
   columns = 9,
@@ -10,7 +12,7 @@ export default function MagnetLines({
   lineHeight = "6vmin",
   baseAngle = -10,
   className = "",
-  style = {}
+  style = EMPTY_STYLE
 }) {
   const containerRef = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -142,20 +144,26 @@ export default function MagnetLines({
   }, [baseAngle, columns, isHovering]);
 
   const total = rows * columns;
-  const spans = Array.from({ length: total }, (_, i) => (
-    <span
-      key={i}
-      style={{
-        "--rotate": `${baseAngle}deg`,
-        "--opacity": "0",
-        backgroundColor: lineColor,
-        width: lineWidth,
-        height: lineHeight,
-        opacity: "var(--opacity)",
-        transition: `opacity ${(i % total) * 5 + 300}ms ease-out`
-      }}
-    />
-  ));
+  const spans = [];
+  for (let row = 0; row < rows; row += 1) {
+    for (let column = 0; column < columns; column += 1) {
+      const order = row * columns + column;
+      spans.push(
+        <span
+          key={`line-${row}-${column}`}
+          style={{
+            "--rotate": `${baseAngle}deg`,
+            "--opacity": "0",
+            backgroundColor: lineColor,
+            width: lineWidth,
+            height: lineHeight,
+            opacity: "var(--opacity)",
+            transition: `opacity ${(order % total) * 5 + 300}ms ease-out`
+          }}
+        />
+      );
+    }
+  }
 
   return (
     <div

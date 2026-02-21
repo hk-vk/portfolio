@@ -10,17 +10,36 @@ const json = (body, status = 200) =>
     },
   });
 
+const normalizePostHogHost = (host) => {
+  if (!host) return 'https://us.posthog.com';
+  const normalized = host.replace(/\/+$/, '');
+  if (normalized.includes('us.i.posthog.com')) return 'https://us.posthog.com';
+  if (normalized.includes('eu.i.posthog.com')) return 'https://eu.posthog.com';
+  return normalized;
+};
+
 export async function onRequestOptions() {
   return json({ ok: true });
 }
 
 export async function onRequestGet(context) {
-  const host = context.env.POSTHOG_API_HOST || 'https://us.posthog.com';
+  const host = normalizePostHogHost(
+    context.env.POSTHOG_API_HOST ||
+      context.env.POSTHOG_HOST ||
+      context.env.VITE_PUBLIC_POSTHOG_HOST,
+  );
   const projectId = context.env.POSTHOG_PROJECT_ID;
-  const apiKey = context.env.POSTHOG_PERSONAL_API_KEY;
+  const apiKey =
+    context.env.POSTHOG_PERSONAL_API_KEY || context.env.POSTHOG_API_KEY;
 
   if (!projectId || !apiKey) {
-    return json({ ok: false, counts: {}, error: 'Missing PostHog API configuration' }, 500);
+    return json({
+      ok: true,
+      counts: {},
+      misconfigured: true,
+      error:
+        'Missing PostHog server config. Required: POSTHOG_PROJECT_ID + POSTHOG_PERSONAL_API_KEY',
+    });
   }
 
   const query = {
@@ -50,7 +69,11 @@ export async function onRequestGet(context) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return json({ ok: false, counts: {}, error: errorText || 'PostHog query failed' }, 502);
+      return json({
+        ok: true,
+        counts: {},
+        error: errorText || 'PostHog query failed',
+      });
     }
 
     const data = await response.json();
@@ -58,13 +81,18 @@ export async function onRequestGet(context) {
     const counts = {};
 
     for (const row of results) {
-      const slug = row?.post_slug;
-      const views = Number(row?.views || 0);
+      const slug =
+        (row && typeof row === 'object' && !Array.isArray(row) && row.post_slug) ||
+        (Array.isArray(row) ? row[0] : null);
+      const views = Number(
+        (row && typeof row === 'object' && !Array.isArray(row) && row.views) ||
+          (Array.isArray(row) ? row[1] : 0),
+      );
       if (slug) counts[slug] = views;
     }
 
     return json({ ok: true, counts });
   } catch (error) {
-    return json({ ok: false, counts: {}, error: error?.message || 'Unknown error' }, 500);
+    return json({ ok: true, counts: {}, error: error?.message || 'Unknown error' });
   }
 }

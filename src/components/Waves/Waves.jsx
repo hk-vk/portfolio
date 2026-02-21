@@ -1,5 +1,7 @@
 import { useRef, useEffect } from "react";
 
+const EMPTY_STYLE = {};
+
 class Grad {
   constructor(x, y, z) {
     this.x = x;
@@ -98,7 +100,7 @@ const Waves = ({
   friction = 0.94, // Slightly more friction for stability
   tension = 0.004, // Reduced tension
   maxCursorMove = 80, // Reduced cursor influence
-  style = {},
+  style = EMPTY_STYLE,
   className = "",
 }) => {
   const containerRef = useRef(null);
@@ -385,7 +387,7 @@ const Waves = ({
     frameIdRef.current = requestAnimationFrame(tick);
     window.addEventListener("resize", onResize);
     window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
     
     // Add device motion support for mobile
     requestDeviceOrientationPermission();

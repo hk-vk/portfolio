@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "../lib/motion";
 import { Icon } from "@iconify/react";
@@ -24,7 +24,7 @@ const Navbar = () => {
   // Use context for social popover state
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } =
     useSocialPopover();
-  const socialPopoverId = useMemo(() => "navbar-social-popover", []);
+  const socialPopoverId = "navbar-social-popover";
 
   useEffect(() => {
     closeSocialPopover();

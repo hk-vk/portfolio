@@ -6,6 +6,7 @@ import SparkleIllustration from '../components/SparkleIllustration';
 import Shimmer from '../components/Shimmer';
 import SEOHead from '../components/SEOHead';
 import { usePostHog } from '@posthog/react';
+import useSWR from 'swr';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
 import { client, urlFor } from '../lib/sanity';
@@ -13,6 +14,13 @@ import { client, urlFor } from '../lib/sanity';
 const BLOG_LIST_CACHE_KEY = 'blog:list:v1';
 const BLOG_LAST_COUNT_KEY = 'blog:last-count:v1';
 const formatViews = (count) => `${new Intl.NumberFormat().format(count || 0)} views`;
+const fetcher = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}`);
+  }
+  return response.json();
+};
 
 const BlogCardSkeleton = () => (
   <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm rounded-xl">
@@ -106,9 +114,13 @@ const BlogPostCard = ({ post, onCardClick }) => (
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewCounts, setViewCounts] = useState({});
   const [skeletonCount, setSkeletonCount] = useState(1);
   const posthog = usePostHog();
+  const { data: viewCountsData } = useSWR('/api/blog-view-counts', fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60_000,
+  });
+  const viewCounts = viewCountsData?.ok && viewCountsData?.counts ? viewCountsData.counts : {};
 
   const handleBlogCardClick = (post) => {
     posthog?.capture('blog_card_clicked', {
@@ -164,19 +176,6 @@ const Blog = () => {
       .catch((error) => {
         console.error(error);
         setIsLoading(false);
-      });
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/blog-view-counts')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.ok && data?.counts) {
-          setViewCounts(data.counts);
-        }
-      })
-      .catch(() => {
-        // keep view count fallback as 0 when API is unavailable
       });
   }, []);
 

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from "../../lib/motion";
 import { useEffect, useRef, useState, useMemo } from "react";
 
 const buildKeyframes = (from, steps) => {
@@ -29,6 +29,17 @@ const BlurText = ({
   stepDuration = 0.35,
 }) => {
   const elements = animateBy === "words" ? text.split(" ") : text.split("");
+  const keyedElements = useMemo(() => {
+    const counts = new Map();
+    return elements.map((segment) => {
+      const next = (counts.get(segment) || 0) + 1;
+      counts.set(segment, next);
+      return {
+        id: `${segment}-${next}`,
+        segment,
+      };
+    });
+  }, [elements]);
   const [inView, setInView] = useState(false);
   const ref = useRef(null);
 
@@ -79,7 +90,7 @@ const BlurText = ({
 
   return (
     <p ref={ref} className={`blur-text ${className} flex flex-wrap`}>
-      {elements.map((segment, index) => {
+      {keyedElements.map(({ id, segment }, index) => {
         const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
 
         const spanTransition = {
@@ -92,7 +103,7 @@ const BlurText = ({
         return (
           <motion.span
             className="inline-block will-change-[transform,filter,opacity]"
-            key={index}
+              key={id}
             initial={fromSnapshot}
             animate={inView ? animateKeyframes : fromSnapshot}
             transition={spanTransition}

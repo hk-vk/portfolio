@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
@@ -56,6 +56,18 @@ const stripMarkdown = (markdownText) => {
 
 const getPostCacheKey = (slug) => `blog:post:${slug}`;
 
+const toWordEntries = (items) => {
+  const counts = new Map();
+  return items.map((word, position) => {
+    const next = (counts.get(word) || 0) + 1;
+    counts.set(word, next);
+    return {
+      id: `${word}-${next}-${position}`,
+      word,
+    };
+  });
+};
+
 const BlogPostSkeleton = () => (
   <div className="pt-32 pb-20">
     <div className="content-container max-w-3xl mx-auto">
@@ -77,6 +89,30 @@ const BlogPostSkeleton = () => (
   </div>
 );
 
+const WordSegment = ({ word }) => {
+  if (!word) return null;
+  if (word.length === 1) {
+    return (
+      <span className="inline-block">
+        <span className="text-primary">{word}</span>
+      </span>
+    );
+  }
+
+  const middleIndex = Math.ceil(word.length / 2) - 1;
+  const start = word.slice(0, middleIndex);
+  const middle = word[middleIndex];
+  const end = word.slice(middleIndex + 1);
+
+  return (
+    <span className="inline-block mx-1">
+      <span className="opacity-90">{start}</span>
+      <span className="text-primary font-bold scale-110 inline-block transform">{middle}</span>
+      <span className="opacity-90">{end}</span>
+    </span>
+  );
+};
+
 const SpeedReaderOverlay = ({ 
   isActive, 
   onClose,
@@ -89,9 +125,10 @@ const SpeedReaderOverlay = ({
   const [chunkSize, setChunkSize] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
 
-  if (!isActive) return null;
-
   useEffect(() => {
+    if (!isActive) {
+      return undefined;
+    }
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onClose();
@@ -99,7 +136,9 @@ const SpeedReaderOverlay = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [isActive, onClose]);
+
+  if (!isActive) return null;
 
   return createPortal(
     <motion.div 
@@ -281,26 +320,8 @@ const RSVPReader = ({ content, isPlaying, wordsPerMinute, chunkSize, onComplete 
   }, [isPlaying, wordChunks, wordsPerMinute, chunkSize, onComplete]);
 
   const currentChunk = wordChunks[currentIndex] || [];
+  const currentChunkEntries = useMemo(() => toWordEntries(currentChunk), [currentChunk]);
   
-  // Helper to highlight the middle character (ORP - Optimal Recognition Point)
-  const renderWord = (word) => {
-    if (!word) return null;
-    if (word.length === 1) return <span className="inline-block"><span className="text-primary">{word}</span></span>;
-    
-    const middleIndex = Math.ceil(word.length / 2) - 1;
-    const start = word.slice(0, middleIndex);
-    const middle = word[middleIndex];
-    const end = word.slice(middleIndex + 1);
-    
-    return (
-      <span className="inline-block mx-1">
-        <span className="opacity-90">{start}</span>
-        <span className="text-primary font-bold scale-110 inline-block transform">{middle}</span>
-        <span className="opacity-90">{end}</span>
-      </span>
-    );
-  };
-
   return (
     <div className="flex flex-col items-center w-full max-w-4xl">
        {/* Focus Guides */}
@@ -315,9 +336,9 @@ const RSVPReader = ({ content, isPlaying, wordsPerMinute, chunkSize, onComplete 
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary/20 rounded-full"></div>
             
             <div className="text-5xl sm:text-7xl md:text-8xl font-medium tracking-tight text-center leading-normal select-none py-4 px-8 min-h-[1.5em] flex items-center justify-center whitespace-nowrap">
-              {currentChunk.map((word, idx) => (
-                <React.Fragment key={idx}>
-                  {renderWord(word)}
+              {currentChunkEntries.map((chunkWord) => (
+                <React.Fragment key={chunkWord.id}>
+                  <WordSegment word={chunkWord.word} />
                 </React.Fragment>
               ))}
             </div>
@@ -347,7 +368,8 @@ const GuidedReader = ({ content, isPlaying, wordsPerMinute, onComplete }) => {
 
   useEffect(() => {
     const plainText = stripMarkdown(content);
-    setWords(plainText.split(/\s+/).filter(w => w.length > 0));
+    const nextWords = plainText.split(/\s+/).filter(w => w.length > 0);
+    setWords(toWordEntries(nextWords));
     setCurrentWordIndex(0);
   }, [content]);
 
@@ -385,15 +407,24 @@ const GuidedReader = ({ content, isPlaying, wordsPerMinute, onComplete }) => {
   return (
     <div ref={containerRef} className="w-full h-[70vh] overflow-y-auto px-4 md:px-20 scroll-smooth">
       <div className="max-w-2xl mx-auto py-20 text-xl md:text-2xl leading-relaxed text-muted-foreground/50 transition-colors duration-500">
-        {words.map((word, idx) => {
+        {words.map((wordEntry, idx) => {
+          const word = wordEntry.word;
           const isActive = idx === currentWordIndex;
           const isPast = idx < currentWordIndex;
           
           return (
             <span 
-              key={idx}
+              key={wordEntry.id}
               ref={el => (wordRefs.current[`word-${idx}`] = el)}
               onClick={() => setCurrentWordIndex(idx)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setCurrentWordIndex(idx);
+                }
+              }}
+              role="button"
+              tabIndex={0}
               className={`inline-block mr-2 mb-2 transition-all duration-200 cursor-pointer rounded px-1
                 ${isActive ? 'text-foreground scale-110 font-medium bg-muted/50 shadow-sm' : ''}
                 ${isPast ? 'text-muted-foreground/80' : ''}

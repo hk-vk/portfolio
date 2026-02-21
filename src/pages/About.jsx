@@ -132,7 +132,7 @@ const About = () => {
             { name: "Docker", level: 75 },
           ].map((skill, index) => (
             <AnimatedSection
-              key={index}
+              key={skill.name}
               animation="fadeUp"
               delay={index * 0.04}
               className="space-y-2"
@@ -283,7 +283,7 @@ const About = () => {
         >
           {['Photography', 'Hiking', 'Reading', 'Tech Meetups'].map((interest, index) => (
             <div
-              key={index}
+              key={interest}
               className="text-center p-6"
             >
               <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-accent/10 rounded-full text-2xl">

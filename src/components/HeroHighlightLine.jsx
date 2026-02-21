@@ -1,9 +1,9 @@
 import React from 'react';
-import { motion, useAnimation, useInView } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { motion } from '../lib/motion';
+import { useInView } from 'framer-motion';
+import { useRef } from 'react';
 
 const HeroHighlightLine = () => {
-  const controls = useAnimation();
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -23,12 +23,6 @@ const HeroHighlightLine = () => {
     L 650 420
   `;
 
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible");
-    }
-  }, [controls, isInView]);
-
   return (
     <motion.svg
       ref={ref}
@@ -37,7 +31,7 @@ const HeroHighlightLine = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       initial="hidden"
-      animate={controls}
+      animate={isInView ? "visible" : "hidden"}
     >
       <motion.path
         d={linePath}
