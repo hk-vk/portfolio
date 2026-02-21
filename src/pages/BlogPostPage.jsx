@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
 import { motion, AnimatePresence } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { Icon } from "@iconify/react";
+import { client, urlFor } from '../lib/sanity';
 
 // Utility function to strip Markdown syntax
 const stripMarkdown = (markdownText) => {
@@ -50,38 +51,6 @@ const stripMarkdown = (markdownText) => {
   
   return plainText.trim();
 };
-
-// Temporary: Define posts here. In a real app, this would come from a CMS, API, or context.
-const blogPostsData = [
-  {
-    id: "portfolio-speed-reader-blog",
-    title: "Don't spend too much time reading my blogs.",
-    date: "May 11, 2025",
-    excerpt: "Seriously, who has time for long reads? Use my speed reader and get on with your day. Here's why it's awesome.",
-    imageUrl: null,
-    content: `
-# Don't spend too much time reading my blogs.
-
-Seriously. You've got stuff to do. I've got stuff to do. Let's not make this a whole thing.
-
-That's why I built a speed reader into this site. It's that little button up there. Click it.
-
-## Why Bother?
-
-*   **Time:** You get the gist, fast.
-*   **Focus:** No distractions, just words.
-*   **Magic:** Okay, not magic, but it feels pretty cool.
-
-## How It Works (The TL;DR Version)
-
-It flashes words at you. Your brain does the rest. Science! (Sort of). You can control the speed. Faster is... well, faster.
-
-## So, Go Ahead.
-
-Try the speed reader on this very post. See? Done. Now go build something amazing. Or take a nap. Your call.
-    `
-  }
-];
 
 const SpeedReaderOverlay = ({ 
   isActive, 
@@ -476,14 +445,36 @@ const BlogPostPage = () => {
   };
 
   useEffect(() => {
-    // Simulate fetching post data
-    const foundPost = blogPostsData.find(p => p.id === postId);
-    if (foundPost) {
-      setPost(foundPost);
-    } else {
-      setPost(null); 
-    }
-    setLoading(false);
+    const query = `*[_type == "post" && slug.current == $slug][0]{
+      title,
+      slug,
+      publishedAt,
+      excerpt,
+      mainImage,
+      body
+    }`;
+
+    client.fetch(query, { slug: postId })
+      .then((data) => {
+        if (data) {
+          // Map Sanity data to local state format
+          setPost({
+            title: data.title,
+            date: new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }),
+            content: data.body, // Assuming plain markdown text for now
+            imageUrl: data.mainImage ? urlFor(data.mainImage).url() : null,
+            excerpt: data.excerpt,
+            category: "Blog" // Default category
+          });
+        } else {
+          setPost(null);
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Sanity fetch error:", error);
+        setLoading(false);
+      });
   }, [postId]);
 
   useEffect(() => {
@@ -499,7 +490,7 @@ const BlogPostPage = () => {
   if (loading) {
     return (
       <div className="pt-32 pb-20 flex justify-center items-center">
-        <p className="text-xl text-muted-foreground">Loading post...</p>
+        <p className="text-xl text-muted-foreground animate-pulse">Loading post...</p>
       </div>
     );
   }
@@ -513,7 +504,7 @@ const BlogPostPage = () => {
       <SEOHead 
         title={`${post.title} | Harikrishnan V K`}
         description={post.excerpt || stripMarkdown(post.content).substring(0, 160) + '...'}
-        url={`/blog/${post.id}`}
+        url={`/blog/${post.slug}`}
         type="article"
         image={post.imageUrl || "/og.jpg"}
       />
@@ -535,6 +526,18 @@ const BlogPostPage = () => {
       <div className="pt-32 pb-20">
       <AnimatedSection animation="fadeUp">
         <div className="content-container max-w-3xl mx-auto">
+          {/* Back Button */}
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="mb-6"
+          >
+            <Link to="/blog" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/30 border border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200 group" aria-label="Back to Blog">
+              <Icon icon="tabler:arrow-left" className="text-xl group-hover:-translate-x-0.5 transition-transform" />
+            </Link>
+          </motion.div>
+
           <motion.h1
             className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-foreground font-serif tracking-tight leading-none"
             initial={{ opacity: 0, y: 6 }}
@@ -613,4 +616,4 @@ const BlogPostPage = () => {
   );
 };
 
-export default BlogPostPage; 
+export default BlogPostPage;

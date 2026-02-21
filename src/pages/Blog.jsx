@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AnimatedSection from '../components/AnimatedSection';
 import { motion } from '../lib/motion';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import SparkleIllustration from '../components/SparkleIllustration';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
+import { client, urlFor } from '../lib/sanity';
 
 const BlogPostCard = ({ post }) => (
   <motion.div
@@ -14,13 +15,17 @@ const BlogPostCard = ({ post }) => (
     whileHover={cardMotion.hover}
     whileTap={cardMotion.press}
   >
-    <Link to={`/blog/${post.id}`} className="block h-full">
+    <Link to={`/blog/${post.slug.current}`} className="block h-full">
       <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
                       hover:border-primary/30 hover:shadow-lg 
                       transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl 
                       group-hover:bg-card/90">
-        {post.imageUrl ? (
-          <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover rounded-md mb-4" />
+        {post.mainImage ? (
+          <img 
+            src={urlFor(post.mainImage).width(400).height(300).url()} 
+            alt={post.title} 
+            className="w-full h-48 object-cover rounded-md mb-4" 
+          />
         ) : (
           <div className="w-full h-48 rounded-md mb-4 relative overflow-hidden 
                           flex flex-col items-center justify-center 
@@ -51,7 +56,7 @@ const BlogPostCard = ({ post }) => (
             {post.title}
           </h2>
           <p className="text-xs text-muted-foreground/80 mb-3 uppercase tracking-wider font-medium">
-            {post.date}
+            {new Date(post.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
           <p className="text-muted-foreground mb-6 text-sm leading-relaxed line-clamp-3">
             {post.excerpt}
@@ -73,37 +78,26 @@ const BlogPostCard = ({ post }) => (
 );
 
 const Blog = () => {
-  const blogPosts = [
-    {
-      id: "portfolio-speed-reader-blog",
-      title: "Don't spend too much time reading my blogs.",
-      date: "May 11, 2025",
-      excerpt: "Seriously, who has time for long reads? Use my speed reader and get on with your day. Here's why it's awesome.",
-      imageUrl: null,
-      content: `
-# Don't spend too much time reading my blogs.
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-Seriously. You've got stuff to do. I've got stuff to do. Let's not make this a whole thing.
+  useEffect(() => {
+    const query = `*[_type == "post"] | order(publishedAt desc) {
+      _id,
+      title,
+      slug,
+      publishedAt,
+      excerpt,
+      mainImage
+    }`;
 
-That's why I built a speed reader into this site. It's that little button up there. Click it.
-
-## Why Bother?
-
-*   **Time:** You get the gist, fast.
-*   **Focus:** No distractions, just words.
-*   **Magic:** Okay, not magic, but it feels pretty cool.
-
-## How It Works (The TL;DR Version)
-
-It flashes words at you. Your brain does the rest. Science! (Sort of). You can control the speed. Faster is... well, faster.
-
-## So, Go Ahead.
-
-Try the speed reader on this very post. See? Done. Now go build something amazing. Or take a nap. Your call.
-      `
-    }
-    // Add more blog posts here as needed // Ensure this comment remains if you want to add more later, or remove it if this is the only post.
-  ];
+    client.fetch(query)
+      .then((data) => {
+        setBlogPosts(data);
+        setIsLoading(false);
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <>
@@ -148,7 +142,11 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
 
       <AnimatedSection animation="fadeIn" delay={0.3}>
         <div className="content-container">
-          {blogPosts.length > 0 ? (
+          {isLoading ? (
+             <div className="flex justify-center py-20">
+               <p className="text-muted-foreground animate-pulse">Loading posts...</p>
+             </div>
+          ) : blogPosts.length > 0 ? (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
               variants={cardMotion.gridVariants}
@@ -156,7 +154,7 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
               animate="visible"
             >
               {blogPosts.map((post) => (
-                <BlogPostCard key={post.id} post={post} />
+                <BlogPostCard key={post._id} post={post} />
               ))}
             </motion.div>
           ) : (
@@ -186,4 +184,4 @@ Try the speed reader on this very post. See? Done. Now go build something amazin
   );
 };
 
-export default Blog; 
+export default Blog;
