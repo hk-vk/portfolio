@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AnimatePresence } from './lib/motion';
+import { usePostHog } from '@posthog/react';
+import { useRef } from 'react';
 import '@fontsource-variable/syne';
 import '@fontsource-variable/plus-jakarta-sans';
 import './index.css';
@@ -48,6 +50,37 @@ const AnimatedRoutes = () => {
   );
 };
 
+const getPageNameFromPath = (pathname) => {
+  if (pathname === '/') return 'home';
+  if (pathname === '/about') return 'about';
+  if (pathname === '/projects') return 'projects';
+  if (pathname === '/blog') return 'blog';
+  if (pathname.startsWith('/blog/')) return 'blog_post';
+  if (pathname === '/contact') return 'contact';
+  return 'other';
+};
+
+const RouteAnalytics = () => {
+  const location = useLocation();
+  const posthog = usePostHog();
+  const lastTrackedPathRef = useRef(null);
+
+  useEffect(() => {
+    const fullPath = `${location.pathname}${location.search}`;
+    if (lastTrackedPathRef.current === fullPath) return;
+
+    posthog?.capture('page_viewed', {
+      page_name: getPageNameFromPath(location.pathname),
+      path: location.pathname,
+      search: location.search || '',
+      title: document.title || '',
+    });
+    lastTrackedPathRef.current = fullPath;
+  }, [location.pathname, location.search, posthog]);
+
+  return null;
+};
+
 function App() {
   // Theme initialization
   useEffect(() => {
@@ -66,6 +99,8 @@ function App() {
     const preloadTimer = setTimeout(() => {
       import('./pages/About');
       import('./pages/Projects');
+      import('./pages/Blog');
+      import('./pages/BlogPostPage');
     }, 500);
 
     return () => {
@@ -82,6 +117,7 @@ function App() {
               <Navbar />
               <main className="relative">
                 <Suspense fallback={<PageLoader />}>
+                  <RouteAnalytics />
                   <ScrollToTop />
                   <AnimatedRoutes />
                 </Suspense>

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "../lib/motion";
 import { Icon } from "@iconify/react";
+import { usePostHog } from "@posthog/react";
 import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
 import { useSocialPopover } from "../context/SocialPopoverContext";
@@ -9,6 +10,7 @@ import { motionInteraction, motionTransition } from "../utils/motionContract";
 
 const Navbar = () => {
   const location = useLocation();
+  const posthog = usePostHog();
 
   const mainLinks = [
     { name: "Home", path: "/", icon: "tabler:home" },
@@ -101,6 +103,13 @@ const Navbar = () => {
                     to={link.path}
                     end={link.path === "/"}
                     className="relative block w-11 h-10 sm:w-14 sm:h-11 md:w-16 md:h-12"
+                    onClick={() =>
+                      posthog?.capture("navbar_link_clicked", {
+                        link_name: link.name,
+                        link_path: link.path,
+                        from_path: location.pathname,
+                      })
+                    }
                     style={{
                       transformStyle: "preserve-3d",
                       perspective: "600px",
@@ -169,7 +178,13 @@ const Navbar = () => {
                       transformStyle: "preserve-3d",
                       perspective: "600px",
                     }}
-                    onClick={() => toggleSocialPopover()}
+                    onClick={() => {
+                      posthog?.capture("navbar_connect_clicked", {
+                        action: socialOpen ? "close" : "open",
+                        from_path: location.pathname,
+                      });
+                      toggleSocialPopover();
+                    }}
                   >
                     {/* 3D Cube container */}
                     <motion.div

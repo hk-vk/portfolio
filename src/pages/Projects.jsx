@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
+import { usePostHog } from '@posthog/react';
 import AnimatedSection from '../components/AnimatedSection';
 import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
@@ -101,6 +102,7 @@ const SectionDivider = () => (
 const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const posthog = usePostHog();
   const { toggleSocialPopover } = useSocialPopover();
   const contactButtonRef = useRef(null);
 
@@ -161,7 +163,13 @@ const Projects = () => {
                 {categories.map((category) => (
                   <button
                     key={category}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => {
+                      setSelectedCategory(category);
+                      posthog?.capture('projects_filter_selected', {
+                        category,
+                        previous_category: selectedCategory,
+                      });
+                    }}
                     className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium active:scale-[0.97] transition-[background-color,color,transform] duration-150 ${
                       selectedCategory === category
                         ? 'bg-primary text-primary-foreground'
@@ -189,7 +197,14 @@ const Projects = () => {
                 variants={cardMotion.itemVariants}
                 whileHover={cardMotion.hover}
                 whileTap={cardMotion.press}
-                onClick={() => setSelectedProjectId(project.id)}
+                onClick={() => {
+                  setSelectedProjectId(project.id);
+                  posthog?.capture('project_modal_opened', {
+                    project_id: project.id,
+                    project_title: project.title,
+                    category: project.category,
+                  });
+                }}
               >
                   <div className="relative overflow-hidden aspect-video bg-muted">
                     <img
@@ -221,7 +236,16 @@ const Projects = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            posthog?.capture('project_link_clicked', {
+                              source: 'projects_card',
+                              link_type: 'live_demo',
+                              project_id: project.id,
+                              project_title: project.title,
+                              link_url: project.liveUrl,
+                            });
+                          }}
                         >
                           <Icon icon="tabler:external-link" className="w-3.5 h-3.5" />
                           Live Demo
@@ -233,7 +257,16 @@ const Projects = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            posthog?.capture('project_link_clicked', {
+                              source: 'projects_card',
+                              link_type: 'source_code',
+                              project_id: project.id,
+                              project_title: project.title,
+                              link_url: project.githubUrl,
+                            });
+                          }}
                         >
                           <Icon icon="tabler:brand-github" className="w-3.5 h-3.5" />
                           Source
@@ -255,7 +288,12 @@ const Projects = () => {
               </p>
               <button
                 ref={contactButtonRef}
-                onClick={() => toggleSocialPopover(contactButtonRef)}
+                onClick={() => {
+                  posthog?.capture('projects_contact_cta_clicked', {
+                    cta_label: 'Get in Touch',
+                  });
+                  toggleSocialPopover(contactButtonRef);
+                }}
                 className="button-primary inline-flex items-center active:scale-[0.97] transition-transform duration-150"
               >
                 Get in Touch
@@ -299,7 +337,14 @@ const Projects = () => {
                     <h2 className="text-2xl md:text-3xl font-bold leading-tight">{selectedProject.title}</h2>
                   </div>
                   <button
-                    onClick={() => setSelectedProjectId(null)}
+                    onClick={() => {
+                      setSelectedProjectId(null);
+                      posthog?.capture('project_modal_closed', {
+                        project_id: selectedProject.id,
+                        project_title: selectedProject.title,
+                        close_method: 'close_button',
+                      });
+                    }}
                     className="text-muted-foreground hover:text-foreground active:scale-[0.97] transition-[color,transform] duration-150"
                     aria-label="Close project details"
                   >
@@ -337,12 +382,40 @@ const Projects = () => {
 
                     <div className="space-y-3">
                       {selectedProject.liveUrl && (
-                        <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer" className="button-primary inline-flex items-center w-full justify-center">
+                        <a
+                          href={selectedProject.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="button-primary inline-flex items-center w-full justify-center"
+                          onClick={() =>
+                            posthog?.capture('project_link_clicked', {
+                              source: 'projects_modal',
+                              link_type: 'visit_live',
+                              project_id: selectedProject.id,
+                              project_title: selectedProject.title,
+                              link_url: selectedProject.liveUrl,
+                            })
+                          }
+                        >
                           Visit Live
                         </a>
                       )}
                       {selectedProject.githubUrl && (
-                        <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer" className="button-secondary inline-flex items-center w-full justify-center">
+                        <a
+                          href={selectedProject.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="button-secondary inline-flex items-center w-full justify-center"
+                          onClick={() =>
+                            posthog?.capture('project_link_clicked', {
+                              source: 'projects_modal',
+                              link_type: 'view_source',
+                              project_id: selectedProject.id,
+                              project_title: selectedProject.title,
+                              link_url: selectedProject.githubUrl,
+                            })
+                          }
+                        >
                           View Source
                         </a>
                       )}
@@ -352,7 +425,14 @@ const Projects = () => {
 
                 <div className="mt-7 pt-4 border-t border-border/40 flex items-center justify-between">
                   <button
-                    onClick={() => moveModal(-1)}
+                    onClick={() => {
+                      moveModal(-1);
+                      posthog?.capture('project_modal_navigated', {
+                        direction: 'previous',
+                        project_id: selectedProject.id,
+                        project_title: selectedProject.title,
+                      });
+                    }}
                     className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 active:scale-[0.97] transition-[color,transform] duration-150"
                     disabled={filteredProjects.length <= 1}
                   >
@@ -360,7 +440,14 @@ const Projects = () => {
                     Previous
                   </button>
                   <button
-                    onClick={() => moveModal(1)}
+                    onClick={() => {
+                      moveModal(1);
+                      posthog?.capture('project_modal_navigated', {
+                        direction: 'next',
+                        project_id: selectedProject.id,
+                        project_title: selectedProject.title,
+                      });
+                    }}
                     className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 active:scale-[0.97] transition-[color,transform] duration-150"
                     disabled={filteredProjects.length <= 1}
                   >

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
+import { usePostHog } from '@posthog/react';
 
 /**
  * SocialPopover – A small pop-up with social media links.
@@ -12,6 +13,7 @@ import { Icon } from '@iconify/react';
  */
 const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   const panelRef = useRef(null);
+  const posthog = usePostHog();
 
   // Close on outside click or ESC key
   useEffect(() => {
@@ -97,6 +99,13 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
               href={l.href}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                posthog?.capture('social_popover_link_clicked', {
+                  link_label: l.label,
+                  link_href: l.href,
+                  path: window.location.pathname,
+                })
+              }
               className="text-2xl text-foreground hover:text-primary active:scale-95 transition-[color,transform] duration-150 ease-out"
               initial={{ opacity: 0, y: 6, scale: 0.9, rotate: -2 }}
               animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}

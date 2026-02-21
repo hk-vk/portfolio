@@ -4,18 +4,22 @@ import { motion } from '../lib/motion';
 import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
 import SEOHead from '../components/SEOHead';
+import { usePostHog } from '@posthog/react';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
 import { client, urlFor } from '../lib/sanity';
 
-const BlogPostCard = ({ post }) => (
+const BLOG_LIST_CACHE_KEY = 'blog:list:v1';
+const formatViews = (count) => `${new Intl.NumberFormat().format(count || 0)} views`;
+
+const BlogPostCard = ({ post, onCardClick }) => (
   <motion.div
     className="group h-full"
     variants={cardMotion.itemVariants}
     whileHover={cardMotion.hover}
     whileTap={cardMotion.press}
   >
-    <Link to={`/blog/${post.slug.current}`} className="block h-full">
+    <Link to={`/blog/${post.slug.current}`} className="block h-full" onClick={() => onCardClick(post)}>
       <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
                       hover:border-primary/30 hover:shadow-lg 
                       transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl 
@@ -57,6 +61,8 @@ const BlogPostCard = ({ post }) => (
           </h2>
           <p className="text-xs text-muted-foreground/80 mb-3 uppercase tracking-wider font-medium">
             {new Date(post.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+            {' '}•{' '}
+            {formatViews(post.viewCount)}
           </p>
           <p className="text-muted-foreground mb-6 text-sm leading-relaxed line-clamp-3">
             {post.excerpt}
@@ -80,8 +86,31 @@ const BlogPostCard = ({ post }) => (
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewCounts, setViewCounts] = useState({});
+  const posthog = usePostHog();
+
+  const handleBlogCardClick = (post) => {
+    posthog?.capture('blog_card_clicked', {
+      post_slug: post?.slug?.current,
+      post_title: post?.title,
+      current_path: window.location.pathname,
+    });
+  };
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(BLOG_LIST_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setBlogPosts(parsed);
+          setIsLoading(false);
+        }
+      }
+    } catch {
+      // ignore cache parse issues
+    }
+
     const query = `*[_type == "post"] | order(publishedAt desc) {
       _id,
       title,
@@ -95,8 +124,29 @@ const Blog = () => {
       .then((data) => {
         setBlogPosts(data);
         setIsLoading(false);
+        try {
+          sessionStorage.setItem(BLOG_LIST_CACHE_KEY, JSON.stringify(data));
+        } catch {
+          // ignore storage write issues
+        }
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error(error);
+        setIsLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/blog-view-counts')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.ok && data?.counts) {
+          setViewCounts(data.counts);
+        }
+      })
+      .catch(() => {
+        // keep view count fallback as 0 when API is unavailable
+      });
   }, []);
 
   return (
@@ -154,7 +204,14 @@ const Blog = () => {
               animate="visible"
             >
               {blogPosts.map((post) => (
-                <BlogPostCard key={post._id} post={post} />
+                <BlogPostCard
+                  key={post._id}
+                  post={{
+                    ...post,
+                    viewCount: viewCounts[post?.slug?.current] || 0,
+                  }}
+                  onCardClick={handleBlogCardClick}
+                />
               ))}
             </motion.div>
           ) : (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from '../lib/motion';
+import { usePostHog } from '@posthog/react';
 import { themeToggle } from '../utils/themeToggle';
 import { spring } from '../utils/motionSettings';
 import { motionInteraction } from '../utils/motionContract';
@@ -10,6 +11,7 @@ import { motionInteraction } from '../utils/motionContract';
 const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
   const { toggleTheme } = themeToggle();
+  const posthog = usePostHog();
   
   useEffect(() => {
     // Set initial state based on current theme
@@ -22,8 +24,14 @@ const ThemeToggle = () => {
     const y = event.clientY;
 
     const performToggle = () => {
+      const previousTheme = isDark ? 'dark' : 'light';
       const newTheme = toggleTheme();
       setIsDark(newTheme === 'dark');
+      posthog?.capture('theme_toggled', {
+        from_theme: previousTheme,
+        to_theme: newTheme,
+        path: window.location.pathname,
+      });
     };
 
     if (!document.startViewTransition) {

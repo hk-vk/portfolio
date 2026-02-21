@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { usePostHog } from '@posthog/react';
 import SparkleIllustration from './SparkleIllustration';
 import FlowerIllustration from './FlowerIllustration';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const posthog = usePostHog();
 
   const socialLinks = [
     { name: 'GitHub', url: 'https://github.com/hk-vk', icon: 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z' },
@@ -110,6 +112,13 @@ const Footer = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    posthog?.capture('footer_social_clicked', {
+                      social_name: link.name,
+                      social_url: link.url,
+                      path: window.location.pathname,
+                    })
+                  }
                   className="text-foreground hover:text-primary transition-colors"
                   whileHover={{ scale: 1.1, y: -2 }}
                   transition={{ type: "spring", stiffness: 400 }}
@@ -139,22 +148,38 @@ const Footer = () => {
               </h3>
               <ul className="space-y-3">
                 <motion.li whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400 }}>
-                  <Link to="/" className="text-muted-foreground hover:text-primary transition-colors animated-underline">
+                  <Link
+                    to="/"
+                    className="text-muted-foreground hover:text-primary transition-colors animated-underline"
+                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'Home', link_path: '/' })}
+                  >
                     Home
                   </Link>
                 </motion.li>
                 <motion.li whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400 }}>
-                  <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors animated-underline">
+                  <Link
+                    to="/about"
+                    className="text-muted-foreground hover:text-primary transition-colors animated-underline"
+                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'About', link_path: '/about' })}
+                  >
                     About
                   </Link>
                 </motion.li>
                 <motion.li whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400 }}>
-                  <Link to="/projects" className="text-muted-foreground hover:text-primary transition-colors animated-underline">
+                  <Link
+                    to="/projects"
+                    className="text-muted-foreground hover:text-primary transition-colors animated-underline"
+                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'Projects', link_path: '/projects' })}
+                  >
                     Projects
                   </Link>
                 </motion.li>
                 <motion.li whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400 }}>
-                  <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors animated-underline">
+                  <Link
+                    to="/contact"
+                    className="text-muted-foreground hover:text-primary transition-colors animated-underline"
+                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'Contact', link_path: '/contact' })}
+                  >
                     Contact
                   </Link>
                 </motion.li>
@@ -173,7 +198,16 @@ const Footer = () => {
                     whileHover={{ x: 3 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
-                    <Link to={category.path} className="text-muted-foreground hover:text-primary transition-colors text-sm animated-underline">
+                    <Link
+                      to={category.path}
+                      className="text-muted-foreground hover:text-primary transition-colors text-sm animated-underline"
+                      onClick={() =>
+                        posthog?.capture('footer_expertise_clicked', {
+                          category_name: category.name,
+                          category_path: category.path,
+                        })
+                      }
+                    >
                       {category.name}
                     </Link>
                   </motion.li>
@@ -193,12 +227,20 @@ const Footer = () => {
           <p>© {currentYear} PORTFOLIO. All rights reserved.</p>
           <div className="flex space-x-8 mt-6 md:mt-0">
             <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400 }}>
-              <Link to="/privacy" className="hover:text-primary transition-colors">
+              <Link
+                to="/privacy"
+                className="hover:text-primary transition-colors"
+                onClick={() => posthog?.capture('footer_policy_clicked', { policy: 'privacy' })}
+              >
                 Privacy Policy
               </Link>
             </motion.div>
             <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 400 }}>
-              <Link to="/terms" className="hover:text-primary transition-colors">
+              <Link
+                to="/terms"
+                className="hover:text-primary transition-colors"
+                onClick={() => posthog?.capture('footer_policy_clicked', { policy: 'terms' })}
+              >
                 Terms of Service
               </Link>
             </motion.div>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from '../lib/motion';
+import { usePostHog } from '@posthog/react';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 
 const Contact = () => {
+  const posthog = usePostHog();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,6 +23,9 @@ const Contact = () => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.message) {
+      posthog?.capture('contact_form_submit_failed', {
+        reason: 'missing_required_fields',
+      });
       return;
     }
 
@@ -29,6 +34,11 @@ const Contact = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
+      posthog?.capture('contact_form_submitted', {
+        has_name: Boolean(formData.name),
+        has_email: Boolean(formData.email),
+        message_length: formData.message.length,
+      });
       setFormData({ name: '', email: '', message: '' });
     }, 1000);
   };
@@ -210,6 +220,12 @@ const Contact = () => {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    posthog?.capture('contact_social_clicked', {
+                      social_name: link.name,
+                      social_href: link.href,
+                    })
+                  }
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -239,12 +255,24 @@ const Contact = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="mailto:vkharikrishnan45@gmail.com?subject=Project Inquiry"
+              onClick={() =>
+                posthog?.capture('contact_quick_action_clicked', {
+                  action_name: 'quick_email',
+                  action_href: 'mailto:vkharikrishnan45@gmail.com?subject=Project Inquiry',
+                })
+              }
               className="px-6 py-2 border border-border rounded-lg hover:bg-muted transition-colors"
             >
               📧 Quick Email
             </a>
             <a
               href="/projects"
+              onClick={() =>
+                posthog?.capture('contact_quick_action_clicked', {
+                  action_name: 'view_my_work',
+                  action_href: '/projects',
+                })
+              }
               className="px-6 py-2 border border-border rounded-lg hover:bg-muted transition-colors"
             >
               🔍 View My Work

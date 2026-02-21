@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from '../lib/motion';
+import { usePostHog } from '@posthog/react';
 import {
   duration,
   entrance,
@@ -37,6 +38,7 @@ QuickLoader.displayName = 'QuickLoader';
 // Optimized project card with intersection observer and image loading
 const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const posthog = usePostHog();
 
   const cardVariants = cardMotion.itemVariants;
 
@@ -98,6 +100,14 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                posthog?.capture('featured_project_link_clicked', {
+                  link_type: 'live_demo',
+                  project_id: project.id,
+                  project_title: project.title,
+                  link_url: project.liveUrl,
+                })
+              }
               className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
             >
               <Icon icon="tabler:external-link" className="w-3.5 h-3.5" />
@@ -109,6 +119,14 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                posthog?.capture('featured_project_link_clicked', {
+                  link_type: 'source_code',
+                  project_id: project.id,
+                  project_title: project.title,
+                  link_url: project.githubUrl,
+                })
+              }
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <Icon icon="tabler:brand-github" className="w-3.5 h-3.5" />
@@ -270,6 +288,7 @@ ExperienceItem.displayName = 'ExperienceItem';
 
 const Home = memo(() => {
   const motionSafe = useMotionSafe();
+  const posthog = usePostHog();
 
   // Use optimized intersection observer hooks
   const [heroRef, heroVisible] = useIntersectionObserver({ threshold: 0.1 });
@@ -541,6 +560,11 @@ const Home = memo(() => {
             >
               <Link
                 to="/projects"
+                onClick={() =>
+                  posthog?.capture('home_view_all_projects_clicked', {
+                    from_path: window.location.pathname,
+                  })
+                }
                 className="button-primary btn-gloss inline-flex items-center group"
               >
                 View All Projects

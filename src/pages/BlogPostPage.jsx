@@ -5,6 +5,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import { motion, AnimatePresence } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { usePostHog } from '@posthog/react';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { Icon } from "@iconify/react";
@@ -51,6 +52,8 @@ const stripMarkdown = (markdownText) => {
   
   return plainText.trim();
 };
+
+const getPostCacheKey = (slug) => `blog:post:${slug}`;
 
 const SpeedReaderOverlay = ({ 
   isActive, 
@@ -389,6 +392,8 @@ const BlogPostPage = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const posthog = usePostHog();
+  const trackedViewRef = useRef(null);
 
   // Speed Reader State
   const [isReaderOpen, setIsReaderOpen] = useState(false);
@@ -445,6 +450,19 @@ const BlogPostPage = () => {
   };
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(getPostCacheKey(postId));
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.title && parsed?.content) {
+          setPost(parsed);
+          setLoading(false);
+        }
+      }
+    } catch {
+      // ignore cache parse issues
+    }
+
     const query = `*[_type == "post" && slug.current == $slug][0]{
       title,
       slug,
@@ -460,12 +478,29 @@ const BlogPostPage = () => {
           // Map Sanity data to local state format
           setPost({
             title: data.title,
+            slug: data.slug?.current,
             date: new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }),
             content: data.body, // Assuming plain markdown text for now
             imageUrl: data.mainImage ? urlFor(data.mainImage).url() : null,
             excerpt: data.excerpt,
             category: "Blog" // Default category
           });
+          try {
+            sessionStorage.setItem(
+              getPostCacheKey(postId),
+              JSON.stringify({
+                title: data.title,
+                slug: data.slug?.current,
+                date: new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }),
+                content: data.body,
+                imageUrl: data.mainImage ? urlFor(data.mainImage).url() : null,
+                excerpt: data.excerpt,
+                category: "Blog",
+              })
+            );
+          } catch {
+            // ignore storage write issues
+          }
         } else {
           setPost(null);
         }
@@ -486,6 +521,20 @@ const BlogPostPage = () => {
       };
     }
   }, [post]);
+
+  useEffect(() => {
+    if (!post || !postId) return;
+    if (trackedViewRef.current === postId) return;
+
+    posthog?.capture('blog_post_viewed', {
+      post_slug: postId,
+      post_title: post.title,
+      post_category: post.category || 'Article',
+      current_path: window.location.pathname,
+      referrer: document.referrer || null,
+    });
+    trackedViewRef.current = postId;
+  }, [post, postId, posthog]);
 
   if (loading) {
     return (
@@ -533,7 +582,17 @@ const BlogPostPage = () => {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="mb-6"
           >
-            <Link to="/blog" className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/30 border border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200 group" aria-label="Back to Blog">
+            <Link
+              to="/blog"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/30 border border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200 group"
+              aria-label="Back to Blog"
+              onClick={() =>
+                posthog?.capture('blog_post_back_clicked', {
+                  post_slug: postId,
+                  post_title: post?.title,
+                })
+              }
+            >
               <Icon icon="tabler:arrow-left" className="text-xl group-hover:-translate-x-0.5 transition-transform" />
             </Link>
           </motion.div>
@@ -564,7 +623,13 @@ const BlogPostPage = () => {
             
             <div className="flex items-center gap-4 sm:gap-6 self-start sm:self-auto">
               <button 
-                onClick={() => setIsReaderOpen(true)}
+                onClick={() => {
+                  setIsReaderOpen(true);
+                  posthog?.capture('blog_speed_reader_opened', {
+                    post_slug: postId,
+                    post_title: post?.title,
+                  });
+                }}
                 className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer group"
                 title="Enter Speed Reader Mode"
               >

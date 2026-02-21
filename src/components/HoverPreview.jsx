@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { usePostHog } from "@posthog/react";
 
 // Context
 const HoverPreviewContext = createContext(null);
@@ -27,12 +28,14 @@ export function HoverPreviewProvider({
   cursorOffset = 20,
   preloadImages = true,
 }) {
+  const posthog = usePostHog();
   const [activePreview, setActivePreview] = useState(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef(null);
 
   const cardHeight = 200;
+  const trackedPreviewKeysRef = useRef(new Set());
 
   // Preload all images on mount
   useEffect(() => {
@@ -73,12 +76,20 @@ export function HoverPreviewProvider({
       }
       const previewData = data[key];
       if (previewData) {
+        if (!trackedPreviewKeysRef.current.has(key)) {
+          posthog?.capture("hover_preview_opened", {
+            preview_key: key,
+            preview_title: previewData.title || null,
+            path: window.location.pathname,
+          });
+          trackedPreviewKeysRef.current.add(key);
+        }
         setActivePreview(previewData);
         setIsVisible(true);
         updatePosition(e);
       }
     },
-    [data, updatePosition]
+    [data, updatePosition, posthog]
   );
 
   const handleHoverMove = useCallback(
