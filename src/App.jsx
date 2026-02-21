@@ -14,9 +14,10 @@ import PageTransition from './components/PageTransition';
 import MotionProvider from './components/MotionProvider';
 import { SmoothScrollProvider } from './context/SmoothScrollContext';
 import { lazyWithRetry } from './utils/lazyWithRetry';
+import Home from './pages/Home';
+import ScrollToTop from './utils/ScrollToTop';
 
 // Lazy load all pages for code splitting and faster initial load
-const Home = lazyWithRetry(() => import('./pages/Home'));
 const About = lazyWithRetry(() => import('./pages/About'));
 const Projects = lazyWithRetry(() => import('./pages/Projects'));
 const Contact = lazyWithRetry(() => import('./pages/Contact'));
@@ -24,22 +25,9 @@ const Blog = lazyWithRetry(() => import('./pages/Blog'));
 const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage'));
 const OGPreview = lazyWithRetry(() => import('./pages/OGPreview'));
 
-// Lazy load utilities for better performance
-const ScrollToTop = lazyWithRetry(() => import('./utils/ScrollToTop'));
-
-// Lightweight loading fallback component - minimal to avoid flash
+// Route-level fallback: no skeleton pulse to avoid cross-page shimmer leakage
 const PageLoader = () => (
-  <div className="min-h-[60vh] bg-background flex items-center justify-center px-6">
-    <div className="w-full max-w-3xl space-y-4 animate-pulse">
-      <div className="h-10 w-1/2 bg-muted/50 rounded-md" />
-      <div className="h-4 w-3/4 bg-muted/40 rounded-md" />
-      <div className="h-4 w-2/3 bg-muted/40 rounded-md" />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        <div className="h-40 bg-muted/30 rounded-xl" />
-        <div className="h-40 bg-muted/30 rounded-xl" />
-      </div>
-    </div>
-  </div>
+  <div className="min-h-[60vh] bg-background" aria-hidden="true" />
 );
 
 class RouteErrorBoundary extends React.Component {
@@ -55,6 +43,12 @@ class RouteErrorBoundary extends React.Component {
   componentDidCatch(error) {
     // Keep this in console for debugging route-level crashes
     console.error('Route render error:', error);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.locationKey !== this.props.locationKey) {
+      this.setState({ hasError: false });
+    }
   }
 
   render() {
@@ -79,6 +73,15 @@ class RouteErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
+const RouteErrorBoundaryWithLocation = ({ children }) => {
+  const location = useLocation();
+  return (
+    <RouteErrorBoundary locationKey={location.pathname}>
+      {children}
+    </RouteErrorBoundary>
+  );
+};
 
 const NotFound = () => (
   <div className="min-h-[60vh] flex items-center justify-center px-6">
@@ -177,13 +180,13 @@ function App() {
             <div className="min-h-screen bg-background">
               <Navbar />
               <main className="relative">
-                <RouteErrorBoundary>
+                <RouteErrorBoundaryWithLocation>
                   <Suspense fallback={<PageLoader />}>
                     <RouteAnalytics />
                     <ScrollToTop />
                     <AnimatedRoutes />
                   </Suspense>
-                </RouteErrorBoundary>
+                </RouteErrorBoundaryWithLocation>
               </main>
             </div>
           </SmoothScrollProvider>

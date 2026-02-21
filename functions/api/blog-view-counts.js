@@ -56,7 +56,7 @@ export async function onRequestGet(context) {
             '/$',
             ''
           ) AS post_slug,
-          count() AS views
+          count(DISTINCT person_id) AS views
         FROM events
         WHERE event = 'blog_post_viewed'
           AND coalesce(

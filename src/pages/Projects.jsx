@@ -193,7 +193,7 @@ const Projects = () => {
             {filteredProjects.map((project) => (
               <motion.article
                 key={project.id}
-                className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-[border-color,box-shadow,transform] duration-200 cursor-pointer"
+                className="group relative flex flex-col h-full bg-card/40 backdrop-blur-md border border-border/40 rounded-xl overflow-hidden hover:border-primary/20 hover:bg-card/60 transition-all duration-300 cursor-pointer"
                 variants={cardMotion.itemVariants}
                 whileHover={cardMotion.hover}
                 whileTap={cardMotion.press}
@@ -206,49 +206,71 @@ const Projects = () => {
                   });
                 }}
               >
-                  <div className="relative overflow-hidden aspect-video bg-muted">
+                  {/* Image Container */}
+                  <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-150"
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute top-3 left-3 text-[10px] font-semibold tracking-[0.18em] text-foreground/80 bg-background/80 border border-border/60 rounded px-2 py-1">
-                      {project.id}
+                    
+                    {/* Overlay Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+
+                    {/* Top Badges */}
+                    <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+                      <span className="bg-background/90 backdrop-blur text-[10px] font-mono font-bold tracking-wider px-2 py-1 rounded border border-border/50 text-foreground shadow-sm">
+                        {project.id}
+                      </span>
+                      <span className="bg-primary/90 backdrop-blur text-[10px] font-medium tracking-wide px-2 py-1 rounded text-primary-foreground shadow-sm">
+                        {project.category}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="p-5">
-                    <h2 className="text-lg font-bold mb-1.5 leading-tight">{project.title}</h2>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
+                  {/* Content */}
+                  <div className="flex flex-col flex-grow p-5">
+                    <div className="flex-grow">
+                      <h2 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-200">
+                        {project.title}
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-4">
+                        {project.description}
+                      </p>
+                    </div>
 
-                    <div className="flex flex-wrap gap-1.5 mb-4">
+                    {/* Tech Stack */}
+                    <div className="flex flex-wrap gap-1.5 mb-5">
                       {project.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="skill-tag text-[10px]">
+                        <span 
+                          key={tag} 
+                          className="px-2 py-0.5 rounded text-[10px] font-mono text-muted-foreground bg-muted/30 border border-border/30"
+                        >
                           {tag}
                         </span>
                       ))}
+                      {project.tags.length > 3 && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono text-muted-foreground bg-muted/30 border border-border/30">
+                          +{project.tags.length - 3}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-4 pt-3 border-t border-border/40">
+                    {/* Actions Footer */}
+                    <div className="flex items-center gap-3 pt-4 mt-auto border-t border-border/30">
                       {project.liveUrl && (
                         <a
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-background border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200 hover:scale-110"
+                          title="Live Demo"
                           onClick={(e) => {
                             e.stopPropagation();
-                            posthog?.capture('project_link_clicked', {
-                              source: 'projects_card',
-                              link_type: 'live_demo',
-                              project_id: project.id,
-                              project_title: project.title,
-                              link_url: project.liveUrl,
-                            });
+                            posthog?.capture('project_link_clicked', { source: 'projects_card', link_type: 'live_demo', project_id: project.id });
                           }}
                         >
-                          <Icon icon="tabler:external-link" className="w-3.5 h-3.5" />
-                          Live Demo
+                          <Icon icon="tabler:external-link" className="w-4 h-4" />
                         </a>
                       )}
                       {project.githubUrl && (
@@ -256,20 +278,14 @@ const Projects = () => {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-background border border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 hover:scale-110"
+                          title="Source Code"
                           onClick={(e) => {
                             e.stopPropagation();
-                            posthog?.capture('project_link_clicked', {
-                              source: 'projects_card',
-                              link_type: 'source_code',
-                              project_id: project.id,
-                              project_title: project.title,
-                              link_url: project.githubUrl,
-                            });
+                            posthog?.capture('project_link_clicked', { source: 'projects_card', link_type: 'source_code', project_id: project.id });
                           }}
                         >
-                          <Icon icon="tabler:brand-github" className="w-3.5 h-3.5" />
-                          Source
+                          <Icon icon="tabler:brand-github" className="w-4 h-4" />
                         </a>
                       )}
                     </div>

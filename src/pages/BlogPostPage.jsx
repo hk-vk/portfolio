@@ -6,18 +6,45 @@ import { motion, AnimatePresence } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { usePostHog } from '@posthog/react';
-import Shimmer from '../components/Shimmer';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { Icon } from "@iconify/react";
 import { client, urlFor } from '../lib/sanity';
 
+const toPlainContent = (value) => {
+  if (typeof value === 'string') return value;
+  if (!value) return '';
+
+  if (Array.isArray(value)) {
+    return value
+      .map((block) => {
+        if (typeof block === 'string') return block;
+        if (block && Array.isArray(block.children)) {
+          return block.children
+            .map((child) => (typeof child?.text === 'string' ? child.text : ''))
+            .join('');
+        }
+        return '';
+      })
+      .filter(Boolean)
+      .join('\n\n');
+  }
+
+  if (typeof value === 'object') {
+    // Graceful fallback for unknown content shapes
+    return '';
+  }
+
+  return String(value);
+};
+
 // Utility function to strip Markdown syntax
 const stripMarkdown = (markdownText) => {
-  if (!markdownText) return '';
+  const normalizedText = toPlainContent(markdownText);
+  if (!normalizedText) return '';
   
   // Replace headers
-  let plainText = markdownText.replace(/^#{1,6}\s+/gm, '');
+  let plainText = normalizedText.replace(/^#{1,6}\s+/gm, '');
   
   // Replace bold and italic
   plainText = plainText.replace(/\*\*(.+?)\*\*/g, '$1'); // Bold
@@ -70,20 +97,26 @@ const toWordEntries = (items) => {
 
 const BlogPostSkeleton = () => (
   <div className="pt-32 pb-20">
-    <div className="content-container max-w-3xl mx-auto">
-      <div className="w-10 h-10 rounded-full bg-muted/50 mb-6" />
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-foreground">Loading blog title</h1>
-      <div className="flex items-center gap-3 text-xs sm:text-sm font-medium uppercase tracking-wider text-muted-foreground mb-12 border-b border-border/40 pb-6">
-        <span>Loading date</span>
-        <span className="w-1 h-1 rounded-full bg-border"></span>
-        <span>Loading read time</span>
+    <div className="content-container max-w-2xl mx-auto">
+      <div className="w-10 h-10 rounded-full bg-muted/45 mb-6 animate-pulse" />
+
+      <div className="space-y-3 mb-6">
+        <div className="h-12 sm:h-14 rounded-md bg-muted/40 w-[92%] animate-pulse" />
+        <div className="h-12 sm:h-14 rounded-md bg-muted/35 w-[72%] animate-pulse" />
       </div>
-      <div className="w-full h-[320px] rounded-lg bg-muted/50 mb-8" />
-      <div className="space-y-4">
-        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
-        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
-        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
-        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
+
+      <div className="flex items-center gap-3 mb-8 border-b border-border/30 pb-5">
+        <div className="h-3.5 rounded-full bg-muted/35 w-28 animate-pulse" />
+        <div className="w-1 h-1 rounded-full bg-border/60" />
+        <div className="h-3.5 rounded-full bg-muted/35 w-16 animate-pulse" />
+      </div>
+
+      <div className="w-full h-[220px] sm:h-[280px] rounded-lg bg-muted/40 mb-8 animate-pulse" />
+
+      <div className="space-y-3">
+        <div className="h-4 rounded-md bg-muted/35 w-full animate-pulse" />
+        <div className="h-4 rounded-md bg-muted/35 w-[94%] animate-pulse" />
+        <div className="h-4 rounded-md bg-muted/35 w-[86%] animate-pulse" />
       </div>
     </div>
   </div>
@@ -456,6 +489,7 @@ const BlogPostPage = () => {
   // Text-to-Speech State
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [hasVoiceLoaded, setHasVoiceLoaded] = useState(false);
+  const safeContent = useMemo(() => toPlainContent(post?.content), [post?.content]);
   
   // Ensure voices are loaded (browsers load them asynchronously)
   useEffect(() => {
@@ -480,7 +514,7 @@ const BlogPostPage = () => {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      const text = stripMarkdown(post.content);
+      const text = stripMarkdown(safeContent);
       const utterance = new SpeechSynthesisUtterance(text);
       
       // Use system default voice for en-US
@@ -508,7 +542,10 @@ const BlogPostPage = () => {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed?.title && parsed?.content) {
-          setPost(parsed);
+          setPost({
+            ...parsed,
+            content: toPlainContent(parsed.content),
+          });
           setLoading(false);
         }
       }
@@ -533,7 +570,7 @@ const BlogPostPage = () => {
             title: data.title,
             slug: data.slug?.current,
             date: new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }),
-            content: data.body, // Assuming plain markdown text for now
+            content: toPlainContent(data.body),
             imageUrl: data.mainImage ? urlFor(data.mainImage).url() : null,
             excerpt: data.excerpt,
             category: "Blog" // Default category
@@ -545,7 +582,7 @@ const BlogPostPage = () => {
                 title: data.title,
                 slug: data.slug?.current,
                 date: new Date(data.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }),
-                content: data.body,
+                content: toPlainContent(data.body),
                 imageUrl: data.mainImage ? urlFor(data.mainImage).url() : null,
                 excerpt: data.excerpt,
                 category: "Blog",
@@ -592,11 +629,7 @@ const BlogPostPage = () => {
   }, [post, postId, posthog]);
 
   if (loading) {
-    return (
-      <Shimmer loading={true}>
-        <BlogPostSkeleton />
-      </Shimmer>
-    );
+    return <BlogPostSkeleton />;
   }
 
   if (!post) {
@@ -607,7 +640,7 @@ const BlogPostPage = () => {
     <>
       <SEOHead 
         title={`${post.title} | Harikrishnan V K`}
-        description={post.excerpt || stripMarkdown(post.content).substring(0, 160) + '...'}
+        description={post.excerpt || `${stripMarkdown(safeContent).substring(0, 160)}...`}
         url={`/blog/${post.slug}`}
         type="article"
         image={post.imageUrl || "/og.jpg"}
@@ -618,7 +651,7 @@ const BlogPostPage = () => {
           <SpeedReaderOverlay 
             isActive={isReaderOpen}
             onClose={() => setIsReaderOpen(false)}
-            content={post.content}
+            content={safeContent}
             wordsPerMinute={wordsPerMinute}
             setWordsPerMinute={setWordsPerMinute}
             readerMode={readerMode}
@@ -669,7 +702,7 @@ const BlogPostPage = () => {
             <div className="flex items-center gap-3">
               <span>{post.date}</span>
               <span className="w-1 h-1 rounded-full bg-border"></span>
-              <span>{Math.max(1, Math.ceil(stripMarkdown(post.content).split(/\s+/).length / 200))} min read</span>
+              <span>{Math.max(1, Math.ceil(stripMarkdown(safeContent).split(/\s+/).filter(Boolean).length / 200))} min read</span>
               <span className="w-1 h-1 rounded-full bg-border"></span>
               <span className="text-primary">{post.category || "Article"}</span>
             </div>
@@ -727,7 +760,9 @@ const BlogPostPage = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.12, duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {safeContent}
+            </ReactMarkdown>
           </motion.div>
         </div>
       </AnimatedSection>

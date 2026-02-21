@@ -24,6 +24,17 @@
     <meta name="twitter:title" content="Harikrishnan V K | Full-Stack Developer Portfolio" />
     <meta name="twitter:description" content="Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey." />
     <meta name="twitter:image" content="https://hari.works/og.jpg" />
+    <script>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = savedTheme || (prefersDark ? 'dark' : 'light');
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+          document.documentElement.style.colorScheme = theme;
+        } catch (_) {}
+      })();
+    </script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

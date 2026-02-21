@@ -63,7 +63,10 @@ export function HoverPreviewProvider({
         y = e.clientY + cursorOffset;
       }
 
-      setPosition({ x, y });
+      setPosition((prev) => ({
+        x: prev.x + (x - prev.x) * 0.55,
+        y: prev.y + (y - prev.y) * 0.55,
+      }));
     },
     [cardWidth, cardHeight, cursorOffset]
   );
@@ -85,8 +88,8 @@ export function HoverPreviewProvider({
           trackedPreviewKeysRef.current.add(key);
         }
         setActivePreview(previewData);
-        setIsVisible(true);
         updatePosition(e);
+        setIsVisible(true);
       }
     },
     [data, updatePosition, posthog]
@@ -106,7 +109,7 @@ export function HoverPreviewProvider({
   const handleHoverEnd = useCallback(() => {
     hideTimeout.current = setTimeout(() => {
       setIsVisible(false);
-    }, 150);
+    }, 110);
   }, []);
 
   const handleCardEnter = useCallback(() => {
@@ -169,7 +172,7 @@ const HoverPreviewCard = forwardRef((_, ref) => {
   return (
     <div
       ref={ref}
-      className={`fixed z-50 transition-all duration-200 ease-out ${
+      className={`fixed z-50 transition-all duration-150 ease-out will-change-transform ${
         isVisible
           ? "scale-100 opacity-100 pointer-events-auto"
           : "translate-y-2 scale-95 opacity-0 pointer-events-none"

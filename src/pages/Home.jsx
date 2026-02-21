@@ -9,42 +9,28 @@ import {
 import { useMotionSafe } from '../utils/useMotionSafe';
 import { cardMotion, motionTransition, sequenceDelay } from '../utils/motionContract';
 import { Link } from 'react-router-dom';
-import { lazy, Suspense, memo, useMemo, useState, useEffect } from 'react';
+import { lazy, Suspense, memo, useMemo, useState, useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
 import SEOHead from '../components/SEOHead';
 import { Icon } from '@iconify/react';
 import { HoverPreviewProvider, HoverPreviewLink } from '../components/HoverPreview';
-
-// Direct import Waves - no lazy loading to ensure immediate visibility
 import Waves from '../components/Waves/Waves';
+import SparkleIllustration from '../components/SparkleIllustration';
+import HeroHighlightLine from '../components/HeroHighlightLine';
+import MagnetLines from '../components/MagnetLines';
 
 // Lazy load heavy components for better performance
 const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
-const SparkleIllustration = lazy(() => import('../components/SparkleIllustration'));
-const HeroHighlightLine = lazy(() => import('../components/HeroHighlightLine'));
-const MagnetLines = lazy(() => import('../components/MagnetLines'));
-
-// Lightweight fallback components for instant loading
-const QuickSparkle = memo(() => (
-  <div className="w-4 h-4 bg-primary rounded-full animate-pulse"></div>
-));
-QuickSparkle.displayName = 'QuickSparkle';
-
-const QuickLoader = memo(({ className }) => (
-  <div className={`bg-gradient-to-r from-muted to-muted/50 animate-pulse rounded ${className}`}></div>
-));
-QuickLoader.displayName = 'QuickLoader';
 
 // Optimized project card with intersection observer and image loading
 const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
   const posthog = usePostHog();
 
   const cardVariants = cardMotion.itemVariants;
 
   return (
     <motion.div
-      className="group bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-[border-color,box-shadow,transform] duration-200"
+      className="group relative flex flex-col h-full bg-card/40 backdrop-blur-md border border-border/40 rounded-xl overflow-hidden hover:border-primary/20 hover:bg-card/60 transition-all duration-300 cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
@@ -52,66 +38,71 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
       whileTap={motionSafe ? cardMotion.press : undefined}
       layout
     >
-      <div className="relative overflow-hidden aspect-video bg-muted">
+      {/* Image Container */}
+      <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
         <img
           src={project.image}
           alt={project.title}
-          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-200"
-          onLoad={() => setImageLoaded(true)}
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
+        
+        {/* Overlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
 
-        <AnimatePresence>
-          {!imageLoaded && (
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-muted to-muted/80 flex items-center justify-center"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: duration.quick / 1000, ease: "easeIn" }}
-            >
-              <div className="text-center">
-                <span className="text-4xl font-bold text-primary/40">{project.id}</span>
-                <p className="text-xs text-muted-foreground mt-1">Loading...</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Top ID Badge */}
+        <div className="absolute top-3 left-3">
+          <span className="bg-background/90 backdrop-blur text-[10px] font-mono font-bold tracking-wider px-2 py-1 rounded border border-border/50 text-foreground shadow-sm">
+            {project.id}
+          </span>
+        </div>
       </div>
 
-      <div className="p-5">
-        <h3 className="text-lg font-bold mb-1.5 text-foreground leading-tight">{project.title}</h3>
+      {/* Content */}
+      <div className="flex flex-col flex-grow p-5">
+        <div className="flex-grow">
+          <h3 className="text-lg font-bold mb-2 text-foreground leading-tight group-hover:text-primary transition-colors duration-200">
+            {project.title}
+          </h3>
 
-        {project.description && (
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
-            {project.description}
-          </p>
-        )}
+          {project.description && (
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+              {project.description}
+            </p>
+          )}
+        </div>
 
-        <div className="flex flex-wrap gap-1.5 mb-4">
+        {/* Tech Stack */}
+        <div className="flex flex-wrap gap-1.5 mb-5">
           {project.tags.slice(0, 3).map((tag) => (
-            <span key={`${project.id}-${tag}`} className="skill-tag text-[10px]">
+            <span 
+              key={`${project.id}-${tag}`} 
+              className="px-2 py-0.5 rounded text-[10px] font-mono text-muted-foreground bg-muted/30 border border-border/30"
+            >
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="flex items-center gap-4 pt-3 border-t border-border/40">
+        {/* Actions Footer */}
+        <div className="flex items-center gap-3 pt-4 mt-auto border-t border-border/30">
           {project.liveUrl && (
             <a
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 posthog?.capture('featured_project_link_clicked', {
                   link_type: 'live_demo',
                   project_id: project.id,
                   project_title: project.title,
                   link_url: project.liveUrl,
-                })
-              }
-              className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
+                });
+              }}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-background border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200 hover:scale-110"
+              title="Live Demo"
             >
-              <Icon icon="tabler:external-link" className="w-3.5 h-3.5" />
-              Live Demo
+              <Icon icon="tabler:external-link" className="w-4 h-4" />
             </a>
           )}
           {project.githubUrl && (
@@ -119,18 +110,19 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 posthog?.capture('featured_project_link_clicked', {
                   link_type: 'source_code',
                   project_id: project.id,
                   project_title: project.title,
                   link_url: project.githubUrl,
-                })
-              }
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                });
+              }}
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-background border border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 hover:scale-110"
+              title="Source Code"
             >
-              <Icon icon="tabler:brand-github" className="w-3.5 h-3.5" />
-              Source
+              <Icon icon="tabler:brand-github" className="w-4 h-4" />
             </a>
           )}
         </div>
@@ -199,9 +191,21 @@ const SkillTag = memo(({ skill, index, isVisible }) => {
 
 SkillTag.displayName = 'SkillTag';
 
-// Experience item with collapsible details
+// Experience item with spotlight effect and card-wide click
 const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const divRef = useRef(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
+
+  const handleMouseMove = (e) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  const handleMouseEnter = () => setOpacity(1);
+  const handleMouseLeave = () => setOpacity(0);
 
   return (
     <motion.div
@@ -213,72 +217,96 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
         delay: sequenceDelay(index)
       }}
     >
-      <div className="rounded-lg p-4 border border-border/30 hover:border-border/60 transition-colors">
-        <div className="flex items-start justify-between gap-4">
-          {/* Left: Title + Company */}
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-foreground leading-[1.25] pb-[0.05em]">{item.title}</p>
-              {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded hidden sm:inline-block">Current</span>}
+      <div 
+        ref={divRef}
+        onClick={() => item.details && setIsExpanded(!isExpanded)}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className={`relative rounded-xl p-0.5 overflow-hidden transition-all duration-300 ${item.details ? 'cursor-pointer' : ''}`}
+      >
+        {/* Spotlight Border Layer */}
+        <div 
+          className="absolute inset-0 z-0 transition-opacity duration-300"
+          style={{
+            opacity,
+            background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, hsl(var(--primary) / 0.15), transparent 40%)`
+          }}
+        />
+        
+        {/* Main Content Card */}
+        <div className="relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border border-border/40 p-5 h-full transition-colors hover:bg-card/90">
+          <div className="flex items-start justify-between gap-4">
+            {/* Left: Title + Company */}
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-foreground leading-[1.25] pb-[0.05em]">{item.title}</p>
+                {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded hidden sm:inline-block">Current</span>}
+              </div>
+              <div className="mt-0.5">
+                <span className="text-muted-foreground/60 text-sm">at </span>
+                <span onClick={(e) => e.stopPropagation()}>
+                  <HoverPreviewLink previewKey={item.companyKey}>
+                    {item.company}
+                  </HoverPreviewLink>
+                </span>
+              </div>
             </div>
-            <div className="mt-0.5">
-              <span className="text-muted-foreground/60 text-sm">at </span>
-              <HoverPreviewLink previewKey={item.companyKey}>
-                {item.company}
-              </HoverPreviewLink>
+
+            {/* Right: Date + Current label on mobile */}
+            <div className="flex flex-col items-end shrink-0 pt-0.5 gap-1">
+              <span className="text-xs text-muted-foreground">{item.date}</span>
+              {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded sm:hidden">Current</span>}
             </div>
           </div>
 
-          {/* Right: Date + Current label on mobile */}
-          <div className="flex flex-col items-end shrink-0 pt-0.5 gap-1">
-            <span className="text-xs text-muted-foreground">{item.date}</span>
-            {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded sm:hidden">Current</span>}
-          </div>
-        </div>
-
-        {/* Collapsible details */}
-        {item.details && (
-          <>
-            <button
-              className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              <Icon
-                icon={isExpanded ? "tabler:chevron-up" : "tabler:chevron-down"}
-                className="w-3.5 h-3.5"
-              />
-              <span>{isExpanded ? 'Less' : 'Details'}</span>
-            </button>
-            <AnimatePresence>
-              {isExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, scaleY: 0.96 }}
-                  animate={{ opacity: 1, scaleY: 1 }}
-                  exit={{ opacity: 0, scaleY: 0.96 }}
-                  transition={{ duration: duration.standard / 1000, ease: "easeOut" }}
-                  style={{ originY: 0 }}
-                  className="overflow-hidden"
+          {/* Collapsible details */}
+          {item.details && (
+            <>
+              <div className="mt-3 flex items-center justify-between">
+                <button
+                  className="inline-flex items-center gap-1 text-xs text-muted-foreground group-hover:text-primary transition-colors"
+                  // Button is visual only now since card handles click, but kept for accessibility/semantics
+                  type="button"
                 >
-                  <div className="mt-2 space-y-1.5">
-                    {item.details.map((detail) => (
-                      <div key={detail.text} className="text-sm text-muted-foreground">
-                        <span>{detail.text}</span>
-                        {detail.linkText && (
-                          <>
-                            {' — '}
-                            <HoverPreviewLink previewKey={detail.previewKey}>
-                              {detail.linkText}
-                            </HoverPreviewLink>
-                          </>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )}
+                  <Icon
+                    icon={isExpanded ? "tabler:chevron-up" : "tabler:chevron-down"}
+                    className="w-3.5 h-3.5"
+                  />
+                  <span>{isExpanded ? 'Less' : 'Details'}</span>
+                </button>
+              </div>
+              
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: duration.standard / 1000, ease: "easeOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-3 pt-3 border-t border-border/30 space-y-2" onClick={(e) => e.stopPropagation()}>
+                      {item.details.map((detail) => (
+                        <div key={detail.text} className="text-sm text-muted-foreground">
+                          <span>{detail.text}</span>
+                          {detail.linkText && (
+                            <>
+                              {' — '}
+                              <HoverPreviewLink previewKey={detail.previewKey}>
+                                {detail.linkText}
+                              </HoverPreviewLink>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -291,23 +319,19 @@ const Home = memo(() => {
   const posthog = usePostHog();
 
   // Use optimized intersection observer hooks
-  const [heroRef, heroVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const [heroRef] = useIntersectionObserver({ threshold: 0.1 });
   const [projectsRef, projectsVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [experienceRef, experienceVisible] = useIntersectionObserver({ threshold: 0.1 });
-
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Check for dark mode
   useEffect(() => {
     const checkDarkMode = () => {
       const isDark = document.documentElement.classList.contains('dark');
       setIsDarkMode(isDark);
     };
 
-    // Check initial state
     checkDarkMode();
 
-    // Set up a MutationObserver to watch for theme changes
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
@@ -319,10 +343,10 @@ const Home = memo(() => {
 
   // Memoize section visibility for performance
   const sectionsVisible = useMemo(() => ({
-    hero: heroVisible,
+    hero: true,
     projects: projectsVisible,
     experience: experienceVisible
-  }), [heroVisible, projectsVisible, experienceVisible]);
+  }), [projectsVisible, experienceVisible]);
 
   // Animation variants using Temporal Precision system
   const containerVariants = useMemo(() => ({
@@ -363,13 +387,11 @@ const Home = memo(() => {
             {/* Decorative Elements with conditional loading */}
             <motion.div
               className="absolute -right-10 top-20 opacity-80 z-10 hidden md:block"
-              initial={{ opacity: 0 }}
-              animate={sectionsVisible.hero ? { opacity: 0.8 } : {}}
+              initial={false}
+              animate={{ opacity: 0.8 }}
               transition={{ delay: sequenceDelay(1), duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="transform rotate-12" size={24} />
-              </Suspense>
+              <SparkleIllustration className="transform rotate-12" size={24} />
             </motion.div>
 
             <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
@@ -377,11 +399,10 @@ const Home = memo(() => {
 
             <motion.div
               className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-4 sm:p-6 md:p-10 overflow-hidden"
-              initial={{ opacity: 0, y: 6 }}
-              animate={sectionsVisible.hero ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+              initial={false}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              {/* Waves inside hero card */}
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
@@ -395,45 +416,39 @@ const Home = memo(() => {
                 />
               </div>
 
-              <Suspense fallback={<QuickLoader className="h-1 w-full mb-4" />}>
-                <HeroHighlightLine />
-              </Suspense>
+              <HeroHighlightLine />
 
               <div className="relative px-1 py-4 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
                 {/* Conditional MagnetLines for better performance */}
                 {sectionsVisible.hero && (
                   <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
-                    <Suspense fallback={null}>
-                      <MagnetLines
-                        rows={8}
-                        columns={8}
-                        containerSize="100%"
-                        lineColor="hsl(var(--primary) / 0.06)"
-                        lineWidth="0.2vmin"
-                        lineHeight="2.5vmin"
-                        baseAngle={-15}
-                      />
-                    </Suspense>
+                    <MagnetLines
+                      rows={8}
+                      columns={8}
+                      containerSize="100%"
+                      lineColor="hsl(var(--primary) / 0.06)"
+                      lineWidth="0.2vmin"
+                      lineHeight="2.5vmin"
+                      baseAngle={-15}
+                    />
                   </div>
                 )}
 
                 <motion.div
                   variants={containerVariants}
-                  initial="hidden"
-                  animate={sectionsVisible.hero ? "visible" : "hidden"}
+                  initial={false}
+                  animate="visible"
                   className="w-full"
                 >
                   {sectionsVisible.hero && (
                     <motion.div
                       className="relative mb-4"
-                      initial={{ opacity: 0 }}
+                      initial={false}
                       animate={{ opacity: 1 }}
                       transition={{ duration: duration.standard / 1000, delay: sequenceDelay(1), ease: motionTransition.componentEnter.ease }}
                     >
                       {/* Decorative sparkle - hidden on mobile */}
-                      <Suspense fallback={<QuickSparkle />}>
-                        <SparkleIllustration className="text-primary absolute -left-7 top-1 hidden sm:block" size={20} />
-                      </Suspense>
+                      <SparkleIllustration className="text-primary absolute -left-7 top-1 hidden sm:block" size={20} />
 
                       {/* "HELLO, I am" - smaller intro text */}
                       <span className="block text-sm sm:text-base md:text-lg font-medium text-muted-foreground mb-1">
@@ -506,9 +521,7 @@ const Home = memo(() => {
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="text-primary mr-3" size={20} />
-              </Suspense>
+              <SparkleIllustration className="text-primary mr-3" size={20} />
               <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight leading-[1.12] pb-[0.08em]">EXPERIENCE</h2>
             </motion.div>
 
@@ -536,9 +549,7 @@ const Home = memo(() => {
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <Suspense fallback={<QuickSparkle />}>
-                <SparkleIllustration className="text-primary mr-4" size={24} />
-              </Suspense>
+              <SparkleIllustration className="text-primary mr-4" size={24} />
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-[1.12] pb-[0.08em]">FEATURED PROJECTS</h2>
               </div>
