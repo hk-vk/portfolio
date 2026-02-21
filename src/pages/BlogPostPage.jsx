@@ -579,14 +579,16 @@ const BlogPostPage = () => {
     if (!post || !postId) return;
     if (trackedViewRef.current === postId) return;
 
+    const canonicalSlug = post.slug || postId;
+
     posthog?.capture('blog_post_viewed', {
-      post_slug: postId,
+      post_slug: canonicalSlug,
       post_title: post.title,
       post_category: post.category || 'Article',
-      current_path: window.location.pathname,
+      current_path: `/blog/${canonicalSlug}`,
       referrer: document.referrer || null,
     });
-    trackedViewRef.current = postId;
+    trackedViewRef.current = canonicalSlug;
   }, [post, postId, posthog]);
 
   if (loading) {

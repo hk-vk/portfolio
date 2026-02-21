@@ -89,8 +89,12 @@ const BlogPostCard = ({ post, onCardClick }) => (
           </h2>
           <p className="text-xs text-muted-foreground/80 mb-3 uppercase tracking-wider font-medium">
             {new Date(post.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-            {' '}•{' '}
-            {formatViews(post.viewCount)}
+            {post.viewCount > 0 ? (
+              <>
+                {' '}•{' '}
+                {formatViews(post.viewCount)}
+              </>
+            ) : null}
           </p>
           <p className="text-muted-foreground mb-6 text-sm leading-relaxed line-clamp-3">
             {post.excerpt}

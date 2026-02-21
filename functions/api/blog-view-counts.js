@@ -47,11 +47,23 @@ export async function onRequestGet(context) {
       kind: 'HogQLQuery',
       query: `
         SELECT
-          properties.post_slug AS post_slug,
+          replaceRegexpOne(
+            coalesce(
+              nullIf(properties.post_slug, ''),
+              nullIf(replaceRegexpOne(properties.current_path, '^/blog/', ''), ''),
+              nullIf(replaceRegexpOne(properties.path, '^/blog/', ''), '')
+            ),
+            '/$',
+            ''
+          ) AS post_slug,
           count() AS views
         FROM events
         WHERE event = 'blog_post_viewed'
-          AND properties.post_slug IS NOT NULL
+          AND coalesce(
+            nullIf(properties.post_slug, ''),
+            nullIf(properties.current_path, ''),
+            nullIf(properties.path, '')
+          ) IS NOT NULL
         GROUP BY post_slug
       `,
     },
