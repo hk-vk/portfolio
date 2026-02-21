@@ -3,6 +3,7 @@ import AnimatedSection from '../components/AnimatedSection';
 import { motion } from '../lib/motion';
 import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
+import Shimmer from '../components/Shimmer';
 import SEOHead from '../components/SEOHead';
 import { usePostHog } from '@posthog/react';
 import { duration } from '../utils/motionSettings';
@@ -10,7 +11,26 @@ import { cardMotion, motionTransition } from '../utils/motionContract';
 import { client, urlFor } from '../lib/sanity';
 
 const BLOG_LIST_CACHE_KEY = 'blog:list:v1';
+const BLOG_LAST_COUNT_KEY = 'blog:last-count:v1';
 const formatViews = (count) => `${new Intl.NumberFormat().format(count || 0)} views`;
+
+const BlogCardSkeleton = () => (
+  <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm rounded-xl">
+    <div className="w-full h-48 bg-muted/60 rounded-md mb-4" />
+    <div className="flex-grow">
+      <div className="h-7 w-[82%] bg-muted/60 rounded mb-3" />
+      <div className="h-3 w-[58%] bg-muted/50 rounded mb-3" />
+      <div className="space-y-2 mb-6">
+        <div className="h-4 w-full bg-muted/50 rounded" />
+        <div className="h-4 w-[94%] bg-muted/50 rounded" />
+        <div className="h-4 w-[76%] bg-muted/50 rounded" />
+      </div>
+    </div>
+    <div className="mt-auto pt-4 border-t border-border/30">
+      <div className="h-4 w-28 bg-muted/50 rounded" />
+    </div>
+  </div>
+);
 
 const BlogPostCard = ({ post, onCardClick }) => (
   <motion.div
@@ -87,6 +107,7 @@ const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewCounts, setViewCounts] = useState({});
+  const [skeletonCount, setSkeletonCount] = useState(1);
   const posthog = usePostHog();
 
   const handleBlogCardClick = (post) => {
@@ -98,6 +119,15 @@ const Blog = () => {
   };
 
   useEffect(() => {
+    try {
+      const lastCount = Number(sessionStorage.getItem(BLOG_LAST_COUNT_KEY) || 0);
+      if (Number.isFinite(lastCount) && lastCount > 0) {
+        setSkeletonCount(Math.min(3, Math.max(1, lastCount)));
+      }
+    } catch {
+      // ignore cache read issues
+    }
+
     try {
       const cached = sessionStorage.getItem(BLOG_LIST_CACHE_KEY);
       if (cached) {
@@ -126,6 +156,7 @@ const Blog = () => {
         setIsLoading(false);
         try {
           sessionStorage.setItem(BLOG_LIST_CACHE_KEY, JSON.stringify(data));
+          sessionStorage.setItem(BLOG_LAST_COUNT_KEY, String(data.length || 1));
         } catch {
           // ignore storage write issues
         }
@@ -193,9 +224,13 @@ const Blog = () => {
       <AnimatedSection animation="fadeIn" delay={0.3}>
         <div className="content-container">
           {isLoading ? (
-             <div className="flex justify-center py-20">
-               <p className="text-muted-foreground animate-pulse">Loading posts...</p>
-             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+              {Array.from({ length: skeletonCount }).map((_, i) => (
+                <Shimmer key={i} loading={true}>
+                  <BlogCardSkeleton />
+                </Shimmer>
+              ))}
+            </div>
           ) : blogPosts.length > 0 ? (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"

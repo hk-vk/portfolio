@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AnimatePresence } from './lib/motion';
 import { usePostHog } from '@posthog/react';
@@ -13,22 +13,81 @@ import Navbar from './components/Navbar';
 import PageTransition from './components/PageTransition';
 import MotionProvider from './components/MotionProvider';
 import { SmoothScrollProvider } from './context/SmoothScrollContext';
+import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Lazy load all pages for code splitting and faster initial load
-const Home = lazy(() => import('./pages/Home'));
-const About = lazy(() => import('./pages/About'));
-const Projects = lazy(() => import('./pages/Projects'));
-const Contact = lazy(() => import('./pages/Contact'));
-const Blog = lazy(() => import('./pages/Blog'));
-const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
-const OGPreview = lazy(() => import('./pages/OGPreview'));
+const Home = lazyWithRetry(() => import('./pages/Home'));
+const About = lazyWithRetry(() => import('./pages/About'));
+const Projects = lazyWithRetry(() => import('./pages/Projects'));
+const Contact = lazyWithRetry(() => import('./pages/Contact'));
+const Blog = lazyWithRetry(() => import('./pages/Blog'));
+const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage'));
+const OGPreview = lazyWithRetry(() => import('./pages/OGPreview'));
 
 // Lazy load utilities for better performance
-const ScrollToTop = lazy(() => import('./utils/ScrollToTop'));
+const ScrollToTop = lazyWithRetry(() => import('./utils/ScrollToTop'));
 
 // Lightweight loading fallback component - minimal to avoid flash
 const PageLoader = () => (
-  <div className="min-h-screen bg-background" />
+  <div className="min-h-[60vh] bg-background flex items-center justify-center px-6">
+    <div className="w-full max-w-3xl space-y-4 animate-pulse">
+      <div className="h-10 w-1/2 bg-muted/50 rounded-md" />
+      <div className="h-4 w-3/4 bg-muted/40 rounded-md" />
+      <div className="h-4 w-2/3 bg-muted/40 rounded-md" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <div className="h-40 bg-muted/30 rounded-xl" />
+        <div className="h-40 bg-muted/30 rounded-xl" />
+      </div>
+    </div>
+  </div>
+);
+
+class RouteErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    // Keep this in console for debugging route-level crashes
+    console.error('Route render error:', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center px-6">
+          <div className="text-center max-w-md">
+            <h2 className="text-2xl font-semibold mb-3">Something went wrong</h2>
+            <p className="text-muted-foreground mb-6">
+              A route failed to render. Try returning home or reloading this page.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Link to="/" className="button-primary">Go Home</Link>
+              <button type="button" className="button-secondary" onClick={() => window.location.reload()}>
+                Reload
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const NotFound = () => (
+  <div className="min-h-[60vh] flex items-center justify-center px-6">
+    <div className="text-center">
+      <h2 className="text-3xl font-semibold mb-3">Page not found</h2>
+      <p className="text-muted-foreground mb-6">This route does not exist.</p>
+      <Link to="/" className="button-primary">Back to Home</Link>
+    </div>
+  </div>
 );
 
 // AnimatedRoutes component to handle page transitions
@@ -45,6 +104,7 @@ const AnimatedRoutes = () => {
         <Route path="/blog/:postId" element={<PageTransition><BlogPostPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/og-preview" element={<PageTransition><OGPreview /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
   );
@@ -101,6 +161,7 @@ function App() {
       import('./pages/Projects');
       import('./pages/Blog');
       import('./pages/BlogPostPage');
+      import('./pages/Contact');
     }, 500);
 
     return () => {
@@ -111,16 +172,18 @@ function App() {
   return (
     <HelmetProvider>
       <MotionProvider>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Router>
           <SmoothScrollProvider>
             <div className="min-h-screen bg-background">
               <Navbar />
               <main className="relative">
-                <Suspense fallback={<PageLoader />}>
-                  <RouteAnalytics />
-                  <ScrollToTop />
-                  <AnimatedRoutes />
-                </Suspense>
+                <RouteErrorBoundary>
+                  <Suspense fallback={<PageLoader />}>
+                    <RouteAnalytics />
+                    <ScrollToTop />
+                    <AnimatedRoutes />
+                  </Suspense>
+                </RouteErrorBoundary>
               </main>
             </div>
           </SmoothScrollProvider>

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { usePostHog } from '@posthog/react';
+import Shimmer from '../components/Shimmer';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { Icon } from "@iconify/react";
@@ -54,6 +55,27 @@ const stripMarkdown = (markdownText) => {
 };
 
 const getPostCacheKey = (slug) => `blog:post:${slug}`;
+
+const BlogPostSkeleton = () => (
+  <div className="pt-32 pb-20">
+    <div className="content-container max-w-3xl mx-auto">
+      <div className="w-10 h-10 rounded-full bg-muted/50 mb-6" />
+      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-foreground">Loading blog title</h1>
+      <div className="flex items-center gap-3 text-xs sm:text-sm font-medium uppercase tracking-wider text-muted-foreground mb-12 border-b border-border/40 pb-6">
+        <span>Loading date</span>
+        <span className="w-1 h-1 rounded-full bg-border"></span>
+        <span>Loading read time</span>
+      </div>
+      <div className="w-full h-[320px] rounded-lg bg-muted/50 mb-8" />
+      <div className="space-y-4">
+        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
+        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
+        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
+        <p className="text-lg text-muted-foreground">Loading paragraph content for this article...</p>
+      </div>
+    </div>
+  </div>
+);
 
 const SpeedReaderOverlay = ({ 
   isActive, 
@@ -538,9 +560,9 @@ const BlogPostPage = () => {
 
   if (loading) {
     return (
-      <div className="pt-32 pb-20 flex justify-center items-center">
-        <p className="text-xl text-muted-foreground animate-pulse">Loading post...</p>
-      </div>
+      <Shimmer loading={true}>
+        <BlogPostSkeleton />
+      </Shimmer>
     );
   }
 
