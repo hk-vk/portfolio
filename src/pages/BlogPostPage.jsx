@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Navigate } from 'react-router-dom';
 import AnimatedSection from '../components/AnimatedSection';
-import { motion } from '../lib/motion';
+import { motion, AnimatePresence } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
+import { Icon } from "@iconify/react";
 
 // Utility function to strip Markdown syntax
 const stripMarkdown = (markdownText) => {
@@ -79,118 +81,183 @@ It flashes words at you. Your brain does the rest. Science! (Sort of). You can c
 Try the speed reader on this very post. See? Done. Now go build something amazing. Or take a nap. Your call.
     `
   }
-  // Add more blog posts here as needed // Ensure this comment remains if you want to add more later, or remove it if this is the only post.
 ];
 
-const SpeedReaderControls = ({ 
+const SpeedReaderOverlay = ({ 
   isActive, 
-  setIsActive, 
+  onClose,
+  content,
   wordsPerMinute, 
   setWordsPerMinute,
-  chunkSize,
-  setChunkSize,
   readerMode,
   setReaderMode
-}) => (
-  <div className="flex flex-col gap-4 p-4 bg-muted/40 rounded-lg mb-8 shadow-sm">
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-      <button 
-        onClick={() => setIsActive(!isActive)}
-        className={`button-primary px-4 py-2 rounded-md flex items-center justify-center min-w-[160px] text-base transition-colors ${isActive ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-primary/90'}`}
-      >
-        {isActive ? (
-          <>
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Stop Reading
-          </>
-        ) : (
-          <>
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Speed Read
-          </>
-        )}
-      </button>
-      
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-muted-foreground">Mode:</span>
-        <div className="flex rounded-md border border-border bg-background p-0.5">
-          <button 
-            onClick={() => setReaderMode('rsvp')} 
-            className={`px-3 py-1.5 text-sm rounded-sm transition-colors ${readerMode === 'rsvp' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
-          >
-            RSVP
-          </button>
-          <button 
-            onClick={() => setReaderMode('guided')} 
-            className={`px-3 py-1.5 text-sm rounded-sm transition-colors ${readerMode === 'guided' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'}`}
-          >
-            Guided Scroll
-          </button>
-        </div>
-      </div>
-    </div>
+}) => {
+  const [chunkSize, setChunkSize] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-    <div className="flex flex-col xs:flex-row items-center gap-x-4 gap-y-3 w-full">
-      <div className="flex items-center gap-2 w-full xs:w-auto flex-1">
-        <label htmlFor="wpm-slider" className="text-sm text-muted-foreground whitespace-nowrap">WPM:</label>
-        <input 
-          id="wpm-slider"
-          type="range" 
-          min="100" 
-          max="1000" 
-          step="50" 
-          value={wordsPerMinute} 
-          onChange={(e) => setWordsPerMinute(parseInt(e.target.value))} 
-          className="w-full accent-primary h-4"
-        />
-        <span className="text-xs font-mono bg-background px-1.5 py-0.5 rounded border border-border min-w-[45px] text-center">{wordsPerMinute}</span>
-      </div>
-
-      {readerMode === 'rsvp' && (
-        <div className="flex items-center gap-2 w-full xs:w-auto flex-1">
-          <label htmlFor="chunk-slider" className="text-sm text-muted-foreground whitespace-nowrap">Words/Flash:</label>
-          <input 
-            id="chunk-slider"
-            type="range" 
-            min="1" 
-            max="5" 
-            step="1" 
-            value={chunkSize} 
-            onChange={(e) => setChunkSize(parseInt(e.target.value))} 
-            className="w-full accent-primary h-4"
-          />
-          <span className="text-xs font-mono bg-background px-1.5 py-0.5 rounded border border-border min-w-[45px] text-center">{chunkSize}</span>
-        </div>
-      )}
-      {readerMode === 'guided' && <div className="flex-1"></div>} 
-    </div>
-  </div>
-);
-
-const SpeedReader = ({ content, isActive, wordsPerMinute, chunkSize }) => {
-  const [wordChunks, setWordChunks] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [estimatedTime, setEstimatedTime] = useState(0);
-  const intervalRef = useRef(null);
-  const totalWordsRef = useRef(0);
+  if (!isActive) return null;
 
   useEffect(() => {
-    // Strip markdown syntax before processing
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-xl"
+    >
+      {/* Header / Close */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/10">
+        <div className="flex items-center gap-2">
+          <Icon icon="tabler:eye-bolt" className="text-primary text-xl" />
+          <span className="font-medium tracking-wide text-sm uppercase text-muted-foreground">Focus Mode</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="hidden md:flex items-center gap-2 text-xs text-muted-foreground/60">
+            <kbd className="px-1.5 py-0.5 bg-muted/30 border border-border/30 rounded text-[10px] font-mono shadow-sm">ESC</kbd>
+            <span>to exit</span>
+          </span>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-muted/20 rounded-full transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <Icon icon="tabler:x" className="text-xl" />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col items-center justify-center relative w-full max-w-5xl mx-auto px-4 overflow-hidden">
+        {readerMode === 'rsvp' ? (
+          <RSVPReader 
+            content={content} 
+            isPlaying={isPlaying} 
+            wordsPerMinute={wordsPerMinute} 
+            chunkSize={chunkSize}
+            onComplete={() => setIsPlaying(false)}
+          />
+        ) : (
+          <GuidedReader 
+             content={content}
+             isPlaying={isPlaying}
+             wordsPerMinute={wordsPerMinute}
+             onComplete={() => setIsPlaying(false)}
+          />
+        )}
+      </div>
+
+      {/* Controls Bar */}
+      <div className="pb-8 pt-4 px-4 w-full flex justify-center">
+        <div className="bg-card/50 border border-border/20 backdrop-blur-md shadow-2xl rounded-2xl p-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 w-full max-w-2xl">
+          
+          {/* Play/Pause */}
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="w-12 h-12 flex items-center justify-center rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-transform active:scale-95 shadow-lg shadow-primary/20"
+          >
+            <Icon icon={isPlaying ? "tabler:pause" : "tabler:play"} className="text-2xl" />
+          </button>
+
+          <div className="h-8 w-px bg-border/40 hidden sm:block"></div>
+
+          {/* Mode Switcher */}
+          <div className="flex bg-muted/30 p-1 rounded-lg">
+             <button 
+                onClick={() => setReaderMode('rsvp')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${readerMode === 'rsvp' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                RSVP
+              </button>
+              <button 
+                onClick={() => setReaderMode('guided')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${readerMode === 'guided' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Guided
+              </button>
+          </div>
+
+          <div className="h-8 w-px bg-border/40 hidden sm:block"></div>
+
+          {/* Speed Controls */}
+          <div className="flex items-center gap-3">
+             <button 
+              onClick={() => setWordsPerMinute(Math.max(100, wordsPerMinute - 50))}
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+            >
+              <Icon icon="tabler:minus" />
+            </button>
+            <div className="flex flex-col items-center w-16">
+              <span className="text-lg font-bold font-mono leading-none">{wordsPerMinute}</span>
+              <span className="text-[9px] uppercase tracking-wider text-muted-foreground">WPM</span>
+            </div>
+            <button 
+              onClick={() => setWordsPerMinute(Math.min(1000, wordsPerMinute + 50))}
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-colors"
+            >
+              <Icon icon="tabler:plus" />
+            </button>
+          </div>
+          
+          {/* Chunk Size (RSVP only) */}
+          {readerMode === 'rsvp' && (
+            <>
+              <div className="h-8 w-px bg-border/40 hidden sm:block"></div>
+              <div className="flex flex-col items-center gap-1 min-w-[60px]">
+                 <span className="text-[9px] uppercase tracking-wider text-muted-foreground">Chunk</span>
+                 <div className="flex items-center gap-2">
+                   <input 
+                    type="range" 
+                    min="1" 
+                    max="5" 
+                    step="1" 
+                    value={chunkSize} 
+                    onChange={(e) => setChunkSize(parseInt(e.target.value))} 
+                    className="w-16 h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                  <span className="text-xs font-mono">{chunkSize}</span>
+                 </div>
+              </div>
+            </>
+          )}
+
+          {/* Exit Button */}
+          <div className="h-8 w-px bg-border/40 hidden sm:block"></div>
+          <button 
+            onClick={onClose}
+            className="flex flex-col items-center gap-1 group text-muted-foreground hover:text-destructive transition-colors p-2"
+          >
+            <Icon icon="tabler:logout" className="text-xl group-hover:scale-110 transition-transform" />
+            <span className="text-[9px] uppercase tracking-wider font-medium">Exit</span>
+          </button>
+
+        </div>
+      </div>
+    </motion.div>,
+    document.body
+  );
+};
+
+const RSVPReader = ({ content, isPlaying, wordsPerMinute, chunkSize, onComplete }) => {
+  const [wordChunks, setWordChunks] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
     const plainTextContent = stripMarkdown(content);
-    
     const allWords = plainTextContent
       .split('\n')
       .filter(para => para.trim())
       .flatMap(para => para.trim().split(/\s+/))
       .filter(word => word.length > 0);
-    
-    totalWordsRef.current = allWords.length;
     
     const chunks = [];
     for (let i = 0; i < allWords.length; i += chunkSize) {
@@ -198,345 +265,215 @@ const SpeedReader = ({ content, isActive, wordsPerMinute, chunkSize }) => {
     }
     setWordChunks(chunks);
     setCurrentIndex(0);
-    setIsComplete(false);
   }, [content, chunkSize]);
 
   useEffect(() => {
-    if (totalWordsRef.current > 0 && wordsPerMinute > 0) {
-      const time = Math.ceil((totalWordsRef.current / wordsPerMinute) * 60);
-      setEstimatedTime(time);
-    }
-  }, [wordsPerMinute, wordChunks]);
-
-  useEffect(() => {
-    if (isActive && wordChunks.length > 0) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setIsComplete(false);
-      setCurrentIndex(0);
-
+    if (isPlaying && wordChunks.length > 0) {
       const interval = (60000 * chunkSize) / wordsPerMinute;
-      
       intervalRef.current = setInterval(() => {
-        setCurrentIndex(prevIndex => {
-          const nextIndex = prevIndex + 1;
-          if (nextIndex >= wordChunks.length) {
+        setCurrentIndex(prev => {
+          const next = prev + 1;
+          if (next >= wordChunks.length) {
             clearInterval(intervalRef.current);
-            setIsComplete(true);
-            return prevIndex;
+            onComplete?.();
+            return prev;
           }
-          const wordsRead = (nextIndex + 1) * chunkSize;
-          const remainingWords = Math.max(0, totalWordsRef.current - wordsRead);
-          setEstimatedTime(Math.ceil((remainingWords / wordsPerMinute) * 60));
-          return nextIndex;
+          setProgress((next / wordChunks.length) * 100);
+          return next;
         });
       }, interval);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (totalWordsRef.current > 0 && wordsPerMinute > 0) {
-        setEstimatedTime(Math.ceil((totalWordsRef.current / wordsPerMinute) * 60));
-      }
     }
+    return () => clearInterval(intervalRef.current);
+  }, [isPlaying, wordChunks, wordsPerMinute, chunkSize, onComplete]);
+
+  const currentChunk = wordChunks[currentIndex] || [];
+  
+  // Helper to highlight the middle character (ORP - Optimal Recognition Point)
+  const renderWord = (word) => {
+    if (!word) return null;
+    if (word.length === 1) return <span className="inline-block"><span className="text-primary">{word}</span></span>;
     
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isActive, wordChunks, wordsPerMinute, chunkSize]);
-  
-  if (!isActive) {
-    return null;
-  }
-  
-  const currentChunkText = wordChunks[currentIndex]?.join(' ') || '';
-
-  return (
-    <div className="p-6 bg-card border border-border rounded-lg mb-8 relative min-h-48 flex flex-col items-center justify-center">
-      {isComplete ? (
-        <div className="text-center">
-          <p className="text-muted-foreground text-lg">Speed reading complete!</p>
-        </div>
-      ) : wordChunks.length > 0 && currentChunkText ? (
-        <div className="text-center w-full">
-          <div className="mb-6 flex items-center justify-center">
-            <div className="w-16 h-1 bg-muted"></div>
-            <div className="relative px-4 sm:px-8 min-w-0 flex-1">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: duration.standard / 1000, ease: 'easeOut' }}
-                className="text-3xl sm:text-4xl font-serif font-bold text-primary truncate"
-              >
-                {currentChunkText}
-              </motion.div>
-            </div>
-            <div className="w-16 h-1 bg-muted"></div>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Chunk {currentIndex + 1} of {wordChunks.length}
-          </div>
-          <div className="text-xs text-muted-foreground mt-1">
-            Time Remaining: ~{Math.floor(estimatedTime / 60)}m {estimatedTime % 60}s
-          </div>
-        </div>
-      ) : (
-        <div className="text-center">
-          <p className="text-muted-foreground">Preparing content...</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Enhanced guided reading component with formatted content and word highlighting
-const HighlightableMarkdown = ({ content, currentWordIndex, wordRefs }) => {
-  const [wordElements, setWordElements] = useState([]);
-  
-  useEffect(() => {
-    // Extract all words from the plain text version for indexing
-    const plainText = stripMarkdown(content);
-    const words = plainText.split(/\s+/).filter(w => w.length > 0);
-    setWordElements(words);
-  }, [content]);
-
-  // Custom text renderer that adds word highlighting
-  const renderText = (text, elementType = 'span') => {
-    const words = text.split(/(\s+)/);
-    let wordIndex = 0;
+    const middleIndex = Math.ceil(word.length / 2) - 1;
+    const start = word.slice(0, middleIndex);
+    const middle = word[middleIndex];
+    const end = word.slice(middleIndex + 1);
     
-    return words.map((part, i) => {
-      if (/\s/.test(part)) {
-        return part; // Return whitespace as-is
-      }
-      
-      // Find the global word index
-      const globalWordIndex = wordElements.findIndex((word, idx) => 
-        idx >= wordIndex && word.toLowerCase() === part.toLowerCase()
-      );
-      
-      if (globalWordIndex !== -1) {
-        wordIndex = globalWordIndex + 1;
-        const isHighlighted = globalWordIndex === currentWordIndex;
-        const wordId = `word-${globalWordIndex}`;
-        
-        return (
-          <motion.span
-            key={`${wordId}-${i}`}
-            ref={el => {
-              if (wordRefs.current && wordId) {
-                wordRefs.current[wordId] = { current: el };
-              }
-            }}
-            className={`guided-word cursor-pointer transition-[background-color,color,box-shadow,transform] duration-150 ease-out ${
-              isHighlighted 
-                ? 'bg-primary/40 text-primary-foreground rounded-md px-1 py-0.5 shadow-md font-medium' 
-                : 'hover:bg-muted/20 rounded-sm'
-            }`}
-            animate={isHighlighted ? {
-              scale: 1.05,
-              boxShadow: '0 4px 12px rgba(var(--primary), 0.4)'
-            } : {
-              scale: 1,
-              boxShadow: '0 0px 0px rgba(var(--primary), 0)'
-            }}
-            transition={{ duration: duration.quick / 1000, ease: 'easeOut' }}
-          >
-            {part}
-          </motion.span>
-        );
-      }
-      
-      return part;
-    });
+    return (
+      <span className="inline-block mx-1">
+        <span className="opacity-90">{start}</span>
+        <span className="text-primary font-bold scale-110 inline-block transform">{middle}</span>
+        <span className="opacity-90">{end}</span>
+      </span>
+    );
   };
 
   return (
-    <div className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content">
-      <ReactMarkdown 
-        remarkPlugins={[remarkGfm]}
-        components={{
-          // Enhanced text rendering with word highlighting
-          p: ({ children }) => (
-            <p className="mb-6 leading-relaxed tracking-wide">
-              {typeof children === 'string' ? renderText(children) : children}
-            </p>
-          ),
-          h1: ({ children }) => (
-            <h1 className="text-3xl md:text-4xl font-bold mb-6 mt-10 leading-tight">
-              {typeof children === 'string' ? renderText(children) : children}
-            </h1>
-          ),
-          h2: ({ children }) => (
-            <h2 className="text-2xl md:text-3xl font-bold mb-5 mt-8 leading-tight">
-              {typeof children === 'string' ? renderText(children) : children}
-            </h2>
-          ),
-          h3: ({ children }) => (
-            <h3 className="text-xl md:text-2xl font-bold mb-4 mt-6">
-              {typeof children === 'string' ? renderText(children) : children}
-            </h3>
-          ),
-          strong: ({ children }) => (
-            <strong className="font-bold text-primary">
-              {typeof children === 'string' ? renderText(children) : children}
-            </strong>
-          ),
-          em: ({ children }) => (
-            <em className="italic text-accent">
-              {typeof children === 'string' ? renderText(children) : children}
-            </em>
-          ),
-          code: ({ children }) => (
-            <code className="bg-muted/70 text-primary px-1.5 py-0.5 rounded text-sm font-mono">
-              {children}
-            </code>
-          ),
-          li: ({ children }) => (
-            <li className="mb-2">
-              {typeof children === 'string' ? renderText(children) : children}
-            </li>
-          ),
-          ul: ({ children }) => <ul className="list-disc pl-6 mb-6 space-y-2">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal pl-6 mb-6 space-y-2">{children}</ol>,
-          a: ({ children, href }) => (
-            <a href={href} className="text-primary hover:text-primary/80 hover:underline transition-colors">
-              {typeof children === 'string' ? renderText(children) : children}
-            </a>
-          ),
-          blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-6">
-              {children}
-            </blockquote>
-          )
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+    <div className="flex flex-col items-center w-full max-w-4xl">
+       {/* Focus Guides */}
+      <div className="relative w-full h-[40vh] flex items-center justify-center">
+         <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-background/95 to-transparent pointer-events-none"></div>
+         <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-background/95 to-transparent pointer-events-none"></div>
+         
+         {/* The Reader Window */}
+         <div className="relative">
+            {/* Top/Bottom Lines */}
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary/20 rounded-full"></div>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary/20 rounded-full"></div>
+            
+            <div className="text-5xl sm:text-7xl md:text-8xl font-medium tracking-tight text-center leading-normal select-none py-4 px-8 min-h-[1.5em] flex items-center justify-center whitespace-nowrap">
+              {currentChunk.map((word, idx) => (
+                <React.Fragment key={idx}>
+                  {renderWord(word)}
+                </React.Fragment>
+              ))}
+            </div>
+         </div>
+      </div>
+
+      {/* Progress Line */}
+      <div className="w-full max-w-md mt-12 h-1 bg-muted rounded-full overflow-hidden">
+        <motion.div 
+          className="h-full bg-primary"
+          animate={{ width: `${progress}%` }}
+          transition={{ ease: "linear", duration: 0.1 }}
+        />
+      </div>
+      <div className="mt-2 text-xs text-muted-foreground font-mono">
+        {currentIndex + 1} / {wordChunks.length} chunks
+      </div>
     </div>
   );
 };
 
-const GuidedHighlighter = ({ content, isActive, wordsPerMinute }) => {
-  const [currentWordIndex, setCurrentWordIndex] = useState(-1);
-  const [totalWords, setTotalWords] = useState(0);
-  const [progress, setProgress] = useState(0);
+const GuidedReader = ({ content, isPlaying, wordsPerMinute, onComplete }) => {
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [words, setWords] = useState([]);
   const wordRefs = useRef({});
-  const intervalRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    // Count total words for progress tracking
     const plainText = stripMarkdown(content);
-    const words = plainText.split(/\s+/).filter(w => w.length > 0);
-    setTotalWords(words.length);
-    setCurrentWordIndex(-1);
-    setProgress(0);
+    setWords(plainText.split(/\s+/).filter(w => w.length > 0));
+    setCurrentWordIndex(0);
   }, [content]);
 
   useEffect(() => {
-    if (isActive && totalWords > 0) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setCurrentWordIndex(0);
-
+    if (isPlaying && words.length > 0) {
       const interval = 60000 / wordsPerMinute;
-      intervalRef.current = setInterval(() => {
-        setCurrentWordIndex(prevIndex => {
-          const nextIndex = prevIndex + 1;
-          if (nextIndex >= totalWords) {
-            clearInterval(intervalRef.current);
-            setProgress(100);
-            return prevIndex;
+      const timer = setInterval(() => {
+        setCurrentWordIndex(prev => {
+          const next = prev + 1;
+          if (next >= words.length) {
+            clearInterval(timer);
+            onComplete?.();
+            return prev;
           }
           
-          // Update progress
-          const newProgress = Math.round((nextIndex / totalWords) * 100);
-          setProgress(newProgress);
-          
-          // Auto-scroll to current word
-          const wordId = `word-${nextIndex}`;
-          const wordElement = wordRefs.current[wordId]?.current;
-          if (wordElement && containerRef.current) {
+          // Auto-scroll
+          const el = wordRefs.current[`word-${next}`];
+          if (el && containerRef.current) {
             const containerRect = containerRef.current.getBoundingClientRect();
-            const wordRect = wordElement.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
             
-            if (wordRect.top < containerRect.top + 100 || wordRect.bottom > containerRect.bottom - 100) {
-              wordElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest'
-              });
+            // Keep current word in middle third of screen
+            if (elRect.top < containerRect.top + containerRect.height / 3 || 
+                elRect.bottom > containerRect.bottom - containerRect.height / 3) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           }
-          
-          return nextIndex;
+          return next;
         });
       }, interval);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      return () => clearInterval(timer);
     }
-    
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isActive, totalWords, wordsPerMinute]);
-
-  if (!isActive) return null;
-  if (totalWords === 0) return <p className="text-muted-foreground">Preparing guided reading...</p>;
+  }, [isPlaying, words, wordsPerMinute, onComplete]);
 
   return (
-    <div className="mb-8">
-      {/* Progress Bar */}
-      <div className="mb-6 p-4 bg-card/50 backdrop-blur-sm border border-border/30 rounded-lg">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-foreground">Reading Progress</span>
-          <span className="text-sm text-muted-foreground">
-            {currentWordIndex + 1} / {totalWords} words ({progress}%)
-          </span>
-        </div>
-        <div className="w-full bg-muted/30 rounded-full h-2 overflow-hidden">
-          <motion.div
-            className="bg-gradient-to-r from-primary to-primary/80 h-2 rounded-full"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: progress / 100 }}
-            transition={{ duration: duration.standard / 1000, ease: 'easeOut' }}
-            style={{ originX: 0 }}
-          />
-        </div>
-        <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-          <span>Est. time remaining: ~{Math.ceil((totalWords - currentWordIndex) / wordsPerMinute)}m</span>
-          <span>{wordsPerMinute} WPM</span>
-        </div>
-      </div>
-
-      {/* Enhanced Content with Formatting Preserved */}
-      <div 
-        ref={containerRef} 
-        className="relative bg-card/30 backdrop-blur-sm border border-border/20 rounded-xl p-6 
-                   max-h-[60vh] overflow-auto shadow-inner"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'hsl(var(--primary) / 0.3) transparent'
-        }}
-      >
-        <HighlightableMarkdown 
-          content={content}
-          currentWordIndex={currentWordIndex}
-          wordRefs={wordRefs}
-        />
+    <div ref={containerRef} className="w-full h-[70vh] overflow-y-auto px-4 md:px-20 scroll-smooth">
+      <div className="max-w-2xl mx-auto py-20 text-xl md:text-2xl leading-relaxed text-muted-foreground/50 transition-colors duration-500">
+        {words.map((word, idx) => {
+          const isActive = idx === currentWordIndex;
+          const isPast = idx < currentWordIndex;
+          
+          return (
+            <span 
+              key={idx}
+              ref={el => (wordRefs.current[`word-${idx}`] = el)}
+              onClick={() => setCurrentWordIndex(idx)}
+              className={`inline-block mr-2 mb-2 transition-all duration-200 cursor-pointer rounded px-1
+                ${isActive ? 'text-foreground scale-110 font-medium bg-muted/50 shadow-sm' : ''}
+                ${isPast ? 'text-muted-foreground/80' : ''}
+                ${!isActive && !isPast ? 'opacity-30 blur-[0.5px]' : ''}
+              `}
+            >
+              {word}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
 };
+
 
 const BlogPostPage = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [isSpeedReadingActive, setIsSpeedReadingActive] = useState(false);
+  // Speed Reader State
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [wordsPerMinute, setWordsPerMinute] = useState(300);
-  const [chunkSize, setChunkSize] = useState(1);
-  const [readerMode, setReaderMode] = useState('rsvp');
+  const [readerMode, setReaderMode] = useState('guided');
+
+  // Text-to-Speech State
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [hasVoiceLoaded, setHasVoiceLoaded] = useState(false);
+  
+  // Ensure voices are loaded (browsers load them asynchronously)
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setHasVoiceLoaded(true);
+      }
+    };
+    
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    
+    return () => {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
+
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    } else {
+      const text = stripMarkdown(post.content);
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Use system default voice for en-US
+      const voices = window.speechSynthesis.getVoices();
+      // Try to find a high-quality Google voice first
+      const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
+                           voices.find(v => v.lang === 'en-US');
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.onend = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+    }
+  };
 
   useEffect(() => {
     // Simulate fetching post data
@@ -544,8 +481,7 @@ const BlogPostPage = () => {
     if (foundPost) {
       setPost(foundPost);
     } else {
-      // If post not found, setPost to a specific state or handle as error
-      setPost(null); // Or some indicator for 'not found'
+      setPost(null); 
     }
     setLoading(false);
   }, [postId]);
@@ -569,7 +505,6 @@ const BlogPostPage = () => {
   }
 
   if (!post) {
-    // Post not found after loading, redirect
     return <Navigate to="/blog" replace />;
   }
 
@@ -582,25 +517,75 @@ const BlogPostPage = () => {
         type="article"
         image={post.imageUrl || "/og.jpg"}
       />
+      
+      <AnimatePresence>
+        {isReaderOpen && (
+          <SpeedReaderOverlay 
+            isActive={isReaderOpen}
+            onClose={() => setIsReaderOpen(false)}
+            content={post.content}
+            wordsPerMinute={wordsPerMinute}
+            setWordsPerMinute={setWordsPerMinute}
+            readerMode={readerMode}
+            setReaderMode={setReaderMode}
+          />
+        )}
+      </AnimatePresence>
+
       <div className="pt-32 pb-20">
       <AnimatedSection animation="fadeUp">
         <div className="content-container max-w-3xl mx-auto">
           <motion.h1
-            className="text-3xl md:text-4xl font-bold uppercase mb-4 text-primary font-serif"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-foreground font-serif tracking-tight leading-none"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
             {post.title}
           </motion.h1>
-          <motion.p
-            className="text-sm text-muted-foreground mb-8"
+          <motion.div
+            className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium uppercase tracking-wider text-muted-foreground mb-12 border-b border-border/40 pb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.04, duration: duration.standard / 1000, ease: 'easeOut' }}
           >
-            Published on {post.date}
-          </motion.p>
+            <div className="flex items-center gap-3">
+              <span>{post.date}</span>
+              <span className="w-1 h-1 rounded-full bg-border"></span>
+              <span>{Math.max(1, Math.ceil(stripMarkdown(post.content).split(/\s+/).length / 200))} min read</span>
+              <span className="w-1 h-1 rounded-full bg-border"></span>
+              <span className="text-primary">{post.category || "Article"}</span>
+            </div>
+            
+            <div className="hidden sm:block w-px h-4 bg-border/60 mx-1"></div>
+            
+            <div className="flex items-center gap-4 sm:gap-6 self-start sm:self-auto">
+              <button 
+                onClick={() => setIsReaderOpen(true)}
+                className="flex items-center gap-1.5 hover:text-primary transition-colors cursor-pointer group"
+                title="Enter Speed Reader Mode"
+              >
+                <Icon icon="tabler:eye-bolt" className="text-lg group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-bold">SPEED READ</span>
+              </button>
+
+              {/* Text-to-Speech Button - Commented out for now due to voice quality issues on Firefox
+              <button 
+                onClick={toggleSpeech}
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer group ${isSpeaking ? 'text-primary' : 'hover:text-primary'}`}
+                title={isSpeaking ? "Stop Listening" : "Listen to Article"}
+              >
+                <div className="relative">
+                  <Icon icon={isSpeaking ? "tabler:player-stop" : "tabler:volume"} className="text-lg group-hover:scale-110 transition-transform relative z-10" />
+                  {isSpeaking && (
+                    <span className="absolute -inset-2 rounded-full bg-primary/20 animate-ping z-0"></span>
+                  )}
+                </div>
+                <span className="text-[10px] font-bold">{isSpeaking ? "STOP LISTENING" : "LISTEN"}</span>
+              </button> 
+              */}
+            </div>
+          </motion.div>
 
           {post.imageUrl && (
             <motion.img
@@ -614,49 +599,13 @@ const BlogPostPage = () => {
           )}
           
           <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="prose prose-lg sm:prose-xl max-w-none dark:prose-invert text-foreground/90 blog-content leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.12, duration: duration.moderate / 1000, ease: 'easeOut' }}
           >
-            <SpeedReaderControls 
-              isActive={isSpeedReadingActive}
-              setIsActive={setIsSpeedReadingActive}
-              wordsPerMinute={wordsPerMinute}
-              setWordsPerMinute={setWordsPerMinute}
-              chunkSize={chunkSize}
-              setChunkSize={setChunkSize}
-              readerMode={readerMode}
-              setReaderMode={setReaderMode}
-            />
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
           </motion.div>
-          
-          {readerMode === 'rsvp' && isSpeedReadingActive && (
-            <SpeedReader 
-              content={post.content}
-              isActive={isSpeedReadingActive}
-              wordsPerMinute={wordsPerMinute}
-              chunkSize={chunkSize}
-            />
-          )}
-
-          {readerMode === 'guided' && isSpeedReadingActive && (
-             <GuidedHighlighter
-              content={post.content}
-              isActive={isSpeedReadingActive}
-              wordsPerMinute={wordsPerMinute}
-            />
-          )}
-
-          { !(readerMode === 'guided' && isSpeedReadingActive) && (
-            <motion.div
-              className="prose prose-lg max-w-none dark:prose-invert text-foreground blog-content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.12, duration: duration.moderate / 1000, ease: 'easeOut' }}
-            >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
-            </motion.div>
-          )}
         </div>
       </AnimatedSection>
     </div>

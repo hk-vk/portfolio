@@ -84,10 +84,10 @@ const ThemeToggle = () => {
       <motion.span
         className="block"
         animate={{
-          opacity: isDark ? 0 : 1,
-          rotate: isDark ? -90 : 0,
-          y: isDark ? 8 : 0,
-          scale: isDark ? 0.9 : 1,
+          opacity: isDark ? 1 : 0,
+          rotate: isDark ? 0 : -90,
+          y: isDark ? 0 : 8,
+          scale: isDark ? 1 : 0.9,
         }}
         transition={spring.snappy}
       >
@@ -96,10 +96,10 @@ const ThemeToggle = () => {
       <motion.span
         className="absolute inset-0 flex items-center justify-center"
         animate={{
-          opacity: isDark ? 1 : 0,
-          rotate: isDark ? 0 : 90,
-          y: isDark ? 0 : -8,
-          scale: isDark ? 1 : 0.9,
+          opacity: isDark ? 0 : 1,
+          rotate: isDark ? 90 : 0,
+          y: isDark ? -8 : 0,
+          scale: isDark ? 0.9 : 1,
         }}
         transition={spring.snappy}
       >
