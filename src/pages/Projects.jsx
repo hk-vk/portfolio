@@ -100,21 +100,12 @@ const SectionDivider = () => (
 );
 
 const Projects = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const posthog = usePostHog();
   const { toggleSocialPopover } = useSocialPopover();
   const contactButtonRef = useRef(null);
 
-  const categories = useMemo(
-    () => ['All', ...Array.from(new Set(projects.map((p) => p.category)))],
-    []
-  );
-
-  const filteredProjects = useMemo(
-    () => (selectedCategory === 'All' ? projects : projects.filter((project) => project.category === selectedCategory)),
-    [selectedCategory]
-  );
+  const filteredProjects = useMemo(() => projects, []);
 
   const selectedProject = useMemo(
     () => filteredProjects.find((project) => project.id === selectedProjectId) || projects.find((project) => project.id === selectedProjectId) || null,
@@ -157,34 +148,7 @@ const Projects = () => {
             </motion.div>
           </AnimatedSection>
 
-          <div className="sticky top-[84px] md:top-[92px] z-30 mb-6">
-            <div className="bg-background/80 backdrop-blur-md border border-border/50 rounded-xl p-2 shadow-sm">
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      posthog?.capture('projects_filter_selected', {
-                        category,
-                        previous_category: selectedCategory,
-                      });
-                    }}
-                    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium active:scale-[0.97] transition-[background-color,color,transform] duration-150 ${
-                      selectedCategory === category
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/70'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
           <motion.div
-            key={selectedCategory}
             className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
             variants={cardMotion.gridVariants}
             initial="hidden"
@@ -221,9 +185,6 @@ const Projects = () => {
                     <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
                       <span className="bg-background/90 backdrop-blur text-[10px] font-mono font-bold tracking-wider px-2 py-1 rounded border border-border/50 text-foreground shadow-sm">
                         {project.id}
-                      </span>
-                      <span className="bg-primary/90 backdrop-blur text-[10px] font-medium tracking-wide px-2 py-1 rounded text-primary-foreground shadow-sm">
-                        {project.category}
                       </span>
                     </div>
                   </div>
@@ -349,7 +310,6 @@ const Projects = () => {
               <div className="p-5 md:p-7">
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-1">{selectedProject.category}</p>
                     <h2 className="text-2xl md:text-3xl font-bold leading-tight">{selectedProject.title}</h2>
                   </div>
                   <button

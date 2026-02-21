@@ -11,6 +11,7 @@ import { cardMotion, motionTransition, sequenceDelay } from '../utils/motionCont
 import { Link } from 'react-router-dom';
 import { lazy, Suspense, memo, useMemo, useState, useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
+import { useSmoothScroll } from '../context/SmoothScrollContext';
 import SEOHead from '../components/SEOHead';
 import { Icon } from '@iconify/react';
 import { HoverPreviewProvider, HoverPreviewLink } from '../components/HoverPreview';
@@ -317,12 +318,17 @@ ExperienceItem.displayName = 'ExperienceItem';
 const Home = memo(() => {
   const motionSafe = useMotionSafe();
   const posthog = usePostHog();
+  const { lenis } = useSmoothScroll();
 
   // Use optimized intersection observer hooks
   const [heroRef] = useIntersectionObserver({ threshold: 0.1 });
   const [projectsRef, projectsVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [experienceRef, experienceVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const experienceContentRef = useRef(null);
+  const projectsContentRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [experienceReveal, setExperienceReveal] = useState(0.15);
+  const [projectsReveal, setProjectsReveal] = useState(0.15);
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -340,6 +346,59 @@ const Home = memo(() => {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const computeReveal = (element) => {
+      if (!element) return 1;
+      const rect = element.getBoundingClientRect();
+      const start = window.innerHeight * 0.98;
+      const end = window.innerHeight * 0.45;
+      return clamp((start - rect.top) / (start - end), 0, 1);
+    };
+
+    const updateReveal = () => {
+      setExperienceReveal(computeReveal(experienceContentRef.current));
+      setProjectsReveal(computeReveal(projectsContentRef.current));
+    };
+
+    updateReveal();
+
+    if (lenis?.on) {
+      lenis.on('scroll', updateReveal);
+    } else {
+      window.addEventListener('scroll', updateReveal, { passive: true });
+    }
+    window.addEventListener('resize', updateReveal);
+
+    return () => {
+      if (lenis?.off) {
+        lenis.off('scroll', updateReveal);
+      } else {
+        window.removeEventListener('scroll', updateReveal);
+      }
+      window.removeEventListener('resize', updateReveal);
+    };
+  }, [lenis]);
+
+  const experienceRevealStyle = useMemo(
+    () => ({
+      transform: `translate3d(0, ${(1 - experienceReveal) * 14}px, 0)`,
+      opacity: 0.9 + experienceReveal * 0.1,
+      transition: 'transform 140ms linear, opacity 140ms linear',
+    }),
+    [experienceReveal],
+  );
+
+  const projectsRevealStyle = useMemo(
+    () => ({
+      transform: `translate3d(0, ${(1 - projectsReveal) * 14}px, 0)`,
+      opacity: 0.9 + projectsReveal * 0.1,
+      transition: 'transform 140ms linear, opacity 140ms linear',
+    }),
+    [projectsReveal],
+  );
 
   // Memoize section visibility for performance
   const sectionsVisible = useMemo(() => ({
@@ -436,7 +495,7 @@ const Home = memo(() => {
 
                 <motion.div
                   variants={containerVariants}
-                  initial={false}
+                  initial="hidden"
                   animate="visible"
                   className="w-full"
                 >
@@ -514,7 +573,7 @@ const Home = memo(() => {
 
         {/* Experience Section */}
         <div ref={experienceRef} className="py-12 md:py-16">
-          <div className="content-container">
+          <div ref={experienceContentRef} className="content-container" style={experienceRevealStyle}>
             <motion.div
               className="mb-8 flex items-center"
               initial={{ opacity: 0, y: 6 }}
@@ -542,7 +601,7 @@ const Home = memo(() => {
         </div>
         {/* Projects Preview Section */}
         <div ref={projectsRef} className="mb-12">
-          <div className="content-container mt-4">
+          <div ref={projectsContentRef} className="content-container mt-4" style={projectsRevealStyle}>
             <motion.div
               className="mb-10 md:mb-12 flex items-center"
               initial={{ opacity: 0, y: 6 }}
