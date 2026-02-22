@@ -22,10 +22,10 @@ export const SmoothScrollProvider = ({ children }) => {
     }
 
     const instance = new Lenis({
-      duration: 1.2,
-      lerp: 0.05,
+      duration: 0.9,
+      lerp: 0.08,
       wheelMultiplier: 0.9,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1,
       autoRaf: false,
       syncTouch: false,
     });
