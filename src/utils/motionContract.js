@@ -28,7 +28,7 @@ export const motionInteraction = {
   },
 };
 
-export const sequenceDelay = (index, offset = 0) => offset + index * 0.04;
+export const sequenceDelay = (index, offset = 0) => offset + index * 0.15;
 
 export const cardMotion = {
   gridVariants: {
@@ -36,17 +36,17 @@ export const cardMotion = {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.04,
-        delayChildren: 0.04,
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
       },
     },
   },
   itemVariants: {
-    hidden: { opacity: 0, y: 10 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: motionTransition.componentEnter,
+      transition: { ...motionTransition.componentEnter, duration: 0.6 },
     },
   },
   hover: motionInteraction.hoverLift,

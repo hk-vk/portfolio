@@ -33,8 +33,6 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
     <motion.div
       className="group relative flex flex-col h-full bg-card/40 backdrop-blur-md border border-border/40 rounded-xl overflow-hidden hover:border-primary/20 hover:bg-card/60 transition-all duration-300 cursor-pointer"
       variants={cardVariants}
-      initial="hidden"
-      animate={isVisible ? "visible" : "hidden"}
       whileHover={motionSafe ? cardMotion.hover : undefined}
       whileTap={motionSafe ? cardMotion.press : undefined}
       layout
@@ -214,8 +212,9 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
       initial={entrance.fadeUp.initial}
       animate={isVisible ? entrance.fadeUp.animate : entrance.fadeUp.initial}
       transition={{
-        duration: duration.quick / 1000,
-        delay: sequenceDelay(index)
+        duration: 0.6,
+        delay: sequenceDelay(index),
+        ease: [0.21, 0.47, 0.32, 0.98]
       }}
     >
       <div 

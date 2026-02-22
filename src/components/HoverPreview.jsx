@@ -202,16 +202,7 @@ const HoverPreviewCard = forwardRef((_, ref) => {
               </div>
             )}
           </div>
-          {activePreview.url && (
-            <a
-              href={activePreview.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 mt-0.5 text-[10px] font-medium text-muted-foreground hover:text-foreground px-1.5 py-0.5 rounded border border-border/50 hover:border-border transition-colors"
-            >
-              Visit ↗
-            </a>
-          )}
+
         </div>
       </div>
     </div>
