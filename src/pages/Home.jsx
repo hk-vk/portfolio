@@ -361,14 +361,7 @@ const Home = memo(() => {
   const [projectsReveal, setProjectsReveal] = useState(0.15);
   
   const heroCardRef = useRef(null);
-  const [heroPosition, setHeroPosition] = useState({ x: 0, y: 0 });
-  const [heroOpacity, setHeroOpacity] = useState(0);
 
-  const handleHeroMouseMove = (e) => {
-    if (!heroCardRef.current) return;
-    const rect = heroCardRef.current.getBoundingClientRect();
-    setHeroPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -502,19 +495,7 @@ const Home = memo(() => {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
-              onMouseMove={handleHeroMouseMove}
-              onMouseEnter={() => setHeroOpacity(1)}
-              onMouseLeave={() => setHeroOpacity(0)}
             >
-              {/* Spotlight Border Layer */}
-              <div 
-                className="absolute inset-0 z-0 transition-opacity duration-300"
-                style={{
-                  opacity: heroOpacity,
-                  background: `radial-gradient(1000px circle at ${heroPosition.x}px ${heroPosition.y}px, hsl(var(--primary) / 0.15), transparent 40%)`
-                }}
-              />
-              
               <div className="relative z-10 bg-background/80 backdrop-blur-md border border-border/40 rounded-[11px] sm:rounded-[15px] p-4 sm:p-6 md:p-10 h-full w-full overflow-hidden">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
