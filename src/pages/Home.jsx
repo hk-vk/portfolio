@@ -26,19 +26,49 @@ const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
 // Optimized project card with intersection observer and image loading
 const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
   const posthog = usePostHog();
+  const divRef = useRef(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [opacity, setOpacity] = useState(0);
 
   const cardVariants = cardMotion.itemVariants;
 
+  const handleMouseMove = (e) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  const handleMouseEnter = () => setOpacity(1);
+  const handleMouseLeave = () => setOpacity(0);
+
+  // We KEEP the existing posthog capture code intact inside the footer.
+  // We ONLY change the layout wrapping.
+
   return (
     <motion.div
-      className="group relative flex flex-col h-full bg-card/40 backdrop-blur-md border border-border/40 rounded-xl overflow-hidden hover:border-primary/20 hover:bg-card/60 transition-all duration-300 cursor-pointer"
+      ref={divRef}
+      className="group relative flex flex-col h-full p-[1px] rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow"
       variants={cardVariants}
       whileHover={motionSafe ? cardMotion.hover : undefined}
       whileTap={motionSafe ? cardMotion.press : undefined}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       layout
     >
-      {/* Image Container */}
-      <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
+      {/* Spotlight Border Layer */}
+      <div 
+        className="absolute inset-0 z-0 transition-opacity duration-300"
+        style={{
+          opacity,
+          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, hsl(var(--primary) / 0.15), transparent 40%)`
+        }}
+      />
+      
+      {/* Main Content Card Wrapper */}
+      <div className="relative z-10 flex flex-col h-full bg-card/60 backdrop-blur-md border border-border/40 rounded-[11px] overflow-hidden hover:bg-card/80 transition-colors">
+        {/* Image Container */}
+        <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
         <img
           src={project.image}
           alt={project.title}
@@ -83,7 +113,7 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
         </div>
 
         {/* Actions Footer */}
-        <div className="flex items-center gap-3 pt-4 mt-auto border-t border-border/30">
+        <div className="flex items-center gap-3 pt-4 mt-auto border-t border-border/30 relative z-20">
           {project.liveUrl && (
             <a
               href={project.liveUrl}
@@ -125,6 +155,7 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
             </a>
           )}
         </div>
+      </div>
       </div>
     </motion.div>
   );
@@ -328,6 +359,16 @@ const Home = memo(() => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [experienceReveal, setExperienceReveal] = useState(0.15);
   const [projectsReveal, setProjectsReveal] = useState(0.15);
+  
+  const heroCardRef = useRef(null);
+  const [heroPosition, setHeroPosition] = useState({ x: 0, y: 0 });
+  const [heroOpacity, setHeroOpacity] = useState(0);
+
+  const handleHeroMouseMove = (e) => {
+    if (!heroCardRef.current) return;
+    const rect = heroCardRef.current.getBoundingClientRect();
+    setHeroPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -456,11 +497,25 @@ const Home = memo(() => {
             <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
 
             <motion.div
-              className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl bg-background/80 backdrop-blur-md shadow-xl ring-1 ring-border/40 p-4 sm:p-6 md:p-10 overflow-hidden"
+              ref={heroCardRef}
+              className="relative mb-8 sm:mb-16 p-[1px] rounded-xl sm:rounded-2xl overflow-hidden group shadow-xl"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
+              onMouseMove={handleHeroMouseMove}
+              onMouseEnter={() => setHeroOpacity(1)}
+              onMouseLeave={() => setHeroOpacity(0)}
             >
+              {/* Spotlight Border Layer */}
+              <div 
+                className="absolute inset-0 z-0 transition-opacity duration-300"
+                style={{
+                  opacity: heroOpacity,
+                  background: `radial-gradient(1000px circle at ${heroPosition.x}px ${heroPosition.y}px, hsl(var(--primary) / 0.15), transparent 40%)`
+                }}
+              />
+              
+              <div className="relative z-10 bg-background/80 backdrop-blur-md border border-border/40 rounded-[11px] sm:rounded-[15px] p-4 sm:p-6 md:p-10 h-full w-full overflow-hidden">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
@@ -564,6 +619,7 @@ const Home = memo(() => {
                     </div>
                   </motion.div>
                 </motion.div>
+              </div>
               </div>
             </motion.div>
 
