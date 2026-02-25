@@ -7,7 +7,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { usePostHog } from "@posthog/react";
+import { motion, AnimatePresence } from "../lib/motion";
 
 // Context
 const HoverPreviewContext = createContext(null);
@@ -47,7 +49,7 @@ export function HoverPreviewProvider({
     });
   }, [data, preloadImages]);
 
-  const updatePosition = useCallback(
+  const clampPosition = useCallback(
     (e) => {
       let x = e.clientX - cardWidth / 2;
       let y = e.clientY - cardHeight - cursorOffset;
@@ -63,12 +65,29 @@ export function HoverPreviewProvider({
         y = e.clientY + cursorOffset;
       }
 
+      return { x, y };
+    },
+    [cardWidth, cardHeight, cursorOffset]
+  );
+
+  // Snap directly to correct position (no lerp) — used on initial hover
+  const snapPosition = useCallback(
+    (e) => {
+      setPosition(clampPosition(e));
+    },
+    [clampPosition]
+  );
+
+  // Smoothly follow cursor during move
+  const updatePosition = useCallback(
+    (e) => {
+      const { x, y } = clampPosition(e);
       setPosition((prev) => ({
         x: prev.x + (x - prev.x) * 0.55,
         y: prev.y + (y - prev.y) * 0.55,
       }));
     },
-    [cardWidth, cardHeight, cursorOffset]
+    [clampPosition]
   );
 
   const handleHoverStart = useCallback(
@@ -88,11 +107,11 @@ export function HoverPreviewProvider({
           trackedPreviewKeysRef.current.add(key);
         }
         setActivePreview(previewData);
-        updatePosition(e);
+        snapPosition(e); // snap directly — no lerp from stale/zero coords
         setIsVisible(true);
       }
     },
-    [data, updatePosition, posthog]
+    [data, snapPosition, posthog]
   );
 
   const handleHoverMove = useCallback(
@@ -138,10 +157,8 @@ export function HoverPreviewProvider({
 
   return (
     <HoverPreviewContext.Provider value={contextValue}>
-      <div className="relative">
-        {children}
-        <HoverPreviewCard ref={cardRef} />
-      </div>
+      {children}
+      <HoverPreviewCard ref={cardRef} />
     </HoverPreviewContext.Provider>
   );
 }
@@ -163,49 +180,72 @@ export function HoverPreviewLink({ previewKey, children, className = "" }) {
   );
 }
 
-// Preview Card
+// Preview Card — rendered via portal at document.body to escape ancestor CSS transforms
 const HoverPreviewCard = forwardRef((_, ref) => {
   const { activePreview, position, isVisible, cardWidth, handleCardEnter, handleCardLeave } = useHoverPreview();
 
-  if (!activePreview) return null;
+  return createPortal(
+    <AnimatePresence>
+      {isVisible && activePreview && (
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, scale: 0.84, y: 14, filter: "blur(6px)" }}
+          animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 0.9, y: 8, filter: "blur(3px)" }}
+          transition={{
+            opacity: { duration: 0.2, ease: "easeOut" },
+            scale: { type: "spring", stiffness: 380, damping: 26, mass: 0.8 },
+            y: { type: "spring", stiffness: 380, damping: 26, mass: 0.8 },
+            filter: { duration: 0.2, ease: "easeOut" },
+          }}
+          className="fixed z-[9999] pointer-events-auto"
+          style={{
+            left: `${position.x}px`,
+            top: `${position.y}px`,
+            width: cardWidth,
+            transformOrigin: "center bottom",
+          }}
+          onMouseEnter={handleCardEnter}
+          onMouseLeave={handleCardLeave}
+        >
+          <div className="overflow-hidden rounded-xl border border-border/50 bg-card/95 p-2 shadow-2xl backdrop-blur-md ring-1 ring-white/[0.08]">
+            {/* Image with subtle zoom-out settle */}
+            <motion.div
+              initial={{ scale: 1.07, opacity: 0.7 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="overflow-hidden rounded-lg"
+            >
+              <img
+                src={activePreview.image}
+                alt={activePreview.title || ""}
+                className="aspect-video w-full object-cover"
+              />
+            </motion.div>
 
-  return (
-    <div
-      ref={ref}
-      className={`fixed z-50 transition-all duration-150 ease-out will-change-transform ${
-        isVisible
-          ? "scale-100 opacity-100 pointer-events-auto"
-          : "translate-y-2 scale-95 opacity-0 pointer-events-none"
-      }`}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: cardWidth,
-      }}
-      onMouseEnter={handleCardEnter}
-      onMouseLeave={handleCardLeave}
-    >
-      <div className="overflow-hidden rounded-xl border border-border/50 bg-card/95 p-2 shadow-2xl backdrop-blur-md">
-        <img
-          src={activePreview.image}
-          alt={activePreview.title || ""}
-          className="aspect-video w-full rounded-lg object-cover"
-        />
-        <div className="px-2 pt-2 pb-1 flex items-start justify-between gap-2">
-          <div>
-            <div className="font-semibold text-foreground text-sm">
-              {activePreview.title}
-            </div>
-            {activePreview.subtitle && (
-              <div className="mt-0.5 text-muted-foreground text-xs">
-                {activePreview.subtitle}
+            {/* Text staggered in after image */}
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, delay: 0.08, ease: "easeOut" }}
+              className="px-2 pt-2 pb-1 flex items-start justify-between gap-2"
+            >
+              <div>
+                <div className="font-semibold text-foreground text-sm leading-snug">
+                  {activePreview.title}
+                </div>
+                {activePreview.subtitle && (
+                  <div className="mt-0.5 text-muted-foreground text-xs">
+                    {activePreview.subtitle}
+                  </div>
+                )}
               </div>
-            )}
+            </motion.div>
           </div>
-
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
   );
 });
 
