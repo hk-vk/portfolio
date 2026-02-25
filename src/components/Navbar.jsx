@@ -133,11 +133,10 @@ const Navbar = () => {
                     >
                       {/* Front face with icon */}
                       <div
-                        className={`absolute inset-0 flex items-center justify-center ${
-                          isActive
+                        className={`absolute inset-0 flex items-center justify-center ${isActive
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted/40 text-foreground"
-                        } border border-border/10 rounded-xl`}
+                          } border border-border/10 rounded-xl`}
                         style={{
                           backfaceVisibility: "hidden",
                           transform: "translateZ(20px)",
@@ -151,11 +150,10 @@ const Navbar = () => {
 
                       {/* Top face with label (rotates into view) */}
                       <div
-                        className={`absolute inset-0 flex items-center justify-center ${
-                          isActive
+                        className={`absolute inset-0 flex items-center justify-center ${isActive
                             ? "bg-primary text-primary-foreground"
                             : "bg-accent/60 text-accent-foreground"
-                        } border border-border/10 rounded-xl`}
+                          } border border-border/10 rounded-xl`}
                         style={{
                           backfaceVisibility: "hidden",
                           transform: "rotateX(90deg) translateZ(20px)",
@@ -204,11 +202,10 @@ const Navbar = () => {
                     >
                       {/* Front face with icon */}
                       <div
-                        className={`absolute inset-0 flex items-center justify-center ${
-                          socialOpen
+                        className={`absolute inset-0 flex items-center justify-center ${socialOpen
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted/40 text-foreground"
-                        } border border-border/10 rounded-xl`}
+                          } border border-border/10 rounded-xl`}
                         style={{
                           backfaceVisibility: "hidden",
                           transform: "translateZ(20px)",
@@ -222,11 +219,10 @@ const Navbar = () => {
 
                       {/* Top face with label (rotates into view) */}
                       <div
-                        className={`absolute inset-0 flex items-center justify-center ${
-                          socialOpen
+                        className={`absolute inset-0 flex items-center justify-center ${socialOpen
                             ? "bg-primary text-primary-foreground"
                             : "bg-accent/60 text-accent-foreground"
-                        } border border-border/10 rounded-xl`}
+                          } border border-border/10 rounded-xl`}
                         style={{
                           backfaceVisibility: "hidden",
                           transform: "rotateX(90deg) translateZ(20px)",

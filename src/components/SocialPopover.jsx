@@ -54,38 +54,34 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
           role="dialog"
           aria-label="Social links"
           ref={panelRef}
-          className="absolute bottom-full right-6 mb-2 z-50 pointer-events-auto bg-background/90 backdrop-blur-md ring-1 ring-border/30 shadow-xl rounded-xl px-4 py-3 flex gap-4"
+          className="absolute bottom-full right-6 mb-2 z-50 pointer-events-auto bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl rounded-xl px-4 py-3 flex gap-4"
           initial={{
             opacity: 0,
-            y: 10,
-            scale: 0.84,
-            borderRadius: 999,
-            clipPath: 'inset(42% 36% 0% 36% round 999px)',
-            filter: 'blur(6px) saturate(0.92)',
+            scale: 0.82,
+            y: 14,
+            filter: 'blur(6px)',
           }}
           animate={{
             opacity: 1,
-            y: 0,
             scale: 1,
-            borderRadius: 16,
-            clipPath: 'inset(0% 0% 0% 0% round 16px)',
-            filter: 'blur(0px) saturate(1)',
+            y: 0,
+            filter: 'blur(0px)',
             transition: {
               type: 'spring',
               stiffness: 380,
-              damping: 30,
-              mass: 0.72,
+              damping: 26,
+              mass: 0.8,
+              opacity: { duration: 0.2, ease: 'easeOut' },
+              filter: { duration: 0.2, ease: 'easeOut' },
               when: 'beforeChildren',
-              staggerChildren: 0.035,
+              staggerChildren: 0.04,
             },
           }}
           exit={{
             opacity: 0,
-            y: 6,
-            scale: 0.92,
-            borderRadius: 999,
-            clipPath: 'inset(36% 34% 0% 34% round 999px)',
-            filter: 'blur(3px) saturate(0.95)',
+            scale: 0.88,
+            y: 8,
+            filter: 'blur(3px)',
             transition: {
               duration: 0.14,
               ease: 'easeIn',
