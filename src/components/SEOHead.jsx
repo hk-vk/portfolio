@@ -10,9 +10,23 @@ const SEOHead = ({
   author = "Harikrishnan V K",
   twitterHandle = "@harikrishnanvk"
 }) => {
-  const baseUrl = "https://hari.works";
-  const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
-  const fullImageUrl = image.startsWith('http') ? image : `${baseUrl}${image}`;
+  const getSiteUrl = () => {
+    if (import.meta.env.VITE_SITE_URL) {
+      return import.meta.env.VITE_SITE_URL;
+    }
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return window.location.origin;
+    }
+    return 'https://hari.works';
+  };
+
+  const siteUrl = getSiteUrl();
+  const fullUrl = url
+    ? url.startsWith('http')
+      ? url
+      : new URL(url, siteUrl).href
+    : siteUrl;
+  const fullImageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).href;
 
   return (
     <Helmet>
