@@ -24,13 +24,13 @@ export async function onRequest(context) {
 
   const getSocialImageForCrawler = (ua, origin) => {
     if (/Slackbot|Pinterest|Skype/i.test(ua)) {
-      return { image: withVersion(`${origin}/social/og_square.jpg`), width: 1080, height: 1080 };
+      return { image: withVersion(`${origin}/social/linkedin-featured-square-1080.jpg`), width: 1080, height: 1080 };
     }
     if (/Twitterbot/i.test(ua)) {
       return { image: withVersion(`${origin}/social/x-1200x675.jpg`), width: 1200, height: 675 };
     }
     if (/LinkedInBot/i.test(ua)) {
-      return { image: withVersion(`${origin}/social/og_square.jpg`), width: 1080, height: 1080 };
+      return { image: withVersion(`${origin}/social/linkedin-featured-square-1080.jpg`), width: 1080, height: 1080 };
     }
     if (/facebookexternalhit|Facebot/i.test(ua)) {
       return { image: withVersion(`${origin}/social/facebook-1200x630.jpg`), width: 1200, height: 630 };
