@@ -1,10 +1,12 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
+const OG_IMAGE_VERSION = '20260324-1';
+
 const SEOHead = ({
   title = "Harikrishnan V K | Portfolio",
   description = "Full-stack developer specializing in modern web technologies. Explore my projects, blog posts, and professional journey.",
-  image = "/og.jpg",
+  image = "/social/og-universal-1200x630.jpg",
   url = "",
   type = "website",
   author = "Harikrishnan V K",
@@ -26,7 +28,9 @@ const SEOHead = ({
       ? url
       : new URL(url, siteUrl).href
     : siteUrl;
-  const fullImageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).href;
+  const resolvedImageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).href;
+  const fullImageUrl = new URL(resolvedImageUrl);
+  fullImageUrl.searchParams.set('v', OG_IMAGE_VERSION);
 
   return (
     <Helmet>
@@ -39,8 +43,8 @@ const SEOHead = ({
       {/* Open Graph Meta Tags */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImageUrl} />
-      <meta property="og:image:secure_url" content={fullImageUrl} />
+      <meta property="og:image" content={fullImageUrl.href} />
+      <meta property="og:image:secure_url" content={fullImageUrl.href} />
       <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
@@ -56,7 +60,8 @@ const SEOHead = ({
       <meta name="twitter:creator" content={twitterHandle} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImageUrl} />
+      <meta name="twitter:image" content={new URL(`/social/x-1200x675.jpg?v=${OG_IMAGE_VERSION}`, siteUrl).href} />
+      <meta name="twitter:image:src" content={new URL(`/social/x-1200x675.jpg?v=${OG_IMAGE_VERSION}`, siteUrl).href} />
       <meta name="twitter:image:alt" content={`Preview image for ${title}`} />
 
       {/* Additional Meta Tags for better SEO */}

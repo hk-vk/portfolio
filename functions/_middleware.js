@@ -1,6 +1,8 @@
 // Cloudflare Functions Middleware for handling social media crawlers
 // This intercepts requests from social media bots and serves them static HTML with proper OG tags
 
+const OG_IMAGE_VERSION = '20260324-1';
+
 export async function onRequest(context) {
   const { request, next } = context;
   const userAgent = request.headers.get('user-agent') || '';
@@ -14,26 +16,35 @@ export async function onRequest(context) {
     return next();
   }
 
+  const withVersion = (imageUrl) => {
+    const image = new URL(imageUrl);
+    image.searchParams.set('v', OG_IMAGE_VERSION);
+    return image.href;
+  };
+
   const getSocialImageForCrawler = (ua, origin) => {
+    if (/Slackbot|Pinterest|Skype/i.test(ua)) {
+      return { image: withVersion(`${origin}/social/og_square.jpg`), width: 1080, height: 1080 };
+    }
     if (/Twitterbot/i.test(ua)) {
-      return { image: `${origin}/social/x-1200x675.jpg`, width: 1200, height: 675 };
+      return { image: withVersion(`${origin}/social/x-1200x675.jpg`), width: 1200, height: 675 };
     }
     if (/LinkedInBot/i.test(ua)) {
-      return { image: `${origin}/social/linkedin-1200x627.jpg`, width: 1200, height: 627 };
+      return { image: withVersion(`${origin}/social/linkedin-1200x627.jpg`), width: 1200, height: 627 };
     }
     if (/facebookexternalhit|Facebot/i.test(ua)) {
-      return { image: `${origin}/social/facebook-1200x630.jpg`, width: 1200, height: 630 };
+      return { image: withVersion(`${origin}/social/facebook-1200x630.jpg`), width: 1200, height: 630 };
     }
     if (/WhatsApp/i.test(ua)) {
-      return { image: `${origin}/social/whatsapp-1200x630.jpg`, width: 1200, height: 630 };
+      return { image: withVersion(`${origin}/social/whatsapp-1200x630.jpg`), width: 1200, height: 630 };
     }
     if (/Telegram/i.test(ua)) {
-      return { image: `${origin}/social/telegram-1200x630.jpg`, width: 1200, height: 630 };
+      return { image: withVersion(`${origin}/social/telegram-1200x630.jpg`), width: 1200, height: 630 };
     }
     if (/Discord/i.test(ua)) {
-      return { image: `${origin}/social/discord-1200x630.jpg`, width: 1200, height: 630 };
+      return { image: withVersion(`${origin}/social/discord-1200x630.jpg`), width: 1200, height: 630 };
     }
-    return { image: `${origin}/og.jpg`, width: 1200, height: 630 };
+    return { image: withVersion(`${origin}/social/og-universal-1200x630.jpg`), width: 1200, height: 630 };
   };
 
   // Extract route information
@@ -115,6 +126,7 @@ export async function onRequest(context) {
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
   <meta name="twitter:image" content="${image}" />
+  <meta name="twitter:image:src" content="${image}" />
   <meta name="twitter:image:alt" content="Preview image for ${title}" />
 
   <!-- Additional Meta Tags -->
