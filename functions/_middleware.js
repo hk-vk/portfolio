@@ -30,7 +30,7 @@ export async function onRequest(context) {
       return { image: withVersion(`${origin}/social/x-1200x675.jpg`), width: 1200, height: 675 };
     }
     if (/LinkedInBot/i.test(ua)) {
-      return { image: withVersion(`${origin}/social/linkedin-1200x627.jpg`), width: 1200, height: 627 };
+      return { image: withVersion(`${origin}/social/og_square.jpg`), width: 1080, height: 1080 };
     }
     if (/facebookexternalhit|Facebot/i.test(ua)) {
       return { image: withVersion(`${origin}/social/facebook-1200x630.jpg`), width: 1200, height: 630 };
