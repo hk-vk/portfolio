@@ -716,6 +716,15 @@ const featuredProjects = [
   },
   {
     id: '02',
+    title: 'Git Talks',
+    description: 'Turn any GitHub repository into an AI-generated podcast episode that explains architecture, design decisions, and code.',
+    tags: ['AI', 'GitHub', 'Podcast', 'Code Analysis', 'TTS'],
+    image: 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev/199shots_so%20(1).png',
+    liveUrl: 'https://gittalks.vercel.app',
+    githubUrl: 'https://github.com/hkvk/gittalks',
+  },
+  {
+    id: '03',
     title: 'YEAH - Fake News Detector',
     description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
     tags: ['TypeScript', 'React', 'Fake News Detection', 'AI/ML', 'Computer Vision'],
@@ -724,21 +733,13 @@ const featuredProjects = [
     githubUrl: 'https://github.com/hk-vk/yeah',
   },
   {
-    id: '03',
+    id: '04',
     title: 'PDFx - Offline PDF Toolkit',
     description: 'A fully offline PDF manipulation toolkit with all processing done in your browser',
     tags: ['TypeScript', 'WebAssembly', 'PDF', 'Privacy', 'Offline-First'],
     image: `${R2_BASE_URL}/image.png`,
     liveUrl: 'https://pdfx-8su.pages.dev/',
     githubUrl: 'https://github.com/hk-vk/pdfX',
-  },
-  {
-    id: '04',
-    title: 'Cricket Score Widget',
-    description: 'An always-on-top Windows desktop application for live cricket scores built with Electron and React',
-    tags: ['Electron', 'React', 'JavaScript', 'Desktop', 'System Tray', 'Windows'],
-    image: `${R2_BASE_URL}/Screenshot-2025-07-06-020503.png`,
-    githubUrl: 'https://github.com/hk-vk/cricket-score-widget',
   },
 ];
 
