@@ -725,12 +725,11 @@ const featuredProjects = [
   },
   {
     id: '03',
-    title: 'YEAH - Fake News Detector',
-    description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
-    tags: ['TypeScript', 'React', 'Fake News Detection', 'AI/ML', 'Computer Vision'],
-    image: `${R2_BASE_URL}/yeahpreview.png`,
-    liveUrl: 'https://www.yeahml.live',
-    githubUrl: 'https://github.com/hk-vk/yeah',
+    title: 'CodexPilot',
+    description: 'A fork of Codex CLI for using Codex models through your GitHub Copilot subscription.',
+    tags: ['Rust', 'CLI', 'GitHub Copilot', 'OpenAI', 'Developer Tooling'],
+    image: 'https://repository-images.githubusercontent.com/1200509020/64db259f-1b41-4887-b4bc-257f45696fc1',
+    githubUrl: 'https://github.com/hk-vk/codexpilot',
   },
   {
     id: '04',

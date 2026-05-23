@@ -44,6 +44,20 @@ const projects = [
   },
   {
     id: '03',
+    title: 'CodexPilot',
+    description: 'A fork of Codex CLI for using Codex models through your GitHub Copilot subscription.',
+    fullDescription: 'CodexPilot is an independent fork of OpenAI Codex that keeps its own local app state while supporting both OpenAI and GitHub Copilot providers. It adds practical developer workflows like provider switching and resuming upstream Codex sessions from /resume.',
+    category: 'Developer Tool',
+    tags: ['Rust', 'CLI', 'GitHub Copilot', 'OpenAI', 'Developer Tooling'],
+    image: 'https://repository-images.githubusercontent.com/1200509020/64db259f-1b41-4887-b4bc-257f45696fc1',
+    githubUrl: 'https://github.com/hk-vk/codexpilot',
+    techStack: ['Rust', 'CLI', 'Node.js', 'pnpm Workspaces'],
+    features: ['GitHub Copilot Support', 'Provider Switching', 'Separate Local State (~/.codexpilot)', 'Resume Upstream Sessions', 'Independent Fork Identity'],
+    challenges: 'Keeping fork behavior and local state isolated from upstream Codex while still enabling useful cross-session resume workflows.',
+    solutions: 'Maintained separate runtime/auth/config paths and added explicit resume pathways that surface upstream sessions without inheriting upstream runtime config.'
+  },
+  {
+    id: '04',
     title: 'YEAH - Fake News Detector',
     description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
     fullDescription: 'A comprehensive fake news detection system that combines multiple AI technologies including natural language processing, computer vision, and web scraping to analyze and verify news content across different media formats.',
@@ -59,7 +73,7 @@ const projects = [
     solutions: 'Implemented efficient caching, parallel processing, and progressive enhancement for optimal user experience.'
   },
   {
-    id: '04',
+    id: '05',
     title: 'CommitStoryGen',
     description: 'A web App that generates a storyline based on the commit history of a github repo',
     fullDescription: 'An innovative tool that transforms boring commit histories into engaging narratives, helping developers showcase their project journey in a more compelling way.',
@@ -75,7 +89,7 @@ const projects = [
     solutions: 'Implemented smart filtering, natural language processing, and progressive loading for better performance.'
   },
   {
-    id: '05',
+    id: '06',
     title: 'PDFx - Offline PDF Toolkit',
     description: 'A fully offline PDF manipulation toolkit with all processing done in your browser',
     fullDescription: 'A privacy-focused PDF manipulation suite that runs entirely in the browser, ensuring your documents never leave your device while providing professional-grade PDF editing capabilities.',
@@ -91,7 +105,7 @@ const projects = [
     solutions: 'Leveraged WebAssembly for heavy computations and implemented chunked processing for large files.'
   },
   {
-    id: '06',
+    id: '07',
     title: 'Cricket Score Widget',
     description: 'An always-on-top Windows desktop application for live cricket scores built with Electron and React',
     fullDescription: 'A simple system tray widget for Windows that displays live cricket scores from Cricbuzz. Features include fetching live match lists, detailed scorecards, match status updates, pinning functionality, light/dark theme toggling, and auto-refresh capabilities.',
