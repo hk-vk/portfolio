@@ -63,8 +63,15 @@ function LifelinePreviewModal({
         className="w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between gap-4 border-b border-border/60 px-4 py-3">
-          <p className="truncate text-sm font-semibold">{photo.alt}</p>
+        <div className="flex items-center gap-3 border-b border-border/60 bg-muted/30 px-3 py-2">
+          <div className="flex shrink-0 items-center gap-1.5" aria-hidden="true">
+            <span className="h-2.5 w-2.5 rounded-full bg-primary/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
+            <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
+          </div>
+          <div className="min-w-0 flex-1 truncate rounded-md border border-border/60 bg-background px-3 py-1 font-mono text-[10px] text-muted-foreground">
+            {photo.previewUrl}
+          </div>
           <button
             type="button"
             onClick={onClose}
@@ -255,20 +262,12 @@ export function LifelinePhotoCard({
           }
         >
           {photo.previewUrl ? (
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-background">
-              <iframe
-                src={photo.previewUrl}
-                title={photo.alt}
-                tabIndex={-1}
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-0 origin-top-left border-0"
-                style={{
-                  width: 960,
-                  height: 600,
-                  transform: `scale(${width / 960})`,
-                }}
-              />
-            </div>
+            <img
+              src={photo.src}
+              alt={photo.alt}
+              loading="lazy"
+              className="pointer-events-none block aspect-[16/10] w-full object-cover"
+            />
           ) : (
             <LifelineEventMedia
               media={photo}

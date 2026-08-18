@@ -41,7 +41,7 @@ const archiveMarkers = [...archiveVersions].reverse().map((version, index) => ({
     { type: 'link', value: 'Open build', href: version.buildPath },
   ]],
   photos: [{
-    src: '/og.png',
+    src: `${version.buildPath}preview.png`,
     alt: `${version.title} build preview`,
     previewUrl: version.buildPath,
     width: 220,
