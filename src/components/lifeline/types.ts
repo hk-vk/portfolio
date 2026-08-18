@@ -35,6 +35,8 @@ export interface LifelineEventImage {
  * scattered, tilted, and draggable, like photos loose in a notebook.
  */
 export interface LifelinePhoto extends LifelineEventImage {
+  /** Optional live build URL rendered as a miniature portfolio preview. */
+  previewUrl?: string
   /** 0..1 across the marker's slot; defaults to a seeded scatter. */
   x?: number
   /** Pixels below the rail; defaults to a seeded scatter. */

@@ -149,7 +149,7 @@ export function LifelineDesktop({
           */}
           <div
             ref={labelsRef}
-            className="lifeline-labels shrink-0 bg-white transition-colors duration-300 will-change-transform dark:bg-black"
+            className="lifeline-labels shrink-0 bg-background transition-colors duration-300 will-change-transform"
             style={{ width: LIFELINE_STICKY_SHIELD_WIDTH }}
           >
             <div className={cn(showIntro && "lifeline-labels-intro")}>

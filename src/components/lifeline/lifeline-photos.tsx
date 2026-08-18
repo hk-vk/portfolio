@@ -1,6 +1,8 @@
 "use client"
 
-import { useRef, useState, type CSSProperties, type PointerEvent } from "react"
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react"
+import { createPortal } from "react-dom"
+import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LifelineEventMedia } from "./lifeline-event"
 import {
@@ -31,6 +33,70 @@ const TEXT_ZONE = 288 + 24
 const CLICK_SLOP = 4
 /** Fingers wobble more than mice — touch presses get extra tap room. */
 const TOUCH_CLICK_SLOP = 10
+
+function LifelinePreviewModal({
+  photo,
+  onClose,
+}: {
+  photo: LifelinePhoto
+  onClose: () => void
+}) {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [onClose])
+
+  if (!photo.previewUrl) return null
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label={photo.alt}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-4 border-b border-border/60 px-4 py-3">
+          <p className="truncate text-sm font-semibold">{photo.alt}</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            aria-label="Close build preview"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="aspect-[16/10] bg-background">
+          <iframe
+            src={photo.previewUrl}
+            title={photo.alt}
+            className="h-full w-full border-0 bg-background"
+          />
+        </div>
+        <div className="flex items-center justify-between gap-4 border-t border-border/60 px-4 py-3">
+          <span className="text-xs text-muted-foreground">Live local snapshot</span>
+          <a
+            href={photo.previewUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-semibold text-foreground hover:text-primary"
+          >
+            Open build
+          </a>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
 
 /** A fresh tilt on every visit — rolled once per card mount. */
 function randomTilt() {
@@ -66,6 +132,7 @@ export function LifelinePhotoCard({
 }) {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [active, setActive] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [lightboxStart, setLightboxStart] =
     useState<LifelineLightboxStart | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -130,7 +197,8 @@ export function LifelinePhotoCard({
     setActive(false)
     // A press that never travelled is a click — expand to the lightbox.
     if (!drag.current.moved && !lightboxStart) {
-      setLightboxStart(measureCard())
+      if (photo.previewUrl) setPreviewOpen(true)
+      else setLightboxStart(measureCard())
     }
   }
 
@@ -186,12 +254,32 @@ export function LifelinePhotoCard({
               : undefined
           }
         >
-          <LifelineEventMedia
-            media={photo}
-            className="pointer-events-none block w-full"
-          />
+          {photo.previewUrl ? (
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-background">
+              <iframe
+                src={photo.previewUrl}
+                title={photo.alt}
+                tabIndex={-1}
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 top-0 origin-top-left border-0"
+                style={{
+                  width: 960,
+                  height: 600,
+                  transform: `scale(${width / 960})`,
+                }}
+              />
+            </div>
+          ) : (
+            <LifelineEventMedia
+              media={photo}
+              className="pointer-events-none block w-full"
+            />
+          )}
         </div>
       </div>
+      {previewOpen && (
+        <LifelinePreviewModal photo={photo} onClose={() => setPreviewOpen(false)} />
+      )}
       {lightboxStart && (
         <LifelineLightbox
           photo={photo}
@@ -297,7 +385,8 @@ export function LifelineFloatingPhotos({
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
       {markers.map((marker, index) => {
-        if (!marker.photos?.length) return null
+        const floatingPhotos = marker.photos?.filter((photo) => !photo.previewUrl) ?? []
+        if (!floatingPhotos.length) return null
 
         // The card's free run: after this day's own text column, up to
         // the start of the next day that has text of its own.
@@ -315,16 +404,16 @@ export function LifelineFloatingPhotos({
         // starts STACK_OVERLAP of the way along the one beneath it.
         const steps: number[] = []
         let fan = 0
-        for (const stacked of marker.photos) {
+        for (const stacked of floatingPhotos) {
           steps.push(fan)
           fan += (stacked.width ?? CARD_WIDTH) * STACK_OVERLAP
         }
-        const photoCount = marker.photos.length
-        const lastPhoto = marker.photos[photoCount - 1]
+        const photoCount = floatingPhotos.length
+        const lastPhoto = floatingPhotos[photoCount - 1]
         const groupWidth =
           steps[steps.length - 1] + (lastPhoto.width ?? CARD_WIDTH)
 
-        return marker.photos.map((photo, photoIndex) => {
+        return floatingPhotos.map((photo, photoIndex) => {
           const width = photo.width ?? CARD_WIDTH
           // Default home: centered in the text-free run between this
           // day's events and the next day that has text — comfortably

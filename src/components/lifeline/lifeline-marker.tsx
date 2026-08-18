@@ -11,6 +11,7 @@ import {
 import { useLifelineFireworks } from "./lifeline-fireworks"
 import { useLifelineHoverImage } from "./lifeline-hover-image"
 import { aggregateLifelinePeople, LifelinePeople } from "./lifeline-people"
+import { LifelinePhotoCard } from "./lifeline-photos"
 import type { LifelineMarker } from "./types"
 
 interface LifelineMarkerColumnProps {
@@ -166,6 +167,17 @@ export const LifelineMarkerColumn = forwardRef<
                   )
                 })}
               </div>
+
+              {marker.photos?.filter((photo) => photo.previewUrl).map((photo, index) => (
+                <div key={`${marker.id}-preview-${index}`} className="mt-7 w-full">
+                  <LifelinePhotoCard
+                    photo={photo}
+                    rotate={photo.rotate ?? 0}
+                    width={photo.width ?? 220}
+                    className="relative"
+                  />
+                </div>
+              ))}
             </div>
 
             {people.length > 0 && (

@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { Link, useParams } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
-import { motion } from '../lib/motion';
 import { Lifeline } from '../components/lifeline/lifeline';
 import SEOHead from '../components/SEOHead';
 import { archiveVersions, getArchiveVersion } from '../data/archiveVersions';
@@ -41,87 +40,32 @@ const archiveMarkers = [...archiveVersions].reverse().map((version, index) => ({
     { type: 'text', value: `${version.title}. ` },
     { type: 'link', value: 'Open build', href: version.buildPath },
   ]],
+  photos: [{
+    src: '/og.png',
+    alt: `${version.title} build preview`,
+    previewUrl: version.buildPath,
+    width: 220,
+    x: 0.08,
+    y: 160,
+    rotate: index % 2 === 0 ? -2 : 2,
+  }],
 }));
 
 const ArchiveLifeline = () => (
   <ThemeProvider attribute="class" disableTransitionOnChange>
-    <div className="overflow-hidden rounded-xl border border-border/60 bg-card/40">
+    <div className="overflow-hidden">
       <Lifeline
         markers={archiveMarkers}
         birthYear={0}
         title="Portfolio archive timeline"
-        mode="embed"
-        className="h-[31rem] md:h-[29rem]"
+        mode="auto"
+        className="h-[27rem] md:h-[25rem]"
       />
     </div>
   </ThemeProvider>
 );
 
-const ArchiveCard = ({ version, position }) => (
-  <motion.article
-    initial={{ opacity: 0, y: 18 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.2 }}
-    transition={{ duration: 0.45, delay: position * 0.06 }}
-    className="grid gap-5 border-t border-border/70 py-8 md:grid-cols-[minmax(0,1.15fr)_minmax(17rem,.85fr)] md:gap-10"
-  >
-    <Link
-      to={`/archive/${version.year}/${version.id}`}
-      className="group relative aspect-[16/10] overflow-hidden rounded-xl border border-border/60 bg-muted/20 shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
-      aria-label={`View ${version.title}`}
-    >
-      <iframe
-        src={version.buildPath}
-        title=""
-        aria-hidden="true"
-        tabIndex="-1"
-        loading="lazy"
-        className="pointer-events-none absolute left-0 top-0 h-[160%] w-[160%] origin-top-left scale-[.625] bg-background transition-transform duration-500 group-hover:scale-[.64]"
-      />
-      <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
-    </Link>
-
-    <div className="flex flex-col justify-between py-1">
-      <div>
-        <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground">
-          <time dateTime={version.date}>{formatDate(version.date)}</time>
-          <span>{version.commit}</span>
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">{version.title}</h2>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-          {version.description}
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {version.highlights.map((highlight) => (
-            <span key={highlight} className="rounded-full border border-border/60 px-3 py-1 text-xs text-muted-foreground">
-              {highlight}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-7 flex items-center gap-4">
-        <Link
-          to={`/archive/${version.year}/${version.id}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary"
-        >
-          View build
-          <Icon icon="tabler:arrow-up-right" className="h-4 w-4" />
-        </Link>
-        <a
-          href={version.buildPath}
-          target="_blank"
-          rel="noreferrer"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          Open full site
-        </a>
-      </div>
-    </div>
-  </motion.article>
-);
-
-const CompareViewer = ({ older, newer }) => {
+const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange }) => {
   const [position, setPosition] = useState(50);
   const stageRef = useRef(null);
 
@@ -144,14 +88,40 @@ const CompareViewer = ({ older, newer }) => {
 
   return (
     <section className="mt-14" aria-labelledby="compare-heading">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
           <h2 id="compare-heading" className="text-2xl font-bold md:text-3xl">Compare the builds</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Drag across the preview to move between the two versions.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Choose two snapshots, then drag the divider.</p>
         </div>
-        <div className="flex gap-4 font-mono text-xs text-muted-foreground">
-          <span>{older.year} {older.title}</span>
-          <span>{newer.year} {newer.title}</span>
+        <div className="grid grid-cols-2 gap-2 sm:min-w-[24rem]">
+          <label className="min-w-0">
+            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Older</span>
+            <select
+              value={older.id}
+              onChange={(event) => onOlderChange(event.target.value)}
+              className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+            >
+              {versions.map((version) => (
+                <option key={version.id} value={version.id} disabled={version.id === newer.id}>
+                  {version.year} / {version.title}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="min-w-0">
+            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Newer</span>
+            <select
+              value={newer.id}
+              onChange={(event) => onNewerChange(event.target.value)}
+              className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+            >
+              {versions.map((version) => (
+                <option key={version.id} value={version.id} disabled={version.id === older.id}>
+                  {version.year} / {version.title}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
 
@@ -210,8 +180,10 @@ const VersionDetail = ({ version }) => (
 const Archive = () => {
   const { year, slug } = useParams();
   const selectedVersion = useMemo(() => getArchiveVersion(year, slug), [year, slug]);
-  const newer = archiveVersions[0];
-  const older = archiveVersions[archiveVersions.length - 1];
+  const [olderId, setOlderId] = useState(archiveVersions.at(-1).id);
+  const [newerId, setNewerId] = useState(archiveVersions[0].id);
+  const newer = archiveVersions.find((version) => version.id === newerId) || archiveVersions[0];
+  const older = archiveVersions.find((version) => version.id === olderId) || archiveVersions.at(-1);
 
   return (
     <>
@@ -245,7 +217,13 @@ const Archive = () => {
               <ArchiveLifeline />
             </section>
 
-            <CompareViewer older={older} newer={newer} />
+            <CompareViewer
+              older={older}
+              newer={newer}
+              versions={archiveVersions}
+              onOlderChange={setOlderId}
+              onNewerChange={setNewerId}
+            />
           </>
         )}
       </div>
