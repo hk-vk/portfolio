@@ -16,6 +16,7 @@ const Navbar = () => {
     { name: "Home", path: "/", icon: "tabler:home" },
     { name: "Work", path: "/projects", icon: "tabler:code" },
     { name: "Blog", path: "/blog", icon: "tabler:pencil" },
+    { name: "Archive", path: "/archive", icon: "tabler:history" },
     { name: "Connect", path: "/contact", icon: "tabler:at" },
   ];
 

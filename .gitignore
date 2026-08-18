@@ -26,4 +26,6 @@ dist-ssr
 .cursor
 cache
 dist
+.archive-worktrees
+public/archive-builds
 .agents
