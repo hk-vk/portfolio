@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
-import { usePostHog } from '@posthog/react';
+import { posthog } from '../utils/analytics';
 
 /**
  * SocialPopover – A small pop-up with social media links.
@@ -13,8 +13,6 @@ import { usePostHog } from '@posthog/react';
  */
 const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   const panelRef = useRef(null);
-  const posthog = usePostHog();
-
   // Close on outside click or ESC key
   useEffect(() => {
     if (!isOpen) return;

@@ -197,6 +197,22 @@ const Waves = ({
       }
     }
 
+    let isActive = !document.hidden;
+    let isIntersecting = true;
+
+    function stop() {
+      if (frameIdRef.current !== null) {
+        cancelAnimationFrame(frameIdRef.current);
+        frameIdRef.current = null;
+      }
+    }
+
+    function schedule() {
+      if (frameIdRef.current === null && isActive && isIntersecting) {
+        frameIdRef.current = requestAnimationFrame(tick);
+      }
+    }
+
     function movePoints(time) {
       const lines = linesRef.current,
         mouse = mouseRef.current,
@@ -279,6 +295,9 @@ const Waves = ({
     }
 
     function tick(t) {
+      frameIdRef.current = null;
+      if (!isActive || !isIntersecting) return;
+
       const mouse = mouseRef.current;
       mouse.sx += (mouse.x - mouse.sx) * 0.1;
       mouse.sy += (mouse.y - mouse.sy) * 0.1;
@@ -294,12 +313,13 @@ const Waves = ({
 
       movePoints(t);
       drawLines();
-      frameIdRef.current = requestAnimationFrame(tick);
+      schedule();
     }
 
     function onResize() {
       setSize();
       setLines();
+      schedule();
     }
     function onMouseMove(e) {
       updateMouse(e.clientX, e.clientY);
@@ -382,10 +402,25 @@ const Waves = ({
       }
     }
 
+    const onVisibilityChange = () => {
+      isActive = !document.hidden;
+      if (isActive && isIntersecting) schedule();
+      else stop();
+    };
+    const observer = typeof IntersectionObserver === "function"
+      ? new IntersectionObserver(([entry]) => {
+          isIntersecting = entry.isIntersecting;
+          if (isIntersecting && isActive) schedule();
+          else stop();
+        }, { rootMargin: "100px" })
+      : null;
+
     setSize();
     setLines();
-    frameIdRef.current = requestAnimationFrame(tick);
     window.addEventListener("resize", onResize);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    observer?.observe(container);
+    schedule();
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     
@@ -394,10 +429,12 @@ const Waves = ({
 
     return () => {
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      observer?.disconnect();
+      stop();
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener('deviceorientation', onDeviceOrientation);
-      cancelAnimationFrame(frameIdRef.current);
     };
   }, []);
 

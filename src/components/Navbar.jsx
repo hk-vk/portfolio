@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "../lib/motion";
 import { Icon } from "@iconify/react";
-import { usePostHog } from "@posthog/react";
 import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
 import { useSocialPopover } from "../context/SocialPopoverContext";
 import { motionInteraction, motionTransition } from "../utils/motionContract";
+import { posthog } from "../utils/analytics";
 
 const Navbar = () => {
   const location = useLocation();
-  const posthog = usePostHog();
-
   const mainLinks = [
     { name: "Home", path: "/", icon: "tabler:home" },
     { name: "Work", path: "/projects", icon: "tabler:code" },

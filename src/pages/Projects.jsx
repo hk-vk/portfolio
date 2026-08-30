@@ -1,13 +1,13 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
-import { usePostHog } from '@posthog/react';
 import AnimatedSection from '../components/AnimatedSection';
 import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
+import { posthog } from '../utils/analytics';
 
 const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 
@@ -130,7 +130,6 @@ const SectionDivider = () => (
 
 
 const ProjectCard = React.memo(({ project, onClick }) => {
-  const posthog = usePostHog();
   const divRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState(0);
@@ -173,6 +172,8 @@ const ProjectCard = React.memo(({ project, onClick }) => {
           <img
             src={project.image}
             alt={project.title}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
           
@@ -257,7 +258,6 @@ ProjectCard.displayName = 'ProjectCard';
 
 const Projects = () => {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const posthog = usePostHog();
   const { toggleSocialPopover } = useSocialPopover();
   const contactButtonRef = useRef(null);
 

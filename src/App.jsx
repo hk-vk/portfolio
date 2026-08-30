@@ -2,10 +2,7 @@ import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AnimatePresence } from './lib/motion';
-import { usePostHog } from '@posthog/react';
 import { useRef } from 'react';
-import '@fontsource-variable/syne';
-import '@fontsource-variable/plus-jakarta-sans';
 import './index.css';
 
 // Only import essential components synchronously
@@ -16,6 +13,7 @@ import { SmoothScrollProvider } from './context/SmoothScrollContext';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import Home from './pages/Home';
 import ScrollToTop from './utils/ScrollToTop';
+import { posthog } from './utils/analytics';
 
 // Lazy load all pages for code splitting and faster initial load
 const About = lazyWithRetry(() => import('./pages/About'));
@@ -125,7 +123,6 @@ const getPageNameFromPath = (pathname) => {
 
 const RouteAnalytics = () => {
   const location = useLocation();
-  const posthog = usePostHog();
   const lastTrackedPathRef = useRef(null);
 
   useEffect(() => {
@@ -139,7 +136,7 @@ const RouteAnalytics = () => {
       title: document.title || '',
     });
     lastTrackedPathRef.current = fullPath;
-  }, [location.pathname, location.search, posthog]);
+  }, [location.pathname, location.search]);
 
   return null;
 };
@@ -158,18 +155,7 @@ function App() {
 
     initTheme();
 
-    // Preload other routes after a bit for faster navigation
-    const preloadTimer = setTimeout(() => {
-      import('./pages/About');
-      import('./pages/Projects');
-      import('./pages/Blog');
-      import('./pages/BlogPostPage');
-      import('./pages/Contact');
-    }, 500);
 
-    return () => {
-      clearTimeout(preloadTimer);
-    };
   }, []);
 
   return (

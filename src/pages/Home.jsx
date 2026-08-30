@@ -1,5 +1,4 @@
 import { motion, AnimatePresence } from '../lib/motion';
-import { usePostHog } from '@posthog/react';
 import {
   duration,
   entrance,
@@ -19,13 +18,13 @@ import Waves from '../components/Waves/Waves';
 import SparkleIllustration from '../components/SparkleIllustration';
 import HeroHighlightLine from '../components/HeroHighlightLine';
 import MagnetLines from '../components/MagnetLines';
+import { posthog } from '../utils/analytics';
 
 // Lazy load heavy components for better performance
 const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
 
 // Optimized project card with intersection observer and image loading
 const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
-  const posthog = usePostHog();
   const divRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState(0);
@@ -72,6 +71,8 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
         <img
           src={project.image}
           alt={project.title}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
         
@@ -347,7 +348,6 @@ ExperienceItem.displayName = 'ExperienceItem';
 
 const Home = memo(() => {
   const motionSafe = useMotionSafe();
-  const posthog = usePostHog();
   const { lenis } = useSmoothScroll();
 
   // Use optimized intersection observer hooks
@@ -357,9 +357,7 @@ const Home = memo(() => {
   const experienceContentRef = useRef(null);
   const projectsContentRef = useRef(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [experienceReveal, setExperienceReveal] = useState(0.15);
-  const [projectsReveal, setProjectsReveal] = useState(0.15);
-  
+
   const heroCardRef = useRef(null);
 
 
@@ -392,8 +390,12 @@ const Home = memo(() => {
     };
 
     const updateReveal = () => {
-      setExperienceReveal(computeReveal(experienceContentRef.current));
-      setProjectsReveal(computeReveal(projectsContentRef.current));
+      [experienceContentRef.current, projectsContentRef.current].forEach((element) => {
+        if (!element) return;
+        const reveal = computeReveal(element);
+        element.style.transform = `translate3d(0, ${(1 - reveal) * 14}px, 0)`;
+        element.style.opacity = `${0.9 + reveal * 0.1}`;
+      });
     };
 
     updateReveal();
@@ -415,23 +417,9 @@ const Home = memo(() => {
     };
   }, [lenis]);
 
-  const experienceRevealStyle = useMemo(
-    () => ({
-      transform: `translate3d(0, ${(1 - experienceReveal) * 14}px, 0)`,
-      opacity: 0.9 + experienceReveal * 0.1,
-      transition: 'transform 140ms linear, opacity 140ms linear',
-    }),
-    [experienceReveal],
-  );
-
-  const projectsRevealStyle = useMemo(
-    () => ({
-      transform: `translate3d(0, ${(1 - projectsReveal) * 14}px, 0)`,
-      opacity: 0.9 + projectsReveal * 0.1,
-      transition: 'transform 140ms linear, opacity 140ms linear',
-    }),
-    [projectsReveal],
-  );
+  const revealStyle = {
+    transition: 'transform 140ms linear, opacity 140ms linear',
+  };
 
   // Memoize section visibility for performance
   const sectionsVisible = useMemo(() => ({
@@ -609,7 +597,7 @@ const Home = memo(() => {
 
         {/* Experience Section */}
         <div ref={experienceRef} className="py-12 md:py-16">
-          <div ref={experienceContentRef} className="content-container" style={experienceRevealStyle}>
+          <div ref={experienceContentRef} className="content-container" style={revealStyle}>
             <motion.div
               className="mb-8 flex items-center"
               initial={{ opacity: 0, y: 6 }}
@@ -620,7 +608,7 @@ const Home = memo(() => {
               <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight leading-[1.12] pb-[0.08em]">EXPERIENCE</h2>
             </motion.div>
 
-            <HoverPreviewProvider data={companyPreviews}>
+            <HoverPreviewProvider data={companyPreviews} preloadImages={false}>
               <div className="space-y-3">
                 {experienceItems.map((item, idx) => (
                   <ExperienceItem
@@ -637,7 +625,7 @@ const Home = memo(() => {
         </div>
         {/* Projects Preview Section */}
         <div ref={projectsRef} className="mb-12">
-          <div ref={projectsContentRef} className="content-container mt-4" style={projectsRevealStyle}>
+          <div ref={projectsContentRef} className="content-container mt-4" style={revealStyle}>
             <motion.div
               className="mb-10 md:mb-12 flex items-center"
               initial={{ opacity: 0, y: 6 }}
