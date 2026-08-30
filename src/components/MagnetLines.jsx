@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import "./MagnetLines.css";
 
 const EMPTY_STYLE = {};
@@ -15,7 +15,7 @@ export default function MagnetLines({
   style = EMPTY_STYLE
 }) {
   const containerRef = useRef(null);
-  const [isHovering, setIsHovering] = useState(false);
+  const isHoveringRef = useRef(false);
   const requestRef = useRef(null);
   const timeRef = useRef(0);
   const mousePositionRef = useRef({ x: 0, y: 0 });
@@ -25,7 +25,8 @@ export default function MagnetLines({
     if (!container) return;
 
     const items = container.querySelectorAll("span");
-    
+    let isActive = !document.hidden;
+
     // Set initial state - optimized with requestAnimationFrame
     if (items.length) {
       const centerX = window.innerWidth / 2;
@@ -57,35 +58,43 @@ export default function MagnetLines({
 
     const onPointerMove = (e) => {
       mousePositionRef.current = { x: e.clientX, y: e.clientY };
-      setIsHovering(true);
+      isHoveringRef.current = true;
     };
 
     const onPointerLeave = () => {
-      setIsHovering(false);
+      isHoveringRef.current = false;
     };
 
     // Optimized animate function with throttling and reduced calculations
     let lastFrameTime = 0;
     const frameThrottle = 16.67; // ~60fps throttling
+    const stop = () => {
+      if (requestRef.current !== null) {
+        cancelAnimationFrame(requestRef.current);
+        requestRef.current = null;
+      }
+    };
+    const schedule = () => {
+      if (requestRef.current === null && isActive && container.offsetParent) {
+        requestRef.current = requestAnimationFrame(animate);
+      }
+    };
     
     const animate = (time) => {
+      requestRef.current = null;
+      if (!isActive || !container.offsetParent) return;
+
       // Throttle animation to 60fps max
       if (time - lastFrameTime < frameThrottle) {
-        requestRef.current = requestAnimationFrame(animate);
+        schedule();
         return;
       }
       lastFrameTime = time;
 
-      // Only animate when component is visible and needed
-      if (!container.offsetParent) {
-        requestRef.current = requestAnimationFrame(animate);
-        return;
-      }
-
       // Batch DOM updates for better performance
       const updates = [];
       
-      if (isHovering) {
+      if (isHoveringRef.current) {
         // More efficient hover animation - reduced calculations
         items.forEach((item, index) => {
           if (index % 2 === 0) { // Only animate every other item for performance
@@ -128,20 +137,39 @@ export default function MagnetLines({
         });
       });
 
-      requestRef.current = requestAnimationFrame(animate);
+      schedule();
     };
 
+    const onVisibilityChange = () => {
+      isActive = !document.hidden && Boolean(container.offsetParent);
+      if (isActive) schedule();
+      else stop();
+    };
+    const observer = typeof IntersectionObserver === "function"
+      ? new IntersectionObserver(([entry]) => {
+          isActive = entry.isIntersecting && !document.hidden;
+          if (isActive) schedule();
+          else stop();
+        }, { rootMargin: "100px" })
+      : null;
+
     window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("resize", onVisibilityChange);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     container.addEventListener("mouseleave", onPointerLeave);
-    requestRef.current = requestAnimationFrame(animate);
+    observer?.observe(container);
+    schedule();
 
     // Cleanup
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("resize", onVisibilityChange);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       container.removeEventListener("mouseleave", onPointerLeave);
-      cancelAnimationFrame(requestRef.current);
+      observer?.disconnect();
+      stop();
     };
-  }, [baseAngle, columns, isHovering]);
+  }, [baseAngle, columns]);
 
   const total = rows * columns;
   const spans = [];

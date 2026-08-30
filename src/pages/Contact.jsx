@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from '../lib/motion';
-import { usePostHog } from '@posthog/react';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
-
+import { posthog } from '../utils/analytics';
 const Contact = () => {
-  const posthog = usePostHog();
   const [formData, setFormData] = useState({
     name: '',
     email: '',

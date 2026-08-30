@@ -8,8 +8,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { usePostHog } from "@posthog/react";
 import { motion, AnimatePresence } from "../lib/motion";
+import { posthog } from "../utils/analytics";
 
 // Context
 const HoverPreviewContext = createContext(null);
@@ -28,9 +28,8 @@ export function HoverPreviewProvider({
   children,
   cardWidth = 280,
   cursorOffset = 20,
-  preloadImages = true,
+  preloadImages = false,
 }) {
-  const posthog = usePostHog();
   const [activePreview, setActivePreview] = useState(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);

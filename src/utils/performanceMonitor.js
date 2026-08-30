@@ -11,6 +11,7 @@ export const measureWebVitals = () => {
     for (const entry of list.getEntries()) {
       if (entry.name === 'first-contentful-paint') {
         console.log('FCP:', entry.startTime);
+        observer.disconnect();
       }
     }
   });
@@ -36,7 +37,7 @@ export const logBundleSize = () => {
 
 // Memory usage monitoring (development only)
 export const logMemoryUsage = () => {
-  if (process.env.NODE_ENV === 'development' && performance.memory) {
+  if (import.meta.env.DEV && performance.memory) {
     console.log('Memory:', {
       used: Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB',
       total: Math.round(performance.memory.totalJSHeapSize / 1048576) + 'MB',
@@ -47,7 +48,7 @@ export const logMemoryUsage = () => {
 
 // Animation frame monitoring
 export const monitorAnimationFrames = () => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     let frameCount = 0;
     let lastTime = performance.now();
     
@@ -72,8 +73,8 @@ export const initPerformanceMonitoring = () => {
   measureWebVitals();
   logBundleSize();
   
-  // Log memory usage every 30 seconds in development
-  if (process.env.NODE_ENV === 'development') {
+  // Opt into the extra development monitors with ?perf; the FPS loop itself is work.
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('perf')) {
     setInterval(logMemoryUsage, 30000);
     monitorAnimationFrames();
   }

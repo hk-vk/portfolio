@@ -5,12 +5,11 @@ import AnimatedSection from '../components/AnimatedSection';
 import { motion, AnimatePresence } from '../lib/motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { usePostHog } from '@posthog/react';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { Icon } from "@iconify/react";
 import { client, urlFor } from '../lib/sanity';
-
+import { posthog } from '../utils/analytics';
 const toPlainContent = (value) => {
   if (typeof value === 'string') return value;
   if (!value) return '';
@@ -478,7 +477,6 @@ const BlogPostPage = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const posthog = usePostHog();
   const trackedViewRef = useRef(null);
 
   // Speed Reader State

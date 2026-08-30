@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
 import Shimmer from '../components/Shimmer';
 import SEOHead from '../components/SEOHead';
-import { usePostHog } from '@posthog/react';
 import useSWR from 'swr';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
+import { posthog } from '../utils/analytics';
 import { client, urlFor } from '../lib/sanity';
 
 const BLOG_LIST_CACHE_KEY = 'blog:list:v1';
@@ -53,10 +53,12 @@ const BlogPostCard = ({ post, onCardClick }) => (
                       transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl 
                       group-hover:bg-card/90">
         {post.mainImage ? (
-          <img 
-            src={urlFor(post.mainImage).width(400).height(300).url()} 
-            alt={post.title} 
-            className="w-full h-48 object-cover rounded-md mb-4" 
+          <img
+            src={urlFor(post.mainImage).width(400).height(300).url()}
+            alt={post.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-48 object-cover rounded-md mb-4"
           />
         ) : (
           <div className="w-full h-48 rounded-md mb-4 relative overflow-hidden 
@@ -119,7 +121,6 @@ const Blog = () => {
   const [blogPosts, setBlogPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [skeletonCount, setSkeletonCount] = useState(1);
-  const posthog = usePostHog();
   const { data: viewCountsData } = useSWR('/api/blog-view-counts', fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60_000,

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from '../lib/motion';
-import { usePostHog } from '@posthog/react';
 import { themeToggle } from '../utils/themeToggle';
 import { spring } from '../utils/motionSettings';
 import { motionInteraction } from '../utils/motionContract';
+import { posthog } from '../utils/analytics';
 
 const SunIcon = ({ className = '' }) => (
   <svg
@@ -42,7 +42,6 @@ const MoonIcon = ({ className = '' }) => (
 const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
   const { toggleTheme } = themeToggle();
-  const posthog = usePostHog();
   
   useEffect(() => {
     // Set initial state based on current theme
