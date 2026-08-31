@@ -1,6 +1,13 @@
 "use client"
 
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent,
+} from "react"
 import { createPortal } from "react-dom"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -42,14 +49,21 @@ function LifelinePreviewModal({
   onClose: () => void
 }) {
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") onClose()
     }
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener("keydown", onKeyDown)
+    }
   }, [onClose])
 
   if (!photo.previewUrl) return null
+
+  const displayPath = photo.previewUrl.replace('/archive-builds/', '/archive/')
 
   return createPortal(
     <div
@@ -60,44 +74,38 @@ function LifelinePreviewModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
+        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-border/60 bg-muted/30 px-3 py-2">
           <div className="flex shrink-0 items-center gap-1.5" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-primary/80" />
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-2.5 w-2.5 rounded-full border-0 bg-primary/80 p-0"
+              aria-label="Close site preview"
+            />
             <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
             <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
           </div>
           <div className="min-w-0 flex-1 truncate rounded-md border border-border/60 bg-background px-3 py-1 font-mono text-[10px] text-muted-foreground">
-            {photo.previewUrl}
+            {displayPath}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            aria-label="Close build preview"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:ring-offset-1 focus-visible:ring-offset-card"
+            aria-label="Close site preview"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="aspect-[16/10] bg-background">
+        <div className="aspect-[9/16] max-h-[calc(100dvh-8rem)] bg-background sm:aspect-[16/10] sm:max-h-none">
           <iframe
             src={photo.previewUrl}
             title={photo.alt}
-            className="h-full w-full border-0 bg-background"
+            className="archive-preview-frame h-full w-full border-0 bg-background"
           />
-        </div>
-        <div className="flex items-center justify-between gap-4 border-t border-border/60 px-4 py-3">
-          <span className="text-xs text-muted-foreground">Live local snapshot</span>
-          <a
-            href={photo.previewUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm font-semibold text-foreground hover:text-primary"
-          >
-            Open build
-          </a>
         </div>
       </div>
     </div>,
@@ -199,14 +207,23 @@ export function LifelinePhotoCard({
     }
   }
 
+  const openCard = () => {
+    if (lightboxStart) return
+    if (photo.previewUrl) setPreviewOpen(true)
+    else setLightboxStart(measureCard())
+  }
+
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
     event.currentTarget.releasePointerCapture(event.pointerId)
     setActive(false)
     // A press that never travelled is a click — expand to the lightbox.
-    if (!drag.current.moved && !lightboxStart) {
-      if (photo.previewUrl) setPreviewOpen(true)
-      else setLightboxStart(measureCard())
-    }
+    if (!drag.current.moved) openCard()
+  }
+
+  const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return
+    event.preventDefault()
+    openCard()
   }
 
   // The browser claiming the gesture (a vertical pan-y scroll on
@@ -222,12 +239,15 @@ export function LifelinePhotoCard({
       <div
         ref={cardRef}
         data-lifeline-interactive=""
+        role="button"
+        tabIndex={0}
+        aria-label={`Open ${photo.alt}`}
         className={cn(
           // pan-y keeps page scrolling alive on touch: a vertical swipe
           // starting on a card scrolls the timeline (the browser claims
           // the gesture and fires pointercancel); horizontal drags move
           // the card.
-          "group/photo pointer-events-auto cursor-grab touch-pan-y",
+          "group/photo pointer-events-auto cursor-grab touch-pan-y rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           active ? "z-50 cursor-grabbing" : "z-20 hover:z-40",
           lightboxStart && "invisible",
           className,
@@ -243,6 +263,7 @@ export function LifelinePhotoCard({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
+        onKeyDown={onKeyDown}
       >
         <div
           className={cn(
@@ -382,7 +403,7 @@ export function LifelineFloatingPhotos({
   }
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+    <div className="pointer-events-none absolute inset-0">
       {markers.map((marker, index) => {
         const floatingPhotos = marker.photos?.filter((photo) => !photo.previewUrl) ?? []
         if (!floatingPhotos.length) return null

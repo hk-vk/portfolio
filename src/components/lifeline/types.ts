@@ -111,4 +111,6 @@ export interface LifelineProps {
   className?: string
   title?: string
   mode?: LifelineMode
+  /** Disable the opening sweep when the settled timeline should render immediately. */
+  playIntro?: boolean
 }

@@ -368,6 +368,10 @@ html.lenis body {
   pointer-events: none;
 }
 
+.lenis.lenis-smooth iframe.archive-preview-frame {
+  pointer-events: auto;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

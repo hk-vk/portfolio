@@ -303,6 +303,7 @@ export function LifelineVertical({
   birthYear,
   title = "Lifeline",
   mode = "auto",
+  playIntro = true,
 }: LifelineProps) {
   // Only an explicit `mode` embeds the vertical layout. `"auto"` measures
   // scrollability on desktop, but the mobile layout *is* a vertical
@@ -317,7 +318,7 @@ export function LifelineVertical({
     [markers],
   )
 
-  const intro = useLifelineIntro(heights)
+  const intro = useLifelineIntro(heights, playIntro)
   const isIntroAnimating = intro.shouldPlay && intro.isPlaying
 
   // Warm the event media posters during idle — the tap-to-open

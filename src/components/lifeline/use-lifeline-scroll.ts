@@ -446,10 +446,9 @@ export function useLifelineScroll(
     const max = measureLayout()
 
     if (!initialized.current) {
-      // A skipped intro parks the rail where the intro would have settled
-      // it — its end, the present. Embedded is no different: it is the same
-      // intro and the same resting place.
-      translatePx.current = introSkippedRef.current ? max : 0
+      // Keep a skipped-intro timeline at its first marker so the starting
+      // point is visible instead of opening on the far end of the rail.
+      translatePx.current = 0
       initialized.current = true
     }
 

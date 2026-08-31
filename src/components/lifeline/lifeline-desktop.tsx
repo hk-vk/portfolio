@@ -21,6 +21,7 @@ export function LifelineDesktop({
   className,
   title = "Lifeline",
   mode = "auto",
+  playIntro = true,
 }: LifelineProps) {
   const widths = useMemo(
     () =>
@@ -53,7 +54,7 @@ export function LifelineDesktop({
     return images
   }, [markers])
 
-  const intro = useLifelineIntro(widths)
+  const intro = useLifelineIntro(widths, playIntro)
   const isIntroAnimating = intro.shouldPlay && intro.isPlaying
 
   const {

@@ -26,12 +26,13 @@ export const LIFELINE_RAIL_SCALE_POWER = 0.45
  */
 export const LIFELINE_FADE_SCALE_MAX = 1.5
 
-export function useLifelineIntro(markerWidths: number[]) {
+export function useLifelineIntro(markerWidths: number[], enabled = true) {
   // Skip straight to the settled end state for users who prefer reduced motion.
   const [shouldPlay] = useState(
     () =>
-      typeof window === "undefined" ||
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      enabled &&
+      (typeof window === "undefined" ||
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches),
   )
   const [isPlaying, setIsPlaying] = useState(true)
   const [isComplete, setIsComplete] = useState(false)
