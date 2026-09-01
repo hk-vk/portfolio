@@ -63,7 +63,10 @@ function LifelinePreviewModal({
 
   if (!photo.previewUrl) return null
 
-  const displayPath = photo.previewUrl.replace('/archive-builds/', '/archive/')
+  const displayPath = photo.previewUrl
+    .replace(/^https?:\/\/[^/]+/, 'hari.works')
+    .replace('/archive-builds/', '/archive/')
+    .replace(/[?].*$/, '')
 
   return createPortal(
     <div

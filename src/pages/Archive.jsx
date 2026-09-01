@@ -216,10 +216,10 @@ const Archive = () => {
           <>
             <header className="max-w-3xl pb-12 md:pb-16">
               <h1 className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
-                The site before this site.
+                How this site took shape.
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                {archiveError || (isLoading ? 'Loading the archive…' : 'A small record of how this site grew, rebuilt from the commits that changed it.')}
+                {archiveError || (isLoading ? 'Loading the archive…' : 'These are the versions that led here. Click any one to open it.')}
               </p>
             </header>
 
