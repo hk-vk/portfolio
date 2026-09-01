@@ -270,7 +270,8 @@ export function LifelinePhotoCard({
       >
         <div
           className={cn(
-            "overflow-hidden rounded-xl shadow-xl ring-1 ring-black/10 transition-[transform,box-shadow] duration-200 ease-out dark:ring-white/15",
+            "relative overflow-hidden rounded-2xl shadow-xl ring-1 ring-[oklch(0_0_0_/_0.1)] transition-[transform,box-shadow] duration-200 ease-out dark:ring-[oklch(1_0_0_/_0.1)]",
+            photo.previewUrl && "bg-background/80 p-1.5",
             animateIntro && "lifeline-marker-intro",
             active
               ? "scale-[1.05] shadow-2xl"
@@ -286,12 +287,20 @@ export function LifelinePhotoCard({
           }
         >
           {photo.previewUrl ? (
-            <img
-              src={photo.src}
-              alt={photo.alt}
-              loading="lazy"
-              className="pointer-events-none block aspect-[16/10] w-full object-cover"
-            />
+            <>
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                className="pointer-events-none block aspect-[16/10] w-full rounded-[0.85rem] object-cover"
+              />
+              <span
+                className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/90 px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide text-foreground shadow-sm"
+                aria-hidden="true"
+              >
+                Open preview
+              </span>
+            </>
           ) : (
             <LifelineEventMedia
               media={photo}

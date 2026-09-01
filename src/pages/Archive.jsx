@@ -12,6 +12,12 @@ const formatDate = (date) => new Intl.DateTimeFormat('en', {
   year: 'numeric',
 }).format(new Date(`${date}T00:00:00`));
 
+const formatTimelineDate = (date) => new Intl.DateTimeFormat('en', {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+}).format(new Date(`${date}T00:00:00Z`));
+
 const BrowserFrame = ({ version, title, className = '' }) => (
   <div className={`flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm ${className}`}>
     <div className="flex h-9 items-center gap-2 border-b border-border/50 bg-muted/30 px-3">
@@ -35,7 +41,7 @@ const createArchiveMarkers = (versions) => [...versions].reverse().map((version,
   id: version.id,
   year: index,
   age: `0${index + 1}`,
-  label: version.date.slice(0, 7),
+  label: formatTimelineDate(version.date),
   events: [[
     { type: 'text', value: `${version.title}.` },
   ]],

@@ -269,17 +269,14 @@ const LifelineVerticalEntry = forwardRef<
               )}
 
               {photos.length > 0 && (
-                <div className="mt-6 flex flex-wrap items-start">
+                <div className="mt-6 flex w-full flex-col gap-4">
                   {photos.map((photo, index) => (
                     <LifelinePhotoCard
                       key={`${photo.src}-${index}`}
                       photo={photo}
                       rotate={photo.rotate ?? photoTilts[index] ?? 0}
-                      width={photo.previewUrl ? 240 : 160}
-                      className={cn(
-                        "relative",
-                        index > 0 && "-ml-8 mt-6",
-                      )}
+                      width={photo.previewUrl ? 280 : 160}
+                      className="relative max-w-full"
                     />
                   ))}
                 </div>
@@ -440,11 +437,11 @@ export function LifelineVertical({
     >
       <div className={cn(`${GRID_CLASS} mb-6 items-end`, showIntro && "lifeline-labels-intro")}>
         <p className="text-right text-[11px] font-medium uppercase leading-4 tracking-[0.08em] text-zinc-500 transition-colors duration-300 dark:text-zinc-600">
-          Age
+          Step
         </p>
         <div aria-hidden="true" />
         <p className="text-[11px] font-medium uppercase leading-5 tracking-[0.08em] text-zinc-500 transition-colors duration-300 dark:text-zinc-600">
-          Years
+          Date
         </p>
       </div>
 
