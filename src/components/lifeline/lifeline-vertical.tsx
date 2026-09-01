@@ -46,7 +46,7 @@ function RailTick() {
   return (
     <span
       aria-hidden="true"
-      className="block h-px w-[10px] bg-zinc-400 transition-colors duration-300 dark:bg-zinc-700"
+      className="block h-px w-[10px] bg-zinc-400 transition-[width,background-color] duration-200 group-hover:w-4 group-hover:bg-zinc-700 dark:bg-zinc-700 dark:group-hover:bg-zinc-400"
     />
   )
 }
@@ -60,6 +60,7 @@ function LifelineVerticalEvent({ event }: { event: LifelineEvent }) {
   const fireworks = useLifelineFireworks()
   const image = getLifelineEventImage(event)
   const effect = getLifelineEventEffect(event)
+  const interactive = Boolean(image || effect)
   const textRef = useRef<HTMLParagraphElement>(null)
   const aspectRef = useRef(3 / 4)
   const [lightboxStart, setLightboxStart] =
@@ -104,9 +105,12 @@ function LifelineVerticalEvent({ event }: { event: LifelineEvent }) {
     <>
       <p
         ref={textRef}
+        role={interactive ? "button" : undefined}
+        tabIndex={interactive ? 0 : undefined}
+        aria-label={interactive ? (image ? `Open ${image.alt}` : "Play timeline effect") : undefined}
         className={cn(
-          "max-w-[18rem] text-left text-[14px] leading-[1.55] tracking-[-0.01em]",
-          (image || effect) && "cursor-pointer",
+          "max-w-[18rem] text-left text-[14px] leading-[1.55] tracking-[-0.01em] transition-colors duration-200",
+          interactive && "cursor-pointer hover:text-foreground focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         )}
         onClick={
           image
@@ -114,6 +118,16 @@ function LifelineVerticalEvent({ event }: { event: LifelineEvent }) {
             : effect && fireworks
               ? () => fireworks.launch(effect)
               : undefined
+        }
+        onKeyDown={
+          interactive
+            ? (event) => {
+                if (event.key !== "Enter" && event.key !== " ") return
+                event.preventDefault()
+                if (image) openMedia()
+                else if (effect && fireworks) fireworks.launch(effect)
+              }
+            : undefined
         }
       >
         <LifelineEventText event={event} />
@@ -194,7 +208,7 @@ const LifelineVerticalEntry = forwardRef<
   return (
     <li
       ref={ref}
-      className={hasContent ? "pb-10" : "pb-3"}
+      className={cn("group", hasContent ? "pb-10" : "pb-3")}
       aria-label={marker.label ?? `${marker.year}`}
     >
       <div
@@ -212,7 +226,7 @@ const LifelineVerticalEntry = forwardRef<
         }}
       >
         <div className={`${GRID_CLASS} items-center`}>
-          <p className="text-right text-[11px] font-medium leading-4 tabular-nums text-zinc-500 transition-colors duration-300 dark:text-zinc-600">
+          <p className="text-right text-[11px] font-medium leading-4 tabular-nums text-zinc-500 transition-colors duration-300 group-hover:text-foreground dark:text-zinc-600">
             {age}
           </p>
 
@@ -220,7 +234,7 @@ const LifelineVerticalEntry = forwardRef<
             <RailTick />
           </div>
 
-          <p className="whitespace-nowrap text-[15px] font-medium leading-5 tabular-nums text-zinc-500 transition-colors duration-300 dark:text-zinc-400">
+          <p className="whitespace-nowrap text-[15px] font-medium leading-5 tabular-nums text-zinc-500 transition-colors duration-300 group-hover:text-foreground dark:text-zinc-400">
             {marker.label ?? marker.year}
           </p>
         </div>
