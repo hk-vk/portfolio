@@ -1,10 +1,10 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { Link, useParams } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
 import { Lifeline } from '../components/lifeline/lifeline';
 import SEOHead from '../components/SEOHead';
-import { archiveVersions, getArchiveVersion } from '../data/archiveVersions';
+import { fetchArchiveVersions } from '../lib/archive-api';
 
 const formatDate = (date) => new Intl.DateTimeFormat('en', {
   day: 'numeric',
@@ -23,7 +23,7 @@ const BrowserFrame = ({ version, title, className = '' }) => (
       </span>
     </div>
     <iframe
-      src={version.buildPath}
+      src={version.buildUrl}
       title={title || `${version.title} portfolio preview`}
       loading="lazy"
       className="min-h-0 w-full flex-1 bg-background"
@@ -31,7 +31,7 @@ const BrowserFrame = ({ version, title, className = '' }) => (
   </div>
 );
 
-const archiveMarkers = [...archiveVersions].reverse().map((version, index) => ({
+const createArchiveMarkers = (versions) => [...versions].reverse().map((version, index) => ({
   id: version.id,
   year: index,
   age: `0${index + 1}`,
@@ -40,9 +40,9 @@ const archiveMarkers = [...archiveVersions].reverse().map((version, index) => ({
     { type: 'text', value: `${version.title}.` },
   ]],
   photos: [{
-    src: `${version.buildPath}preview.png`,
+    src: version.previewUrl,
     alt: `${version.title} site preview`,
-    previewUrl: version.buildPath,
+    previewUrl: version.buildUrl,
     width: 220,
     x: 0.08,
     y: 160,
@@ -50,11 +50,11 @@ const archiveMarkers = [...archiveVersions].reverse().map((version, index) => ({
   }],
 }));
 
-const ArchiveLifeline = () => (
+const ArchiveLifeline = ({ versions }) => (
   <ThemeProvider attribute="class" disableTransitionOnChange>
     <div className="overflow-hidden">
       <Lifeline
-        markers={archiveMarkers}
+        markers={createArchiveMarkers(versions)}
         birthYear={0}
         title="Portfolio archive timeline"
         mode="auto"
@@ -131,9 +131,9 @@ const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange })
         onPointerDown={handlePointerDown}
         onPointerMove={(event) => event.currentTarget.hasPointerCapture(event.pointerId) && setPositionFromPointer(event)}
       >
-        <iframe src={older.buildPath} title={`${older.title}, older version`} className="pointer-events-none absolute inset-0 h-full w-full bg-background" />
+        <iframe src={older.buildUrl} title={`${older.title}, older version`} className="pointer-events-none absolute inset-0 h-full w-full bg-background" />
         <div className="pointer-events-none absolute inset-0" style={{ clipPath: `inset(0 0 0 ${position}%)` }}>
-          <iframe src={newer.buildPath} title={`${newer.title}, newer version`} className="pointer-events-none h-full w-full bg-background" />
+          <iframe src={newer.buildUrl} title={`${newer.title}, newer version`} className="pointer-events-none h-full w-full bg-background" />
         </div>
         <div className="pointer-events-none absolute inset-y-0 w-px bg-white shadow-[0_0_0_1px_rgba(0,0,0,.25)]" style={{ left: `${position}%` }} />
         <button
@@ -175,11 +175,32 @@ const VersionDetail = ({ version }) => (
 
 const Archive = () => {
   const { year, slug } = useParams();
-  const selectedVersion = useMemo(() => getArchiveVersion(year, slug), [year, slug]);
-  const [olderId, setOlderId] = useState(archiveVersions.at(-1).id);
-  const [newerId, setNewerId] = useState(archiveVersions[0].id);
+  const [archiveVersions, setArchiveVersions] = useState([]);
+  const [archiveError, setArchiveError] = useState('');
+  const [olderId, setOlderId] = useState('');
+  const [newerId, setNewerId] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchArchiveVersions(controller.signal)
+      .then((versions) => {
+        setArchiveVersions(versions);
+        setOlderId((current) => current || versions.at(-1)?.id || '');
+        setNewerId((current) => current || versions[0]?.id || '');
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setArchiveError('The archive is unavailable right now.');
+      });
+    return () => controller.abort();
+  }, []);
+
+  const selectedVersion = useMemo(
+    () => archiveVersions.find((version) => version.year === year && version.id === slug),
+    [archiveVersions, year, slug],
+  );
   const newer = archiveVersions.find((version) => version.id === newerId) || archiveVersions[0];
   const older = archiveVersions.find((version) => version.id === olderId) || archiveVersions.at(-1);
+  const isLoading = archiveVersions.length === 0 && !archiveError;
 
   return (
     <>
@@ -198,25 +219,25 @@ const Archive = () => {
                 The site before this site.
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                A small record of how this site grew, rebuilt from the commits that changed it.
+                {archiveError || (isLoading ? 'Loading the archive…' : 'A small record of how this site grew, rebuilt from the commits that changed it.')}
               </p>
             </header>
 
-            <section aria-labelledby="archive-rail-heading">
-              <div className="mb-5 flex items-end justify-between gap-4">
-                <h2 id="archive-rail-heading" className="text-2xl font-bold md:text-3xl">Browse the timeline</h2>
-                <span className="font-mono text-xs text-muted-foreground">10 milestones</span>
-              </div>
-              <ArchiveLifeline />
-            </section>
+            {!isLoading && !archiveError && (
+              <>
+                <section aria-label="Archive milestones">
+                  <ArchiveLifeline versions={archiveVersions} />
+                </section>
 
-            <CompareViewer
-              older={older}
-              newer={newer}
-              versions={archiveVersions}
-              onOlderChange={setOlderId}
-              onNewerChange={setNewerId}
-            />
+                <CompareViewer
+                  older={older}
+                  newer={newer}
+                  versions={archiveVersions}
+                  onOlderChange={setOlderId}
+                  onNewerChange={setNewerId}
+                />
+              </>
+            )}
           </>
         )}
       </div>
