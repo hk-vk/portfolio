@@ -489,7 +489,7 @@ const Home = memo(() => {
                 className="metal-hero-frame block w-full"
                 preset="silver"
                 theme={isDarkMode ? 'dark' : 'light'}
-                strength={0.12}
+                strength={0.38}
                 shaderScale={3}
                 ringCssPx={1}
                 paused={!motionSafe || !sectionsVisible.hero}
@@ -529,57 +529,43 @@ const Home = memo(() => {
                   </div>
                 )}
 
+                <HoverPreviewProvider data={heroPreviews} preloadImages={false}>
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
                   className="w-full"
                 >
-                  {sectionsVisible.hero && (
-                    <motion.div
-                      className="relative mb-4"
-                      initial={false}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: duration.standard / 1000, delay: sequenceDelay(1), ease: motionTransition.componentEnter.ease }}
-                    >
-                      {/* Decorative sparkle - hidden on mobile */}
-                      <SparkleIllustration className="text-primary absolute -left-7 top-1 hidden sm:block" size={20} />
-
-                      {/* "HELLO, I am" - smaller intro text */}
-                      <span className="block text-sm sm:text-base md:text-lg font-medium text-muted-foreground mb-1">
-                        Hello, I am
-                      </span>
-
-                      {/* "HARIKRISHNAN" - dynamically sized hero name */}
-                      <h1
-                        className="font-bold tracking-tighter font-display w-full leading-[1.12] pb-[0.08em]"
-                        style={{ fontSize: 'clamp(1.5rem, 7vw, 4rem)' }}
-                      >
-                        HARIKRISHNAN
-                      </h1>
-
-                      {/* Subtle accent line under name */}
-                      <div className="mt-2 w-16 sm:w-20 h-1 bg-gradient-to-r from-primary to-primary/30 rounded-full" />
-                    </motion.div>
-                  )}
+                  <motion.div className="mb-8" variants={childVariants}>
+                    <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Harikrishnan V K</h1>
+                  </motion.div>
 
                   <motion.p
                     variants={childVariants}
-                    className="mb-2 sm:mb-3 text-base sm:text-lg md:text-xl text-left"
+                    className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
                   >
-                    Full-stack developer from India.
-                    <br className="hidden sm:block" />
-                    <span className="block sm:inline text-primary/85 font-medium"> I build simple, useful products from idea to deployment.</span>
+                    I am a full-stack developer at{' '}
+                    <a href="https://www.comini.in" target="_blank" rel="noopener noreferrer">
+                      <HoverPreviewLink previewKey="comini" className="hero-link !font-normal !text-foreground">
+                        Comini Learning
+                      </HoverPreviewLink>
+                    </a>. I build learning tools at work and odd little side projects after hours.
                   </motion.p>
 
-                  <motion.p
-                    variants={childVariants}
-                    className="mb-6 sm:mb-8 max-w-prose text-pretty text-sm sm:text-base leading-relaxed text-muted-foreground text-left"
-                  >
-                    I create responsive web applications that combine clean design with efficient code. My expertise ranges from interactive frontend interfaces to scalable backend systems.
+                  <motion.p variants={childVariants} className="mt-5 max-w-2xl text-base leading-loose text-muted-foreground sm:text-lg">
+                    Outside work, I make small tools for problems that keep bothering me. You can browse my
+                    {' '}<Link to="/projects" className="hero-link">
+                      projects
+                    </Link>, send me an
+                    {' '}<a href="mailto:hi@hari.works" className="hero-link">
+                      email
+                    </a>, or find my code on
+                    {' '}<a href="https://github.com/hk-vk" target="_blank" rel="noopener noreferrer" className="hero-link">
+                      GitHub
+                    </a>.
                   </motion.p>
 
-                  <motion.div variants={childVariants} className="w-full">
+                  <motion.div variants={childVariants} className="mt-8 w-full sm:mt-10">
                     <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
                     <div className="skill-row sm:hidden">
                       <div className="skill-marquee-track">
@@ -607,6 +593,7 @@ const Home = memo(() => {
                     </div>
                   </motion.div>
                 </motion.div>
+                </HoverPreviewProvider>
               </div>
               </div>
               </MetalFx>
@@ -779,6 +766,8 @@ const companyPreviews = {
     url: 'https://tryripples.comini.in/',
   },
 };
+
+const heroPreviews = { comini: companyPreviews.comini };
 
 const experienceItems = [
   {

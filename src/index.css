@@ -819,15 +819,29 @@ html::view-transition-new(root) {
     visibility: visible !important;
   }
 
-  .metal-hero-frame::after {
-    box-shadow: inset 0 0 0 1px hsl(var(--foreground) / 0.32) !important;
-  }
-
   .skill-row {
     --marquee-speed: 18s;
   }
 
   .skill-row .skill-marquee-track {
     will-change: transform;
+  }
+
+  .hero-link {
+    color: hsl(var(--foreground));
+    text-decoration-line: underline;
+    text-decoration-color: hsl(var(--foreground) / 0.45);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .hero-link:hover {
+    text-decoration-color: hsl(var(--foreground));
+  }
+
+  .hero-link:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 4px;
   }
 }
