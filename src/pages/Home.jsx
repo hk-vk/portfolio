@@ -480,12 +480,24 @@ const Home = memo(() => {
 
             <motion.div
               ref={heroCardRef}
-              className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl overflow-hidden group shadow-xl"
+              className="relative mb-8 overflow-hidden rounded-xl sm:mb-16 sm:rounded-2xl"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <div className="relative z-10 bg-background/80 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-10 h-full w-full overflow-hidden">
+              <MetalFx
+                className="metal-hero-frame block w-full"
+                preset="silver"
+                theme={isDarkMode ? 'dark' : 'light'}
+                strength={0.12}
+                shaderScale={3}
+                ringCssPx={1}
+                paused={!motionSafe || !sectionsVisible.hero}
+                disableGlow
+                innerShadow={{ alpha: 0.22 }}
+                normalizeHostStyles={false}
+              >
+              <div className="relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 p-4 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
@@ -588,6 +600,7 @@ const Home = memo(() => {
                 </motion.div>
               </div>
               </div>
+              </MetalFx>
             </motion.div>
 
           </div>

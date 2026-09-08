@@ -17,14 +17,17 @@ const mainLinks = [
   { name: "Connect", path: "/contact", icon: "tabler:at" },
 ];
 
-const MetalNavItem = ({ active, motionSafe, theme, children }) => (
+const MetalNavItem = ({ active, motionSafe, theme, ready, children }) => {
+  if (!ready) return children;
+
+  return (
   <MetalFx
     key={`${theme}-${active ? "active" : "inactive"}`}
     preset="silver"
     variant="button"
     theme={theme}
     className={active ? "metal-nav-active" : "metal-nav-inactive"}
-    strength={1}
+    strength={0.65}
     glowGain={1.35}
     paused={!motionSafe || !active}
     disableGlow={!active}
@@ -34,16 +37,35 @@ const MetalNavItem = ({ active, motionSafe, theme, children }) => (
   >
     {children}
   </MetalFx>
-);
+  );
+};
 
 const Navbar = () => {
   const motionSafe = useMotionSafe();
+  const [layoutReady, setLayoutReady] = useState(false);
+
   const [theme, setTheme] = useState(() =>
     document.documentElement.classList.contains("dark") ? "dark" : "light",
   );
   const location = useLocation();
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } = useSocialPopover();
   const socialPopoverId = "navbar-social-popover";
+
+  useEffect(() => {
+    let frame;
+    let cancelled = false;
+
+    document.fonts.ready.then(() => {
+      frame = requestAnimationFrame(() => {
+        if (!cancelled) setLayoutReady(true);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
+  }, []);
 
   useEffect(() => {
     const updateTheme = () =>
@@ -105,7 +127,7 @@ const Navbar = () => {
           );
 
           return link.name === "Connect" ? (
-            <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme}>
+            <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
               <button
                 ref={triggerRef}
                 type="button"
@@ -125,7 +147,7 @@ const Navbar = () => {
               </button>
             </MetalNavItem>
           ) : (
-            <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme}>
+            <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
               <NavLink
                 to={link.path}
                 end={link.path === "/"}
