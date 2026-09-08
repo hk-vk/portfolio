@@ -166,7 +166,7 @@ const ProjectCard = React.memo(({ project, onClick }) => {
       />
       
       {/* Main Content Card Wrapper */}
-      <div className="relative z-10 flex flex-col h-full bg-card/60 backdrop-blur-md border border-border/40 rounded-[11px] overflow-hidden hover:bg-card/80 transition-colors">
+      <div className="metal-edge relative z-10 flex flex-col h-full bg-card/60 backdrop-blur-md border rounded-[11px] overflow-hidden hover:bg-card/80 transition-colors">
         {/* Image Container */}
         <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
           <img

@@ -1,3 +1,4 @@
+import { MetalFx } from 'metal-fx';
 import { motion, AnimatePresence } from '../lib/motion';
 import {
   duration,
@@ -65,7 +66,7 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
       />
       
       {/* Main Content Card Wrapper */}
-      <div className="relative z-10 flex flex-col h-full bg-card/60 backdrop-blur-md border border-border/40 rounded-[11px] overflow-hidden hover:bg-card/80 transition-colors">
+      <div className="metal-edge relative z-10 flex flex-col h-full bg-card/60 backdrop-blur-md border rounded-[11px] overflow-hidden hover:bg-card/80 transition-colors">
         {/* Image Container */}
         <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
         <img
@@ -267,7 +268,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
         />
         
         {/* Main Content Card */}
-        <div className="relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border border-border/40 p-5 h-full transition-colors hover:bg-card/90">
+        <div className="metal-edge relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border p-5 h-full transition-colors hover:bg-card/90">
           <div className="flex items-start justify-between gap-4">
             {/* Left: Title + Company */}
             <div>
@@ -479,12 +480,12 @@ const Home = memo(() => {
 
             <motion.div
               ref={heroCardRef}
-              className="relative mb-8 sm:mb-16 p-[1px] rounded-xl sm:rounded-2xl overflow-hidden group shadow-xl"
+              className="relative mb-8 sm:mb-16 rounded-xl sm:rounded-2xl overflow-hidden group shadow-xl"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <div className="relative z-10 bg-background/80 backdrop-blur-md border border-border/40 rounded-[11px] sm:rounded-[15px] p-4 sm:p-6 md:p-10 h-full w-full overflow-hidden">
+              <div className="relative z-10 bg-background/80 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-10 h-full w-full overflow-hidden">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
@@ -539,11 +540,8 @@ const Home = memo(() => {
 
                       {/* "HARIKRISHNAN" - dynamically sized hero name */}
                       <h1
-                        className="font-bold tracking-tighter font-display bg-clip-text text-transparent w-full leading-[1.12] pb-[0.08em]"
-                        style={{
-                          backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--primary)) 100%)',
-                          fontSize: 'clamp(1.5rem, 7vw, 4rem)',
-                        }}
+                        className="font-bold tracking-tighter font-display w-full leading-[1.12] pb-[0.08em]"
+                        style={{ fontSize: 'clamp(1.5rem, 7vw, 4rem)' }}
                       >
                         HARIKRISHNAN
                       </h1>
@@ -564,7 +562,7 @@ const Home = memo(() => {
 
                   <motion.p
                     variants={childVariants}
-                    className="mb-6 sm:mb-8 text-sm sm:text-base text-muted-foreground text-left"
+                    className="mb-6 sm:mb-8 max-w-prose text-pretty text-sm sm:text-base leading-relaxed text-muted-foreground text-left"
                   >
                     I create responsive web applications that combine clean design with efficient code. My expertise ranges from interactive frontend interfaces to scalable backend systems.
                   </motion.p>
@@ -604,8 +602,8 @@ const Home = memo(() => {
               animate={sectionsVisible.experience ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <SparkleIllustration className="text-primary mr-3" size={20} />
-              <h2 className="text-3xl md:text-4xl font-bold font-display tracking-tight leading-[1.12] pb-[0.08em]">EXPERIENCE</h2>
+              <SparkleIllustration className="text-primary mr-3 shrink-0" size={20} />
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display tracking-tight leading-[1.12] pb-[0.08em]">EXPERIENCE</h2>
             </motion.div>
 
             <HoverPreviewProvider data={companyPreviews} preloadImages={false}>
@@ -632,9 +630,9 @@ const Home = memo(() => {
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <SparkleIllustration className="text-primary mr-4" size={24} />
+              <SparkleIllustration className="text-primary mr-3 shrink-0" size={20} />
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-[1.12] pb-[0.08em]">FEATURED PROJECTS</h2>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-[1.12] pb-[0.08em]">FEATURED PROJECTS</h2>
               </div>
             </motion.div>
 
@@ -660,6 +658,14 @@ const Home = memo(() => {
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: sequenceDelay(1), duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease }}
             >
+              <MetalFx
+                preset="silver"
+                theme={isDarkMode ? 'dark' : 'light'}
+                strength={0.7}
+                paused={!motionSafe || !projectsVisible}
+                disableGlow={!motionSafe}
+                innerShadow
+              >
               <Link
                 to="/projects"
                 onClick={() =>
@@ -667,7 +673,7 @@ const Home = memo(() => {
                     from_path: window.location.pathname,
                   })
                 }
-                className="button-primary btn-gloss inline-flex items-center group"
+                className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-foreground transition-transform duration-150 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring group"
               >
                 View All Projects
                 <svg
@@ -679,6 +685,7 @@ const Home = memo(() => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </Link>
+              </MetalFx>
             </motion.div>
           </div>
         </div>

@@ -8,44 +8,44 @@
 
 @layer base {
   :root {
-    --background: 48 33% 94%;
-    --foreground: 240 10% 10%;
-    --card: 60 9% 98%;
-    --card-foreground: 240 10% 10%;
-    --primary: 349 75% 44%;
-    --primary-foreground: 60 9% 98%;
-    --secondary: 240 50% 50%;
-    --secondary-foreground: 60 9% 98%;
-    --accent: 260 60% 55%;
-    --accent-foreground: 60 9% 98%;
-    --muted: 240 5% 90%;
-    --muted-foreground: 240 5% 45%;
-    --popover: 60 9% 98%;
-    --popover-foreground: 240 10% 10%;
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 349 75% 44%;
+    --background: 210 20% 96%;
+    --foreground: 220 12% 12%;
+    --card: 210 20% 99%;
+    --card-foreground: 220 12% 12%;
+    --primary: 215 25% 27%;
+    --primary-foreground: 210 20% 99%;
+    --secondary: 215 25% 27%;
+    --secondary-foreground: 210 20% 99%;
+    --accent: 215 25% 27%;
+    --accent-foreground: 210 20% 99%;
+    --muted: 215 12% 90%;
+    --muted-foreground: 220 7% 38%;
+    --popover: 210 20% 99%;
+    --popover-foreground: 220 12% 12%;
+    --border: 215 14% 78%;
+    --input: 215 14% 78%;
+    --ring: 215 25% 27%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 240 10% 10%;
-    --foreground: 240 15% 95%;
-    --card: 240 10% 13%;
-    --card-foreground: 240 15% 95%;
-    --primary: 349 75% 55%;
-    --primary-foreground: 60 9% 98%;
-    --secondary: 240 50% 60%;
-    --secondary-foreground: 60 9% 98%;
-    --accent: 260 60% 65%;
-    --accent-foreground: 60 9% 98%;
-    --muted: 240 5% 20%;
-    --muted-foreground: 240 5% 75%;
-    --popover: 240 10% 15%;
-    --popover-foreground: 240 15% 95%;
-    --border: 240 8% 28%;
-    --input: 240 8% 28%;
-    --ring: 349 75% 55%;
+    --background: 220 10% 8%;
+    --foreground: 210 18% 95%;
+    --card: 220 9% 11%;
+    --card-foreground: 210 18% 95%;
+    --primary: 210 16% 76%;
+    --primary-foreground: 220 10% 8%;
+    --secondary: 210 16% 76%;
+    --secondary-foreground: 220 10% 8%;
+    --accent: 210 16% 76%;
+    --accent-foreground: 220 10% 8%;
+    --muted: 215 8% 18%;
+    --muted-foreground: 215 10% 70%;
+    --popover: 220 9% 12%;
+    --popover-foreground: 210 18% 95%;
+    --border: 215 12% 29%;
+    --input: 215 12% 29%;
+    --ring: 210 16% 76%;
   }
 
   * {
@@ -53,14 +53,19 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: 'Plus Jakarta Sans Variable', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Syne Variable', system-ui, sans-serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
   }
 
   /* Optimized transitions - only transform and opacity for better performance */
@@ -89,12 +94,63 @@
     @apply px-4 py-2 transition-colors hover:text-primary;
   }
 
+  .metal-nav-active,
+  .metal-nav-inactive {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .metal-nav-active {
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .metal-nav-active > .metal-fx-canvas {
+    filter: grayscale(1);
+  }
+
+  .metal-nav-inactive > .metal-fx-canvas,
+  .metal-nav-inactive > .metal-fx-inner,
+  .metal-nav-inactive > .metal-fx-glow-svg {
+    opacity: 0 !important;
+  }
+
+  .metal-nav-inactive::before,
+  .metal-nav-inactive::after {
+    content: none;
+  }
+
+  .nav-content {
+    transition: transform 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .nav-control:active .nav-content {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-content {
+      transition: none;
+    }
+
+    .nav-control:active .nav-content {
+      transform: none;
+    }
+  }
+
   .nav-category {
     @apply px-3 py-1 text-xs font-medium uppercase tracking-widest border-b-2 border-transparent hover:border-primary transition-colors;
   }
 
   .content-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .metal-edge {
+    border-color: hsl(var(--border) / 0.72);
+    box-shadow:
+      inset 0 1px 0 hsl(var(--foreground) / 0.08),
+      0 18px 45px -38px hsl(var(--primary) / 0.55);
   }
 
   .card {

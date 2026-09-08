@@ -177,7 +177,7 @@ const About = () => {
         </AnimatedSection>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <AnimatedSection animation="fadeUp" delay={0.04} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+          <AnimatedSection animation="fadeUp" delay={0.04} className="metal-edge border p-6 rounded-xl hover:border-primary transition-colors">
             <h3 className="text-xl font-bold mb-2">YEAH</h3>
             <p className="text-sm text-muted-foreground mb-4">React • FastAPI • PyTorch</p>
             <p className="text-muted-foreground">
@@ -186,7 +186,7 @@ const About = () => {
             </p>
           </AnimatedSection>
           
-          <AnimatedSection animation="fadeUp" delay={0.08} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+          <AnimatedSection animation="fadeUp" delay={0.08} className="metal-edge border p-6 rounded-xl hover:border-primary transition-colors">
             <h3 className="text-xl font-bold mb-2">MedVault</h3>
             <p className="text-sm text-muted-foreground mb-4">Next.js • MongoDB • Clerk</p>
             <p className="text-muted-foreground">
@@ -195,7 +195,7 @@ const About = () => {
             </p>
           </AnimatedSection>
           
-          <AnimatedSection animation="fadeUp" delay={0.12} className="border border-border p-6 rounded-xl hover:border-primary transition-colors">
+          <AnimatedSection animation="fadeUp" delay={0.12} className="metal-edge border p-6 rounded-xl hover:border-primary transition-colors">
             <h3 className="text-xl font-bold mb-2">Commit Story Gen</h3>
             <p className="text-sm text-muted-foreground mb-4">React • Next.js • Gemini API</p>
             <p className="text-muted-foreground">

@@ -48,9 +48,9 @@ const BlogPostCard = ({ post, onCardClick }) => (
     whileTap={cardMotion.press}
   >
     <Link to={`/blog/${post.slug.current}`} className="block h-full" onClick={() => onCardClick(post)}>
-      <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
-                      hover:border-primary/30 hover:shadow-lg 
-                      transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl 
+      <div className="metal-edge border p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
+                      hover:border-primary/40 hover:shadow-lg
+                      transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl
                       group-hover:bg-card/90">
         {post.mainImage ? (
           <img
