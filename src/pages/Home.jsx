@@ -536,9 +536,26 @@ const Home = memo(() => {
                   animate="visible"
                   className="w-full"
                 >
-                  <motion.div className="mb-8" variants={childVariants}>
-                    <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Harikrishnan V K</h1>
-                  </motion.div>
+                  {sectionsVisible.hero && (
+                    <motion.div
+                      className="relative mb-4"
+                      initial={false}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: duration.standard / 1000, delay: sequenceDelay(1), ease: motionTransition.componentEnter.ease }}
+                    >
+                      <SparkleIllustration className="text-primary absolute -left-7 top-1 hidden sm:block" size={20} />
+                      <span className="mb-1 block text-sm font-medium text-muted-foreground sm:text-base md:text-lg">
+                        Hello, I am
+                      </span>
+                      <h1
+                        className="w-full pb-[0.08em] font-bold leading-[1.12] tracking-tighter font-display"
+                        style={{ fontSize: 'clamp(1.5rem, 7vw, 4rem)' }}
+                      >
+                        HARIKRISHNAN V K
+                      </h1>
+                      <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-primary to-primary/30 sm:w-20" />
+                    </motion.div>
+                  )}
 
                   <motion.p
                     variants={childVariants}
@@ -768,6 +785,7 @@ const companyPreviews = {
 };
 
 const heroPreviews = { comini: companyPreviews.comini };
+
 
 const experienceItems = [
   {
