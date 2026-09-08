@@ -11,10 +11,10 @@ import { motionInteraction, motionTransition } from "../utils/motionContract";
 import { posthog } from "../utils/analytics";
 
 const mainLinks = [
-  { name: "Home", path: "/", icon: "tabler:home" },
-  { name: "Work", path: "/projects", icon: "tabler:code" },
-  { name: "Blog", path: "/blog", icon: "tabler:pencil" },
-  { name: "Connect", path: "/contact", icon: "tabler:at" },
+  { name: "Home", path: "/", icon: "hugeicons:home-01" },
+  { name: "Work", path: "/projects", icon: "hugeicons:code-folder" },
+  { name: "Blog", path: "/blog", icon: "hugeicons:book-open-01" },
+  { name: "Connect", path: "/contact", icon: "hugeicons:mail-01" },
 ];
 
 const MetalNavItem = ({ active, motionSafe, theme, ready, children }) => {
@@ -111,7 +111,7 @@ const Navbar = () => {
                 }
                 transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                <Icon icon={link.icon} className="size-5" />
+                <Icon icon={link.icon} className="size-[15px] sm:size-4" />
               </motion.span>
               {active && (
                 <motion.span
