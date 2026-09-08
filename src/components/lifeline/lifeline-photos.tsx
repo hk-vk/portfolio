@@ -6,7 +6,6 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent,
 } from "react"
 import { createPortal } from "react-dom"
 import { X } from "lucide-react"
@@ -36,10 +35,6 @@ const STACK_OVERLAP = 0.6
 const CASCADE_Y = 170
 /** Event text column: max-w-[18rem] plus breathing room. */
 const TEXT_ZONE = 288 + 24
-/** Pointer travel below this is a click (opens the lightbox), not a drag. */
-const CLICK_SLOP = 4
-/** Fingers wobble more than mice — touch presses get extra tap room. */
-const TOUCH_CLICK_SLOP = 10
 
 function LifelinePreviewModal({
   photo,
@@ -122,10 +117,9 @@ function randomTilt() {
 }
 
 /**
- * The interactive photo card, positioning-agnostic: drag moves it for
- * the session, a press without travel expands it into the lightbox.
- * Desktop floats it over the track (absolute + left/top); the vertical
- * layout drops it into normal flow.
+ * The interactive photo card, positioning-agnostic: a click or tap expands
+ * it into the preview/lightbox. Desktop floats it over the track (absolute +
+ * left/top); the vertical layout drops it into normal flow.
  */
 export function LifelinePhotoCard({
   photo,
@@ -148,44 +142,10 @@ export function LifelinePhotoCard({
   introDelay?: number
   introDuration?: number
 }) {
-  const [offset, setOffset] = useState({ x: 0, y: 0 })
-  const [active, setActive] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [lightboxStart, setLightboxStart] =
     useState<LifelineLightboxStart | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
-  const drag = useRef({
-    startX: 0,
-    startY: 0,
-    baseX: 0,
-    baseY: 0,
-    moved: false,
-    slop: CLICK_SLOP,
-  })
-
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    // The desktop track scrubs on drag — a card drag must not reach it.
-    event.stopPropagation()
-    event.preventDefault()
-    event.currentTarget.setPointerCapture(event.pointerId)
-    drag.current = {
-      startX: event.clientX,
-      startY: event.clientY,
-      baseX: offset.x,
-      baseY: offset.y,
-      moved: false,
-      slop: event.pointerType === "touch" ? TOUCH_CLICK_SLOP : CLICK_SLOP,
-    }
-    setActive(true)
-  }
-
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!active) return
-    const dx = event.clientX - drag.current.startX
-    const dy = event.clientY - drag.current.startY
-    if (Math.hypot(dx, dy) > drag.current.slop) drag.current.moved = true
-    setOffset({ x: drag.current.baseX + dx, y: drag.current.baseY + dy })
-  }
 
   // The card's real geometry: bounding-box center (rotation preserves
   // it) plus untransformed layout size — never the rotated hull, which
@@ -216,25 +176,10 @@ export function LifelinePhotoCard({
     else setLightboxStart(measureCard())
   }
 
-  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    event.currentTarget.releasePointerCapture(event.pointerId)
-    setActive(false)
-    // A press that never travelled is a click — expand to the lightbox.
-    if (!drag.current.moved) openCard()
-  }
-
   const onKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Enter" && event.key !== " ") return
     event.preventDefault()
     openCard()
-  }
-
-  // The browser claiming the gesture (a vertical pan-y scroll on
-  // touch) is not a click — reset without opening.
-  const onPointerCancel = (event: PointerEvent<HTMLDivElement>) => {
-    event.currentTarget.releasePointerCapture(event.pointerId)
-    setActive(false)
-    setOffset({ x: drag.current.baseX, y: drag.current.baseY })
   }
 
   return (
@@ -246,12 +191,8 @@ export function LifelinePhotoCard({
         tabIndex={0}
         aria-label={`Open ${photo.alt}`}
         className={cn(
-          // pan-y keeps page scrolling alive on touch: a vertical swipe
-          // starting on a card scrolls the timeline (the browser claims
-          // the gesture and fires pointercancel); horizontal drags move
-          // the card.
-          "group/photo pointer-events-auto cursor-grab touch-pan-y rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-          active ? "z-50 cursor-grabbing" : "z-20 hover:z-40",
+          "group/photo pointer-events-auto cursor-pointer touch-pan-y rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          "z-20 hover:z-40",
           lightboxStart && "invisible",
           className,
         )}
@@ -259,13 +200,10 @@ export function LifelinePhotoCard({
           {
             ...style,
             width,
-            transform: `translate(${offset.x}px, ${offset.y}px) rotate(${rotate}deg)`,
+            transform: `rotate(${rotate}deg)`,
           } as CSSProperties
         }
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
+        onClick={openCard}
         onKeyDown={onKeyDown}
       >
         <div
@@ -273,9 +211,7 @@ export function LifelinePhotoCard({
             "relative overflow-hidden rounded-2xl shadow-xl ring-1 ring-[oklch(0_0_0_/_0.1)] transition-[transform,box-shadow] duration-200 ease-out dark:ring-[oklch(1_0_0_/_0.1)]",
             photo.previewUrl && "bg-background/80 p-1.5",
             animateIntro && "lifeline-marker-intro",
-            active
-              ? "scale-[1.05] shadow-2xl"
-              : "group-hover/photo:scale-[1.03] group-hover/photo:shadow-2xl",
+            "group-hover/photo:scale-[1.03] group-hover/photo:shadow-2xl",
           )}
           style={
             animateIntro
@@ -381,8 +317,7 @@ function FloatingCard({
 /**
  * Always-visible media scattered over the timeline — anchored to their
  * marker's slot, tilted and overlapping like photos in a notebook.
- * Rendered inside the transformed track, so they ride the scroll;
- * dragging repositions a card for the session.
+ * Rendered inside the transformed track, so they ride the scroll.
  */
 export function LifelineFloatingPhotos({
   markers,
