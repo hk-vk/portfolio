@@ -79,8 +79,8 @@ const Navbar = () => {
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
   const itemClass = (active) =>
-    `nav-control group flex h-11 sm:h-12 items-center justify-center rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
-      active ? "w-28 gap-2 bg-card px-3 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-11 sm:w-12 hover:bg-muted/50"
+    `nav-control group flex h-10 items-center justify-center rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-12 ${
+      active ? "w-[6.5rem] gap-1.5 bg-card px-2.5 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-10 hover:bg-muted/50 sm:w-12"
     }`;
 
   return (
@@ -97,7 +97,7 @@ const Navbar = () => {
         {mainLinks.map((link) => {
           const active = socialOpen ? link.name === "Connect" : isActive(link.path);
           const content = (
-            <span className="nav-content flex items-center gap-2 sm:gap-2.5">
+            <span className="nav-content flex items-center gap-1.5 sm:gap-2.5">
               <motion.span
                 className="grid size-5 shrink-0 place-items-center"
                 animate={
@@ -172,7 +172,7 @@ const Navbar = () => {
           whileHover={{ ...motionInteraction.hoverIcon, rotate: 2 }}
           whileTap={motionInteraction.press}
           transition={motionTransition.microEnter}
-          className="ml-0.5 flex size-11 shrink-0 items-center justify-center rounded-2xl hover:bg-muted/50 sm:size-12"
+          className="ml-0 flex size-10 shrink-0 items-center justify-center rounded-2xl hover:bg-muted/50 sm:ml-0.5 sm:size-12"
         >
           <ThemeToggle />
         </motion.div>

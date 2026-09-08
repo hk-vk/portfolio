@@ -175,7 +175,8 @@
     flex-shrink: 0;
   }
 
-  .skill-marquee {
+  .skill-marquee,
+  .skill-row {
     --marquee-speed: 25s;
     overflow: clip;
     overflow-clip-margin: 4px;
@@ -814,5 +815,19 @@ html::view-transition-new(root) {
 @layer components {
   .metal-hero-frame {
     background: transparent !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .metal-hero-frame::after {
+    box-shadow: inset 0 0 0 1px hsl(var(--foreground) / 0.32) !important;
+  }
+
+  .skill-row {
+    --marquee-speed: 18s;
+  }
+
+  .skill-row .skill-marquee-track {
+    will-change: transform;
   }
 }

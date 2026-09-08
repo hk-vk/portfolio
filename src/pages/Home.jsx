@@ -581,10 +581,19 @@ const Home = memo(() => {
 
                   <motion.div variants={childVariants} className="w-full">
                     <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
-                    <div
-                      className="skill-marquee"
-                      onTouchStart={(e) => e.currentTarget.classList.toggle('is-paused')}
-                    >
+                    <div className="skill-row sm:hidden">
+                      <div className="skill-marquee-track">
+                        {repeatedSkills.map((skill) => (
+                          <SkillTag
+                            key={skill.marqueeKey}
+                            skill={skill}
+                            index={skill.baseIndex}
+                            isVisible={sectionsVisible.hero}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="skill-marquee hidden sm:block">
                       <div className="skill-marquee-track">
                         {repeatedSkills.map((skill) => (
                           <SkillTag
