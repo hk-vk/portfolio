@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "../lib/motion";
+import { AnimatePresence, LayoutGroup, motion } from "../lib/motion";
 import { MetalFx } from "metal-fx";
 import { Icon } from "@iconify/react";
 import ThemeToggle from "./ThemeToggle";
@@ -94,6 +94,7 @@ const Navbar = () => {
         aria-label="Primary navigation"
         className="relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 shadow-xl ring-1 ring-border/30 backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
       >
+        <LayoutGroup id="primary-navigation">
         {mainLinks.map((link) => {
           const active = socialOpen ? link.name === "Connect" : isActive(link.path);
           const content = (
@@ -185,6 +186,8 @@ const Navbar = () => {
             </MetalNavItem>
           );
         })}
+        </LayoutGroup>
+
 
         <motion.div
           whileHover={{ ...motionInteraction.hoverIcon, rotate: 2 }}
