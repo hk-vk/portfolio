@@ -1,6 +1,5 @@
 import {
   AnimatePresence,
-  LayoutGroup,
   LazyMotion,
   MotionConfig,
   domAnimation,
@@ -8,4 +7,4 @@ import {
 } from 'framer-motion';
 
 export const motion = m;
-export { AnimatePresence, LayoutGroup, LazyMotion, MotionConfig, domAnimation };
+export { AnimatePresence, LazyMotion, MotionConfig, domAnimation };

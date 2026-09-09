@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { AnimatePresence, LayoutGroup, motion } from "../lib/motion";
+import { AnimatePresence, motion } from "../lib/motion";
 import { MetalFx } from "metal-fx";
 import { Icon } from "@iconify/react";
 import ThemeToggle from "./ThemeToggle";
@@ -21,22 +21,22 @@ const MetalNavItem = ({ active, motionSafe, theme, ready, children }) => {
   if (!ready) return children;
 
   return (
-  <MetalFx
-    key={`${theme}-${active ? "active" : "inactive"}`}
-    preset="silver"
-    variant="button"
-    theme={theme}
-    className={active ? "metal-nav-active" : "metal-nav-inactive"}
-    strength={0.65}
-    glowGain={1.35}
-    paused={!motionSafe || !active}
-    disableGlow={!active}
-    innerShadow={active}
-    borderRadius={16}
-    style={{ overflow: "hidden", borderRadius: 16, isolation: "isolate" }}
-  >
-    {children}
-  </MetalFx>
+    <MetalFx
+      key={`${theme}-${active ? "active" : "inactive"}`}
+      preset="silver"
+      variant="button"
+      theme={theme}
+      className={active ? "metal-nav-active" : "metal-nav-inactive"}
+      strength={0.65}
+      glowGain={1.35}
+      paused={!motionSafe || !active}
+      disableGlow={!active}
+      innerShadow={active}
+      borderRadius={16}
+      style={{ overflow: "hidden", borderRadius: 16, isolation: "isolate" }}
+    >
+      {children}
+    </MetalFx>
   );
 };
 
@@ -50,6 +50,9 @@ const Navbar = () => {
   const location = useLocation();
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } = useSocialPopover();
   const socialPopoverId = "navbar-social-popover";
+  const navRef = useRef(null);
+  const tabRefs = useRef(new Map());
+  const [activeIndicator, setActiveIndicator] = useState(null);
 
   useEffect(() => {
     let frame;
@@ -78,6 +81,39 @@ const Navbar = () => {
   const isActive = (path) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
+  const activeTabName = socialOpen
+    ? "Connect"
+    : mainLinks.find((link) => isActive(link.path))?.name || "Home";
+
+  const setTabRef = (name, node) => {
+    if (node) {
+      tabRefs.current.set(name, node);
+    } else {
+      tabRefs.current.delete(name);
+    }
+  };
+
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const tab = tabRefs.current.get(activeTabName);
+    if (!nav || !tab) return undefined;
+
+    const updateIndicator = () => {
+      const navRect = nav.getBoundingClientRect();
+      const tabRect = tab.getBoundingClientRect();
+      const inset = 1.6;
+      setActiveIndicator({
+        x: tabRect.left - navRect.left + inset,
+        y: tabRect.top - navRect.top + inset,
+        width: tabRect.width - inset * 2,
+        height: tabRect.height - inset * 2,
+      });
+    };
+
+    updateIndicator();
+    window.addEventListener("resize", updateIndicator);
+    return () => window.removeEventListener("resize", updateIndicator);
+  }, [activeTabName, layoutReady]);
   const itemClass = (active) =>
     `nav-control group relative flex h-10 items-center justify-center overflow-hidden rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-12 ${
       active ? "w-[6.5rem] gap-1.5 bg-card px-2.5 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-10 hover:bg-muted/50 sm:w-12"
@@ -91,26 +127,33 @@ const Navbar = () => {
       className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] inset-x-0 z-50 flex justify-center px-2 sm:px-4"
     >
       <nav
+        ref={navRef}
         aria-label="Primary navigation"
-        className="relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 shadow-xl ring-1 ring-border/30 backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
+        className="relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 shadow-xl backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
       >
-        <LayoutGroup id="primary-navigation">
+        {activeIndicator && (
+          <motion.span
+            initial={false}
+            animate={{
+              transform: `translate3d(${activeIndicator.x}px, ${activeIndicator.y}px, 0)`,
+            }}
+            transition={
+              motionSafe
+                ? { type: "spring", stiffness: 520, damping: 38, mass: 0.65 }
+                : { duration: 0 }
+            }
+            style={{
+              width: activeIndicator.width,
+              height: activeIndicator.height,
+            }}
+            className="nav-active-indicator"
+            aria-hidden="true"
+          />
+        )}
         {mainLinks.map((link) => {
           const active = socialOpen ? link.name === "Connect" : isActive(link.path);
           const content = (
             <>
-              {active && (
-                <motion.span
-                  layoutId="navbar-active-indicator"
-                  transition={
-                    motionSafe
-                      ? { type: "spring", stiffness: 520, damping: 38, mass: 0.65 }
-                      : { duration: 0 }
-                  }
-                  className="nav-active-indicator"
-                  aria-hidden="true"
-                />
-              )}
               <span className="nav-content relative z-10 flex items-center gap-1.5 sm:gap-2.5">
                 <motion.span
                   className="grid size-5 shrink-0 place-items-center"
@@ -148,7 +191,10 @@ const Navbar = () => {
           return link.name === "Connect" ? (
             <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
               <button
-                ref={triggerRef}
+                ref={(node) => {
+                  triggerRef.current = node;
+                  setTabRef(link.name, node);
+                }}
                 type="button"
                 aria-label="Open contact links"
                 aria-expanded={socialOpen}
@@ -168,6 +214,7 @@ const Navbar = () => {
           ) : (
             <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
               <NavLink
+                ref={(node) => setTabRef(link.name, node)}
                 to={link.path}
                 end={link.path === "/"}
                 aria-label={link.name}
@@ -186,8 +233,6 @@ const Navbar = () => {
             </MetalNavItem>
           );
         })}
-        </LayoutGroup>
-
 
         <motion.div
           whileHover={{ ...motionInteraction.hoverIcon, rotate: 2 }}
