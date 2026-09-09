@@ -130,7 +130,7 @@
   top: 0;
   left: 0;
   z-index: 1;
-  border-radius: inherit;
+  border-radius: calc(1rem - 1.6px);
   background: linear-gradient(
     135deg,
     hsl(var(--foreground) / 0.09),
