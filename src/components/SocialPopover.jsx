@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
 import { posthog } from '../utils/analytics';
+import { useMotionSafe } from '../utils/useMotionSafe';
 
 /**
  * SocialPopover – A small pop-up with social media links.
@@ -13,6 +14,7 @@ import { posthog } from '../utils/analytics';
  */
 const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   const panelRef = useRef(null);
+  const motionSafe = useMotionSafe();
   // Close on outside click or ESC key
   useEffect(() => {
     if (!isOpen) return;
@@ -45,54 +47,28 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   ];
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isOpen && (
         <motion.div
           id={id}
           role="dialog"
           aria-label="Social links"
           ref={panelRef}
-          className="absolute bottom-full right-6 mb-2 z-50 pointer-events-auto bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl rounded-xl px-4 py-3 flex gap-4"
-          initial={{
-            opacity: 0,
-            scale: 0.82,
-            y: 14,
-            filter: 'blur(6px)',
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            filter: 'blur(0px)',
-            transition: {
-              type: 'spring',
-              stiffness: 380,
-              damping: 26,
-              mass: 0.8,
-              opacity: { duration: 0.2, ease: 'easeOut' },
-              filter: { duration: 0.2, ease: 'easeOut' },
-              when: 'beforeChildren',
-              staggerChildren: 0.04,
-            },
-          }}
-          exit={{
-            opacity: 0,
-            scale: 0.88,
-            y: 8,
-            filter: 'blur(3px)',
-            transition: {
-              duration: 0.14,
-              ease: 'easeIn',
-            },
-          }}
+          className="pointer-events-auto absolute bottom-full right-12 z-50 flex gap-1.5 rounded-2xl border border-border/40 bg-background/95 p-1.5 shadow-xl shadow-black/20 backdrop-blur-xl"
+          initial={motionSafe ? { opacity: 0, transform: 'translateY(8px) scale(0.96)', filter: 'blur(2px)' } : { opacity: 0 }}
+          animate={motionSafe ? { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)' } : { opacity: 1 }}
+          exit={motionSafe ? { opacity: 0, transform: 'translateY(4px) scale(0.98)', filter: 'blur(1px)' } : { opacity: 0 }}
+          transition={{ duration: 0.2, ease: [0.19, 1, 0.22, 1] }}
           style={{ transformOrigin: 'bottom right' }}
         >
           {links.map((l) => (
-            <motion.a
+            <a
               key={l.label}
               href={l.href}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={l.label}
+              title={l.label}
               onClick={() =>
                 posthog?.capture('social_popover_link_clicked', {
                   link_label: l.label,
@@ -100,14 +76,10 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
                   path: window.location.pathname,
                 })
               }
-              className="text-2xl text-foreground hover:text-primary active:scale-95 transition-[color,transform] duration-150 ease-out"
-              initial={{ opacity: 0, y: 6, scale: 0.9, rotate: -2 }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, y: 3, scale: 0.94 }}
-              transition={{ type: 'spring', stiffness: 460, damping: 28, mass: 0.5 }}
+              className="grid size-10 place-items-center rounded-xl text-muted-foreground transition-[background-color,color,transform] duration-150 ease-out hover:bg-muted/70 hover:text-foreground active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <Icon icon={l.icon} aria-label={l.label} />
-            </motion.a>
+              <Icon icon={l.icon} className="size-5" aria-hidden="true" />
+            </a>
           ))}
         </motion.div>
       )}
