@@ -13,7 +13,7 @@ const SparkleIllustration = ({ className = '', size = 24 }) => {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id={gradientId} x1="3" y1="3" x2="21" y2="21">
+        <linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">
           <stop stopColor="hsl(var(--muted-foreground))" />
           <stop offset="0.32" stopColor="hsl(var(--primary))" />
           <stop offset="0.48" stopColor="hsl(var(--foreground))" />

@@ -76,7 +76,7 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
                   path: window.location.pathname,
                 })
               }
-              className="grid size-10 place-items-center rounded-xl text-muted-foreground transition-[background-color,color,transform] duration-150 ease-out hover:bg-muted/70 hover:text-foreground active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="grid size-10 place-items-center rounded-xl text-foreground transition-[background-color,transform] duration-150 ease-out hover:bg-muted/70 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               <Icon icon={l.icon} className="size-5" aria-hidden="true" />
             </a>

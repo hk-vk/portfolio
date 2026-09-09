@@ -268,7 +268,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
         />
         
         {/* Main Content Card */}
-        <div className="metal-edge relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border p-5 h-full transition-colors hover:bg-card/90">
+        <div className={`metal-edge ${isCurrent ? 'experience-current' : ''} relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border p-5 h-full transition-colors hover:bg-card/90`}>
           <div className="flex items-start justify-between gap-4">
             {/* Left: Title + Company */}
             <div>
@@ -497,7 +497,7 @@ const Home = memo(() => {
                 innerShadow={{ alpha: 0.22 }}
                 normalizeHostStyles={false}
               >
-              <div className="relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 p-4 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
+              <div className="hero-surface relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 p-4 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
@@ -553,7 +553,7 @@ const Home = memo(() => {
                       >
                         HARIKRISHNAN V K
                       </h1>
-                      <div className="mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-primary to-primary/30 sm:w-20" />
+                      <div aria-hidden="true" className="hero-silver-line mt-2 h-1 w-16 rounded-full sm:w-20" />
                     </motion.div>
                   )}
 
@@ -561,22 +561,22 @@ const Home = memo(() => {
                     variants={childVariants}
                     className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
                   >
-                    I am a full-stack developer at{' '}
+                    I’m a full-stack developer at{' '}
                     <a href="https://www.comini.in" target="_blank" rel="noopener noreferrer">
                       <HoverPreviewLink previewKey="comini" className="hero-link !font-normal !text-foreground">
                         Comini Learning
                       </HoverPreviewLink>
-                    </a>. I build learning tools at work and odd little side projects after hours.
+                    </a>, where I build tools for playful, practical learning.
                   </motion.p>
 
                   <motion.p variants={childVariants} className="mt-5 max-w-2xl text-base leading-loose text-muted-foreground sm:text-lg">
-                    Outside work, I make small tools for problems that keep bothering me. You can browse my
+                    After hours, I make small things for problems that keep bothering me. You can browse my
                     {' '}<Link to="/projects" className="hero-link">
                       projects
                     </Link>, send me an
                     {' '}<a href="mailto:hi@hari.works" className="hero-link">
                       email
-                    </a>, or find my code on
+                    </a>, or find the code on
                     {' '}<a href="https://github.com/hk-vk" target="_blank" rel="noopener noreferrer" className="hero-link">
                       GitHub
                     </a>.
