@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { motion } from "../lib/motion";
+import { AnimatePresence, motion } from "../lib/motion";
 import { MetalFx } from "metal-fx";
 import { Icon } from "@iconify/react";
 import ThemeToggle from "./ThemeToggle";
@@ -79,7 +79,7 @@ const Navbar = () => {
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
   const itemClass = (active) =>
-    `nav-control group flex h-10 items-center justify-center rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-12 ${
+    `nav-control group relative flex h-10 items-center justify-center overflow-hidden rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-12 ${
       active ? "w-[6.5rem] gap-1.5 bg-card px-2.5 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-10 hover:bg-muted/50 sm:w-12"
     }`;
 
@@ -97,33 +97,51 @@ const Navbar = () => {
         {mainLinks.map((link) => {
           const active = socialOpen ? link.name === "Connect" : isActive(link.path);
           const content = (
-            <span className="nav-content flex items-center gap-1.5 sm:gap-2.5">
-              <motion.span
-                className="grid size-5 shrink-0 place-items-center"
-                animate={
-                  motionSafe
-                    ? {
-                        transform: active
-                          ? "translateY(-1px) scale(1.06)"
-                          : "translateY(0) scale(1)",
-                      }
-                    : undefined
-                }
-                transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-              >
-                <Icon icon={link.icon} className="size-[15px] sm:size-4" />
-              </motion.span>
+            <>
               {active && (
                 <motion.span
-                  initial={motionSafe ? { opacity: 0, transform: "translateX(-4px)" } : false}
-                  animate={{ opacity: 1, transform: "translateX(0)" }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
-                  className="whitespace-nowrap text-sm font-medium sm:text-base"
-                >
-                  {link.name}
-                </motion.span>
+                  layoutId="navbar-active-indicator"
+                  transition={
+                    motionSafe
+                      ? { type: "spring", stiffness: 520, damping: 38, mass: 0.65 }
+                      : { duration: 0 }
+                  }
+                  className="nav-active-indicator"
+                  aria-hidden="true"
+                />
               )}
-            </span>
+              <span className="nav-content relative z-10 flex items-center gap-1.5 sm:gap-2.5">
+                <motion.span
+                  className="grid size-5 shrink-0 place-items-center"
+                  animate={
+                    motionSafe
+                      ? {
+                          transform: active
+                            ? "translateY(-1px) scale(1.06)"
+                            : "translateY(0) scale(1)",
+                        }
+                      : undefined
+                  }
+                  transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
+                  <Icon icon={link.icon} className="size-[15px] sm:size-4" />
+                </motion.span>
+                <AnimatePresence initial={false} mode="popLayout">
+                  {active && (
+                    <motion.span
+                      key={link.name}
+                      initial={motionSafe ? { opacity: 0, transform: "translateX(-5px)" } : false}
+                      animate={{ opacity: 1, transform: "translateX(0)" }}
+                      exit={motionSafe ? { opacity: 0, transform: "translateX(-5px)" } : undefined}
+                      transition={{ duration: 0.18, ease: [0.19, 1, 0.22, 1] }}
+                      className="whitespace-nowrap text-sm font-medium sm:text-base"
+                    >
+                      {link.name}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </span>
+            </>
           );
 
           return link.name === "Connect" ? (
