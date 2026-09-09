@@ -132,19 +132,11 @@ const Navbar = () => {
         className="relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 shadow-xl backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
       >
         {activeIndicator && (
-          <motion.span
-            initial={false}
-            animate={{
-              transform: `translate3d(${activeIndicator.x}px, ${activeIndicator.y}px, 0)`,
-            }}
-            transition={
-              motionSafe
-                ? { type: "spring", stiffness: 520, damping: 38, mass: 0.65 }
-                : { duration: 0 }
-            }
+          <span
             style={{
               width: activeIndicator.width,
               height: activeIndicator.height,
+              transform: `translate3d(${activeIndicator.x}px, ${activeIndicator.y}px, 0)`,
             }}
             className="nav-active-indicator"
             aria-hidden="true"
