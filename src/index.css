@@ -29,9 +29,9 @@
   }
 
   .dark {
-    --background: 220 10% 8%;
+    --background: 220 10% 11%;
     --foreground: 210 18% 95%;
-    --card: 220 9% 11%;
+    --card: 220 9% 14%;
     --card-foreground: 210 18% 95%;
     --primary: 210 16% 76%;
     --primary-foreground: 220 10% 8%;
@@ -188,9 +188,7 @@
 
   .metal-edge {
     border-color: hsl(var(--border) / 0.72);
-    box-shadow:
-      inset 0 1px 0 hsl(var(--foreground) / 0.08),
-      0 18px 45px -38px hsl(var(--primary) / 0.55);
+    box-shadow: 0 18px 45px -38px hsl(var(--primary) / 0.55);
   }
 
   .card {
@@ -855,7 +853,8 @@ html::view-transition-new(root) {
     visibility: visible !important;
   }
 
-  .experience-current {
+  .experience-shell:hover .experience-card,
+  .experience-card.experience-active {
     border-color: transparent;
     background:
       linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
@@ -863,10 +862,22 @@ html::view-transition-new(root) {
     box-shadow: none;
   }
 
-  .dark .experience-current {
+  .dark .experience-shell:hover .experience-card,
+  .dark .experience-card.experience-active {
     background:
       linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
       linear-gradient(115deg, #69717c, #a8afb8 28%, #424953 58%, #747d89) border-box;
+  }
+
+  .experience-current-label {
+    color: #343a42;
+    background: linear-gradient(115deg, #a9b0b9, #eef1f4 35%, #9ba4af 70%, #d4d9df);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.32);
+  }
+
+  .dark .experience-current-label {
+    color: #17191d;
+    background: linear-gradient(115deg, #7d8691, #dfe4e9 35%, #929ca8 70%, #c4cbd3);
   }
 
   .hero-silver-line {

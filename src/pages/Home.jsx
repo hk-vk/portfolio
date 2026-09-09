@@ -256,7 +256,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`relative rounded-xl p-0.5 overflow-hidden transition-all duration-300 ${item.details ? 'cursor-pointer' : ''}`}
+        className={`experience-shell relative rounded-xl p-0.5 overflow-hidden transition-all duration-300 ${item.details ? 'cursor-pointer' : ''}`}
       >
         {/* Spotlight Border Layer */}
         <div 
@@ -268,13 +268,13 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
         />
         
         {/* Main Content Card */}
-        <div className={`metal-edge ${isCurrent ? 'experience-current' : ''} relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border p-5 h-full transition-colors hover:bg-card/90`}>
+        <div className={`metal-edge experience-card ${isExpanded ? 'experience-active' : ''} relative z-10 bg-card/80 backdrop-blur-sm rounded-[10px] border p-5 h-full transition-colors hover:bg-card/90`}>
           <div className="flex items-start justify-between gap-4">
             {/* Left: Title + Company */}
             <div>
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-foreground leading-[1.25] pb-[0.05em]">{item.title}</p>
-                {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded hidden sm:inline-block">Current</span>}
+                {isCurrent && <span className="experience-current-label hidden rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider sm:inline-block">Current</span>}
               </div>
               <div className="mt-0.5">
                 <span className="text-muted-foreground/60 text-sm">at </span>
@@ -289,7 +289,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
             {/* Right: Date + Current label on mobile */}
             <div className="flex flex-col items-end shrink-0 pt-0.5 gap-1">
               <span className="text-xs text-muted-foreground">{item.date}</span>
-              {isCurrent && <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded sm:hidden">Current</span>}
+              {isCurrent && <span className="experience-current-label rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider sm:hidden">Current</span>}
             </div>
           </div>
 
@@ -460,7 +460,7 @@ const Home = memo(() => {
         description="Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences."
         url="/"
       />
-      <div className="pt-16 md:pt-24 pb-20 overflow-hidden relative">
+      <div className="pt-6 sm:pt-16 md:pt-24 pb-20 overflow-hidden relative">
         {/* Waves Background - hero section only */}
         <div ref={heroRef} className="mb-0 relative overflow-hidden">
           {/* Hero content container */}
@@ -475,12 +475,9 @@ const Home = memo(() => {
               <SparkleIllustration className="transform rotate-12" size={24} />
             </motion.div>
 
-            <div className="pattern-dots w-40 h-40 top-0 left-1/4 hidden md:block"></div>
-            <div className="pattern-dots w-40 h-40 bottom-0 right-1/4 hidden md:block"></div>
-
             <motion.div
               ref={heroCardRef}
-              className="relative mb-8 overflow-hidden rounded-xl sm:mb-16 sm:rounded-2xl"
+              className="relative mb-4 overflow-hidden rounded-xl sm:mb-16 sm:rounded-2xl"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
@@ -620,7 +617,7 @@ const Home = memo(() => {
         </div>
 
         {/* Experience Section */}
-        <div ref={experienceRef} className="py-12 md:py-16">
+        <div ref={experienceRef} className="pb-12 pt-6 sm:py-12 md:py-16">
           <div ref={experienceContentRef} className="content-container" style={revealStyle}>
             <motion.div
               className="mb-8 flex items-center"
