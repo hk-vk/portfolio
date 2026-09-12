@@ -55,7 +55,7 @@ const ThemeToggle = () => {
       whileTap={motionSafe ? motionInteraction.press : undefined}
       onClick={handleToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="relative grid size-10 place-items-center overflow-hidden rounded-2xl text-foreground transition-colors hover:text-primary sm:size-12"
+      className="relative grid size-10 place-items-center overflow-hidden rounded-2xl border border-border/50 bg-muted/40 text-foreground transition-colors hover:bg-muted/60 hover:text-primary sm:size-12"
     >
       <motion.span
         className="block"

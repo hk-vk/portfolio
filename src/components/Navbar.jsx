@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "../lib/motion";
-import { MetalFx } from "metal-fx";
 import { Icon } from "@iconify/react";
 import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
@@ -16,36 +15,13 @@ const mainLinks = [
   { name: "Connect", path: "/contact", icon: "hugeicons:mail-01" },
 ];
 
-const MetalNavItem = ({ active, motionSafe, theme, ready, children }) => {
-  if (!ready) return children;
-
-  return (
-    <MetalFx
-      key={`${theme}-${active ? "active" : "inactive"}`}
-      preset="silver"
-      variant="button"
-      theme={theme}
-      className={active ? "metal-nav-active" : "metal-nav-inactive"}
-      strength={0.65}
-      glowGain={1.35}
-      paused={!motionSafe || !active}
-      disableGlow={!active}
-      innerShadow={active}
-      borderRadius={16}
-      style={{ overflow: "hidden", borderRadius: 16, isolation: "isolate" }}
-    >
-      {children}
-    </MetalFx>
-  );
-};
+const MetalNavItem = ({ active, children }) =>
+  active ? <div className="metal-nav-active">{children}</div> : children;
 
 const Navbar = () => {
   const motionSafe = useMotionSafe();
   const [layoutReady, setLayoutReady] = useState(false);
 
-  const [theme, setTheme] = useState(() =>
-    document.documentElement.classList.contains("dark") ? "dark" : "light",
-  );
   const location = useLocation();
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } = useSocialPopover();
   const socialPopoverId = "navbar-social-popover";
@@ -67,14 +43,6 @@ const Navbar = () => {
       cancelled = true;
       cancelAnimationFrame(frame);
     };
-  }, []);
-
-  useEffect(() => {
-    const updateTheme = () =>
-      setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-    const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
   }, []);
 
   const isActive = (path) =>
@@ -115,7 +83,7 @@ const Navbar = () => {
   }, [activeTabName, layoutReady]);
   const itemClass = (active) =>
     `nav-control group relative flex h-10 items-center justify-center overflow-hidden rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-12 ${
-      active ? "w-[6.5rem] gap-1.5 bg-card px-2.5 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-10 hover:bg-muted/50 sm:w-12"
+      active ? "w-[6.5rem] gap-1.5 bg-card px-2.5 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-10 border border-border/50 bg-muted/40 hover:bg-muted/60 sm:w-12"
     }`;
 
   return (
@@ -180,7 +148,7 @@ const Navbar = () => {
           );
 
           return link.name === "Connect" ? (
-            <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
+            <MetalNavItem key={link.path} active={active}>
               <button
                 ref={(node) => {
                   triggerRef.current = node;
@@ -203,7 +171,7 @@ const Navbar = () => {
               </button>
             </MetalNavItem>
           ) : (
-            <MetalNavItem key={link.path} active={active} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
+            <MetalNavItem key={link.path} active={active}>
               <NavLink
                 ref={(node) => setTabRef(link.name, node)}
                 to={link.path}
@@ -225,7 +193,7 @@ const Navbar = () => {
           );
         })}
 
-        <MetalNavItem active={false} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
+        <MetalNavItem active={false}>
           <ThemeToggle />
         </MetalNavItem>
 

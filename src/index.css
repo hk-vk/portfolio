@@ -6,6 +6,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --nav-metal-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 /* Official Evil Rabbit Lifeline intro animation plumbing. */
 @keyframes lifeline-rail-draw {
   from { transform: scaleX(0); }
@@ -139,13 +145,10 @@
   }
 
   .metal-nav-active {
+    position: relative;
     overflow: hidden;
+    border-radius: 1rem;
     isolation: isolate;
-  }
-
-  .metal-nav-active > .metal-fx-canvas,
-  .metal-nav-active > .metal-fx-glow-svg {
-    opacity: 0 !important;
   }
 
   .metal-nav-active .nav-control {
@@ -153,19 +156,23 @@
   }
 
   .metal-nav-active::after {
-    border: 1px solid hsl(var(--foreground) / 0.65);
-    box-shadow: none !important;
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: conic-gradient(from var(--nav-metal-angle), hsl(var(--foreground) / 0.38), hsl(var(--foreground) / 0.82), hsl(var(--foreground) / 0.32), hsl(var(--foreground) / 0.68), hsl(var(--foreground) / 0.28), hsl(var(--foreground) / 0.76), hsl(var(--foreground) / 0.38));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: nav-metal-border 8s linear infinite;
   }
 
-  .metal-nav-inactive > .metal-fx-canvas,
-  .metal-nav-inactive > .metal-fx-inner,
-  .metal-nav-inactive > .metal-fx-glow-svg {
-    opacity: 0 !important;
-  }
-
-  .metal-nav-inactive::before,
-  .metal-nav-inactive::after {
-    content: none;
+  @keyframes nav-metal-border {
+    to { --nav-metal-angle: 360deg; }
   }
 
 
@@ -186,26 +193,12 @@
 }
 
 
-  @media (hover: hover) and (pointer: fine) {
-    .metal-nav-inactive::before {
-      content: '';
-      background: linear-gradient(115deg, transparent, hsl(var(--foreground) / 0.09) 35%, hsl(var(--foreground) / 0.03) 65%, transparent);
-      box-shadow: none;
-      opacity: 0;
-      transition: opacity 150ms ease;
-    }
-
-    .metal-nav-inactive:hover::before {
-      opacity: 1;
-    }
-  }
-
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .navbar-controls > .metal-nav-inactive {
+    .navbar-controls > .nav-control {
       transition: transform 180ms cubic-bezier(0.215, 0.61, 0.355, 1);
     }
 
-    .navbar-controls > .metal-nav-inactive:hover {
+    .navbar-controls > .nav-control:hover {
       transform: translateY(-2px);
     }
   }
@@ -222,9 +215,12 @@
     .nav-content {
       transition: none;
     }
-    .nav-active-indicator,
-    .metal-nav-inactive::before {
+    .nav-active-indicator {
       transition: none;
+    }
+
+    .metal-nav-active::after {
+      animation: none;
     }
 
     .nav-control:active .nav-content {
@@ -244,14 +240,61 @@
     content: '';
     position: absolute;
     inset: 0;
-    padding: 0.75px;
+    border: 0.75px solid hsl(var(--foreground) / 0.05);
     border-radius: inherit;
     pointer-events: none;
-    background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.1) 20%, hsl(var(--foreground) / 0.32) 50%, hsl(var(--foreground) / 0.1) 80%, transparent);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
+  }
+
+  .metal-cta {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(110deg, hsl(var(--card) / 0.98), hsl(var(--foreground) / 0.055) 46%, hsl(var(--card) / 0.95)) padding-box,
+      linear-gradient(110deg, hsl(var(--foreground) / 0.42), hsl(var(--foreground) / 0.1) 24%, hsl(var(--foreground) / 0.34) 48%, hsl(var(--foreground) / 0.08) 70%, hsl(var(--foreground) / 0.3)) border-box;
+  }
+
+  .metal-sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .metal-sheen::before {
+    content: '';
+    position: absolute;
+    inset-block: -35%;
+    left: -42%;
+    width: 28%;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.24) 48%, transparent);
+    transform: translateX(-220%) skewX(-18deg);
+    animation: metal-specular 7s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+
+  .experience-current-label::before { animation-delay: -3.4s; }
+  .hero-silver-line::before { animation-delay: -5s; }
+  .metal-cta::before { animation-delay: -2.2s; }
+
+  @keyframes metal-specular {
+    0%, 68% { transform: translateX(-220%) skewX(-18deg); }
+    82%, 100% { transform: translateX(620%) skewX(-18deg); }
+  }
+
+  .sparkle-specular {
+    transform-box: view-box;
+    animation: sparkle-specular 7.6s cubic-bezier(0.215, 0.61, 0.355, 1) infinite -2.8s;
+  }
+
+  @keyframes sparkle-specular {
+    0%, 70% { transform: translateX(0); }
+    86%, 100% { transform: translateX(60px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .metal-sheen::before,
+    .sparkle-specular {
+      animation: none;
+      display: none;
+    }
   }
 
   .surface-shadow {
@@ -928,9 +971,22 @@ html::view-transition-new(root) {
 
 @layer components {
   .metal-hero-frame {
-    background: transparent !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    border-radius: inherit;
+  }
+
+  .metal-hero-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(110deg, hsl(var(--foreground) / 0.2), hsl(var(--foreground) / 0.055) 22%, hsl(var(--foreground) / 0.16) 44%, hsl(var(--foreground) / 0.045) 67%, hsl(var(--foreground) / 0.18));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
   }
 
   .experience-shell:hover .experience-card,
@@ -950,18 +1006,19 @@ html::view-transition-new(root) {
   }
 
   .experience-current-label {
-    color: #343a42;
-    background: linear-gradient(115deg, #a9b0b9, #eef1f4 35%, #9ba4af 70%, #d4d9df);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.32);
+    color: #2d333b;
+    background: linear-gradient(108deg, #89929d, #dfe4e9 18%, #a4adb7 34%, #f4f6f8 48%, #929ca7 66%, #d0d6dc 82%, #858f9a);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), inset 0 -1px 0 rgb(58 65 74 / 0.2);
   }
 
   .dark .experience-current-label {
-    color: #17191d;
-    background: linear-gradient(115deg, #7d8691, #dfe4e9 35%, #929ca8 70%, #c4cbd3);
+    color: #15181c;
+    background: linear-gradient(108deg, #69727d, #cbd1d8 18%, #8c96a1 34%, #edf0f3 48%, #77828e 66%, #bbc2ca 82%, #626c77);
   }
 
   .hero-silver-line {
-    background: linear-gradient(105deg, #68727e, #c9d0d8 24%, #f1f4f7 39%, #89939f 62%, #bbc3cd 83%, #68727e);
+    background: linear-gradient(105deg, #626c77, #aab3bd 15%, #e5e9ed 28%, #89939f 44%, #f4f6f8 55%, #929ca7 70%, #c7cdd4 84%, #626c77);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), inset 0 -1px 0 rgb(39 45 52 / 0.24);
   }
 
   .dark .hero-silver-line {

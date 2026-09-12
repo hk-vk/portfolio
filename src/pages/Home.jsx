@@ -1,4 +1,3 @@
-import { MetalFx } from 'metal-fx';
 import { motion, AnimatePresence } from '../lib/motion';
 import {
   duration,
@@ -274,7 +273,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
             <div>
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-foreground leading-[1.25] pb-[0.05em]">{item.title}</p>
-                {isCurrent && <span className="experience-current-label hidden rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider sm:inline-block">Current</span>}
+                {isCurrent && <span className="experience-current-label metal-sheen hidden rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider sm:inline-block">Current</span>}
               </div>
               <div className="mt-0.5">
                 <span className="text-muted-foreground/60 text-sm">at </span>
@@ -289,7 +288,7 @@ const ExperienceItem = memo(({ item, index, isVisible, isCurrent }) => {
             {/* Right: Date + Current label on mobile */}
             <div className="flex flex-col items-end shrink-0 pt-0.5 gap-1">
               <span className="text-xs text-muted-foreground">{item.date}</span>
-              {isCurrent && <span className="experience-current-label rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider sm:hidden">Current</span>}
+              {isCurrent && <span className="experience-current-label metal-sheen rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider sm:hidden">Current</span>}
             </div>
           </div>
 
@@ -482,18 +481,7 @@ const Home = memo(() => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <MetalFx
-                className="metal-hero-frame block w-full"
-                preset="silver"
-                theme={isDarkMode ? 'dark' : 'light'}
-                strength={0.38}
-                shaderScale={3}
-                ringCssPx={1}
-                paused={!motionSafe || !sectionsVisible.hero}
-                disableGlow
-                innerShadow={{ alpha: 0.22 }}
-                normalizeHostStyles={false}
-              >
+              <div className="metal-hero-frame relative block w-full">
               <div className="hero-surface relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 p-4 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
@@ -550,7 +538,7 @@ const Home = memo(() => {
                       >
                         HARIKRISHNAN V K
                       </h1>
-                      <div aria-hidden="true" className="hero-silver-line mt-2 h-1 w-16 rounded-full sm:w-20" />
+                      <div aria-hidden="true" className="hero-silver-line metal-sheen mt-2 h-1 w-16 rounded-full sm:w-20" />
                     </motion.div>
                   )}
 
@@ -610,7 +598,7 @@ const Home = memo(() => {
                 </HoverPreviewProvider>
               </div>
               </div>
-              </MetalFx>
+              </div>
             </motion.div>
 
           </div>
@@ -681,14 +669,6 @@ const Home = memo(() => {
               animate={sectionsVisible.projects ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: sequenceDelay(1), duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease }}
             >
-              <MetalFx
-                preset="silver"
-                theme={isDarkMode ? 'dark' : 'light'}
-                strength={0.7}
-                paused={!motionSafe || !projectsVisible}
-                disableGlow={!motionSafe}
-                innerShadow
-              >
               <Link
                 to="/projects"
                 onClick={() =>
@@ -696,7 +676,7 @@ const Home = memo(() => {
                     from_path: window.location.pathname,
                   })
                 }
-                className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-foreground transition-transform duration-150 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring group"
+                className="metal-cta metal-sheen inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold text-foreground transition-transform duration-150 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring group"
               >
                 View All Projects
                 <svg
@@ -708,7 +688,6 @@ const Home = memo(() => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </Link>
-              </MetalFx>
             </motion.div>
           </div>
         </div>
