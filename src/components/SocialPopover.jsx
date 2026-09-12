@@ -41,9 +41,9 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   }, [isOpen, onClose, triggerRef]);
 
   const links = [
-    { href: 'https://github.com/hk-vk', icon: 'tabler:brand-github', label: 'GitHub' },
-    { href: 'https://linkedin.com/in/harikrishnanvk', icon: 'tabler:brand-linkedin', label: 'LinkedIn' },
-    { href: 'mailto:vkharikrishnan45@gmail.com', icon: 'tabler:mail', label: 'Email' },
+    { href: 'https://github.com/hk-vk', icon: 'hugeicons:github', label: 'GitHub' },
+    { href: 'https://linkedin.com/in/harikrishnanvk', icon: 'hugeicons:linkedin-01', label: 'LinkedIn' },
+    { href: 'mailto:vkharikrishnan45@gmail.com', icon: 'hugeicons:mail-01', label: 'Email' },
   ];
 
   return (
@@ -78,7 +78,7 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
               }
               className="grid size-10 place-items-center rounded-xl text-foreground transition-[background-color,transform] duration-150 ease-out hover:bg-muted/70 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              <Icon icon={l.icon} className="size-5" aria-hidden="true" />
+              <Icon icon={l.icon} className="size-[15px] sm:size-4" aria-hidden="true" />
             </a>
           ))}
         </motion.div>

@@ -477,7 +477,7 @@ const Home = memo(() => {
 
             <motion.div
               ref={heroCardRef}
-              className="relative mb-4 overflow-hidden rounded-xl sm:mb-16 sm:rounded-2xl"
+              className="surface-shadow relative mb-4 overflow-hidden rounded-xl sm:mb-16 sm:rounded-2xl"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}

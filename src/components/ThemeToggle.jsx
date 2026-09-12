@@ -1,46 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { Icon } from '@iconify/react';
 import { motion } from '../lib/motion';
 import { themeToggle } from '../utils/themeToggle';
-import { spring } from '../utils/motionSettings';
 import { motionInteraction } from '../utils/motionContract';
+import { useMotionSafe } from '../utils/useMotionSafe';
 import { posthog } from '../utils/analytics';
-
-const SunIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <circle cx="12" cy="12" r="5" />
-    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-  </svg>
-);
-
-const MoonIcon = ({ className = '' }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"
-    />
-  </svg>
-);
 
 /**
  * Theme toggle button component that allows switching between light and dark mode
  */
 const ThemeToggle = () => {
   const [isDark, setIsDark] = useState(false);
+  const motionSafe = useMotionSafe();
   const { toggleTheme } = themeToggle();
   
   useEffect(() => {
@@ -64,7 +35,7 @@ const ThemeToggle = () => {
       });
     };
 
-    if (!document.startViewTransition) {
+    if (!motionSafe || !document.startViewTransition) {
       performToggle();
       return;
     }
@@ -81,8 +52,7 @@ const ThemeToggle = () => {
   
   return (
     <motion.button
-      whileHover={{ rotate: isDark ? -12 : 12, ...motionInteraction.hoverIcon }}
-      whileTap={motionInteraction.press}
+      whileTap={motionSafe ? motionInteraction.press : undefined}
       onClick={handleToggle}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       className="relative grid size-10 place-items-center overflow-hidden rounded-2xl text-foreground transition-colors hover:text-primary sm:size-12"
@@ -91,25 +61,21 @@ const ThemeToggle = () => {
         className="block"
         animate={{
           opacity: isDark ? 1 : 0,
-          rotate: isDark ? 0 : -90,
-          y: isDark ? 0 : 8,
-          scale: isDark ? 1 : 0.9,
+          scale: motionSafe ? (isDark ? 1 : 0.82) : 1,
         }}
-        transition={spring.snappy}
+        transition={{ duration: motionSafe ? 0.18 : 0, ease: [0.19, 1, 0.22, 1] }}
       >
-        <SunIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+        <Icon icon="hugeicons:sun-03" className="size-[18px]" />
       </motion.span>
       <motion.span
         className="absolute inset-0 flex items-center justify-center"
         animate={{
           opacity: isDark ? 0 : 1,
-          rotate: isDark ? 90 : 0,
-          y: isDark ? -8 : 0,
-          scale: isDark ? 0.9 : 1,
+          scale: motionSafe ? (isDark ? 0.82 : 1) : 1,
         }}
-        transition={spring.snappy}
+        transition={{ duration: motionSafe ? 0.18 : 0, ease: [0.19, 1, 0.22, 1] }}
       >
-        <MoonIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+        <Icon icon="hugeicons:moon-02" className="size-[18px]" />
       </motion.span>
     </motion.button>
   );

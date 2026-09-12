@@ -7,7 +7,6 @@ import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
 import { useSocialPopover } from "../context/SocialPopoverContext";
 import { useMotionSafe } from "../utils/useMotionSafe";
-import { motionInteraction, motionTransition } from "../utils/motionContract";
 import { posthog } from "../utils/analytics";
 
 const mainLinks = [
@@ -129,7 +128,7 @@ const Navbar = () => {
       <nav
         ref={navRef}
         aria-label="Primary navigation"
-        className="relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 shadow-xl backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
+        className="surface-shadow navbar-controls relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
       >
         {activeIndicator && (
           <span
@@ -226,14 +225,9 @@ const Navbar = () => {
           );
         })}
 
-        <motion.div
-          whileHover={{ ...motionInteraction.hoverIcon, rotate: 2 }}
-          whileTap={motionInteraction.press}
-          transition={motionTransition.microEnter}
-          className="ml-0 flex size-10 shrink-0 items-center justify-center rounded-2xl hover:bg-muted/50 sm:ml-0.5 sm:size-12"
-        >
+        <MetalNavItem active={false} motionSafe={motionSafe} theme={theme} ready={layoutReady}>
           <ThemeToggle />
-        </motion.div>
+        </MetalNavItem>
 
         <SocialPopover
           id={socialPopoverId}
