@@ -23,6 +23,7 @@ const Contact = lazyWithRetry(() => import('./pages/Contact'));
 const Blog = lazyWithRetry(() => import('./pages/Blog'));
 const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage'));
 const OGPreview = lazyWithRetry(() => import('./pages/OGPreview'));
+const Archive = lazyWithRetry(() => import('./pages/Archive')); 
 
 const PageLoader = () => (
   <section className="flex min-h-[60vh] items-center px-4 sm:px-6" aria-busy="true" aria-live="polite">
@@ -128,6 +129,8 @@ const AnimatedRoutes = () => {
         <Route path="/blog" element={<PageTransition><Blog /></PageTransition>} />
         <Route path="/blog/:postId" element={<PageTransition><BlogPostPage /></PageTransition>} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+        <Route path="/archive" element={<PageTransition><Archive /></PageTransition>} />
+        <Route path="/archive/:year/:slug" element={<PageTransition><Archive /></PageTransition>} />
         <Route path="/og-preview" element={<PageTransition><OGPreview /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
@@ -142,6 +145,7 @@ const getPageNameFromPath = (pathname) => {
   if (pathname === '/blog') return 'blog';
   if (pathname.startsWith('/blog/')) return 'blog_post';
   if (pathname === '/contact') return 'contact';
+  if (pathname.startsWith('/archive')) return 'archive';
   return 'other';
 };
 
@@ -178,7 +182,6 @@ function App() {
     };
 
     initTheme();
-
 
   }, []);
 

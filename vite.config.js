@@ -1,13 +1,22 @@
+import { resolve } from 'node:path';
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': resolve(process.cwd(), 'src'),
+    },
+  },
   plugins: [react()],
   assetsInclude: ['**/*.glb', '**/*.png'],
   server: {
     host: '0.0.0.0',
     allowedHosts: ['.trycloudflare.com'],
+    watch: {
+      ignored: ['**/.archive-worktrees/**', '**/public/archive-builds/**'],
+    },
   },
   base: '/',
   build: {
