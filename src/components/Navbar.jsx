@@ -12,7 +12,7 @@ const mainLinks = [
   { name: "Home", path: "/", icon: "hugeicons:home-01" },
   { name: "Work", path: "/projects", icon: "hugeicons:code-folder" },
   { name: "Blog", path: "/blog", icon: "hugeicons:book-open-01" },
-  { name: "Connect", path: "/contact", icon: "hugeicons:mail-01" },
+  { name: "Connect", path: "/contact", icon: "hugeicons:share-08" },
 ];
 
 const MetalNavItem = ({ active, children }) =>
