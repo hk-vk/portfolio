@@ -37,7 +37,7 @@ const BrowserFrame = ({ version, title, className = '' }) => (
   </div>
 );
 
-const createArchiveMarkers = (versions) => [...versions].reverse().map((version, index) => ({
+const createArchiveMarkers = (versions) => versions.map((version, index) => ({
   id: version.id,
   year: index,
   age: `0${index + 1}`,
@@ -46,13 +46,13 @@ const createArchiveMarkers = (versions) => [...versions].reverse().map((version,
     { type: 'text', value: `${version.title}.` },
   ]],
   photos: [{
-    src: version.previewUrl,
-    alt: `${version.title} site preview`,
+    src: version.id === 'live' ? '' : version.previewUrl,
+    alt: formatTimelineDate(version.date),
     previewUrl: version.buildUrl,
-    width: 220,
-    x: 0.08,
-    y: 160,
-    rotate: index % 2 === 0 ? -2 : 2,
+    width: 340,
+    x: 0.5,
+    y: 72 + (index % 2) * 20,
+    rotate: 0,
   }],
 }));
 
@@ -65,7 +65,7 @@ const ArchiveLifeline = ({ versions }) => (
         title="Portfolio archive timeline"
         mode="auto"
         playIntro={false}
-        className="h-[27rem] md:h-[25rem]"
+        className="h-[27rem] md:h-[29rem]"
       />
     </div>
   </ThemeProvider>
@@ -74,6 +74,23 @@ const ArchiveLifeline = ({ versions }) => (
 const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange }) => {
   const [position, setPosition] = useState(50);
   const stageRef = useRef(null);
+
+  const olderIndex = versions.findIndex((v) => v.id === older.id);
+  const newerIndex = versions.findIndex((v) => v.id === newer.id);
+  const nextIndex = (current, dir, otherId) => {
+    let i = current + dir;
+    while (i >= 0 && i < versions.length && versions[i].id === otherId) i += dir;
+    return i;
+  };
+  const step = (setter, current, dir, otherId) => {
+    const i = nextIndex(current, dir, otherId);
+    if (i >= 0 && i < versions.length) setter(versions[i].id);
+  };
+  const canStep = (current, dir, otherId) => {
+    const i = nextIndex(current, dir, otherId);
+    return i >= 0 && i < versions.length;
+  };
+
 
   const setPositionFromPointer = (event) => {
     const bounds = stageRef.current?.getBoundingClientRect();
@@ -93,14 +110,14 @@ const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange })
   };
 
   return (
-    <section className="mt-14" aria-labelledby="compare-heading">
+    <section className="mt-10" aria-labelledby="compare-heading">
       <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 id="compare-heading" className="text-2xl font-bold md:text-3xl">Compare the versions</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Pick two moments, then drag the line to see what changed.</p>
+          <h2 id="compare-heading" className="text-2xl font-bold md:text-3xl">Same portfolio. Different time.</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Choose two versions and drag the seam across them.</p>
         </div>
         <div className="grid grid-cols-2 gap-2 sm:min-w-[24rem]">
-          <label className="min-w-0">
+          <div className="min-w-0">
             <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Older</span>
             <select
               value={older.id}
@@ -113,8 +130,8 @@ const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange })
                 </option>
               ))}
             </select>
-          </label>
-          <label className="min-w-0">
+          </div>
+          <div className="min-w-0">
             <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Newer</span>
             <select
               value={newer.id}
@@ -127,7 +144,7 @@ const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange })
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         </div>
       </div>
 
@@ -155,8 +172,27 @@ const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange })
         >
           <Icon icon="tabler:arrows-left-right" className="h-5 w-5" />
         </button>
-        <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">Older</span>
-        <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">Newer</span>
+        <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">{older.title}</span>
+        <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">{newer.title}</span>
+
+        <button
+          type="button"
+          aria-label="Step both versions back"
+          disabled={!canStep(newerIndex, 1, older.id) && !canStep(olderIndex, 1, newer.id)}
+          onClick={() => { step(onNewerChange, newerIndex, 1, older.id); step(onOlderChange, olderIndex, 1, newer.id); }}
+          className="absolute left-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-white/40 bg-background/80 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-30"
+        >
+          <Icon icon="tabler:chevron-left" className="size-5" />
+        </button>
+        <button
+          type="button"
+          aria-label="Step both versions forward"
+          disabled={!canStep(olderIndex, -1, newer.id) && !canStep(newerIndex, -1, older.id)}
+          onClick={() => { step(onOlderChange, olderIndex, -1, newer.id); step(onNewerChange, newerIndex, -1, older.id); }}
+          className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-white/40 bg-background/80 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-30"
+        >
+          <Icon icon="tabler:chevron-right" className="size-5" />
+        </button>
       </div>
     </section>
   );
@@ -190,9 +226,22 @@ const Archive = () => {
     const controller = new AbortController();
     fetchArchiveVersions(controller.signal)
       .then((versions) => {
-        setArchiveVersions(versions);
-        setOlderId((current) => current || versions.at(-1)?.id || '');
-        setNewerId((current) => current || versions[0]?.id || '');
+        const live = {
+          id: 'live',
+          year: String(new Date().getFullYear()),
+          slug: 'current',
+          title: 'Current portfolio',
+          commit: 'live',
+          date: new Date().toISOString().slice(0, 10),
+          description: 'The site you are on right now, always pointing at the live deployment.',
+          highlights: ['Live site', 'Always current'],
+          buildUrl: `${window.location.origin}/`,
+          previewUrl: `${window.location.origin}/`,
+        };
+        const all = [live, ...versions];
+        setArchiveVersions(all);
+        setOlderId((current) => current || all.at(-1)?.id || '');
+        setNewerId((current) => current || all[0]?.id || '');
       })
       .catch((error) => {
         if (error.name !== 'AbortError') setArchiveError('The archive is unavailable right now.');
@@ -220,12 +269,12 @@ const Archive = () => {
           <VersionDetail version={selectedVersion} />
         ) : (
           <>
-            <header className="max-w-3xl pb-12 md:pb-16">
+            <header className="max-w-3xl pb-4 md:pb-6">
               <h1 className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
-                How this site took shape.
+                My little Wayback Machine.
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                {archiveError || (isLoading ? 'Loading the archive…' : 'These are the versions that led here. Click any one to open it.')}
+                {archiveError || (isLoading ? 'Winding back the clock…' : 'See how my portfolio has changed over time. Pick a version to look around.')}
               </p>
             </header>
 

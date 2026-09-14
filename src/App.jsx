@@ -12,7 +12,6 @@ import MotionProvider from './components/MotionProvider';
 import { SmoothScrollProvider } from './context/SmoothScrollContext';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import Home from './pages/Home';
-import SparkleIllustration from './components/SparkleIllustration';
 import ScrollToTop from './utils/ScrollToTop';
 import { posthog } from './utils/analytics';
 
@@ -24,34 +23,6 @@ const Blog = lazyWithRetry(() => import('./pages/Blog'));
 const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage'));
 const OGPreview = lazyWithRetry(() => import('./pages/OGPreview'));
 const Archive = lazyWithRetry(() => import('./pages/Archive')); 
-
-const PageLoader = () => (
-  <section className="flex min-h-[60vh] items-center px-4 sm:px-6" aria-busy="true" aria-live="polite">
-    <div className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border/60 bg-card/35 p-6 shadow-lg shadow-black/10 backdrop-blur-sm dark:shadow-black/25 sm:p-10">
-      <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-foreground/40 to-transparent" aria-hidden="true" />
-      <div className="relative">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-          <SparkleIllustration size={16} />
-          <span>Hari works</span>
-        </div>
-        <h1 className="mt-5 max-w-xl text-3xl font-bold sm:text-5xl">
-          Building useful web products.
-        </h1>
-        <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-          I am Harikrishnan, a full-stack developer who turns product ideas into fast, maintainable web apps.
-        </p>
-        <a
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-          href="mailto:hi@hari.works"
-        >
-          <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
-          hi@hari.works
-        </a>
-        <span className="sr-only">Loading page.</span>
-      </div>
-    </div>
-  </section>
- );
 
 class RouteErrorBoundary extends React.Component {
   constructor(props) {
@@ -194,7 +165,7 @@ function App() {
               <Navbar />
               <main className="relative">
                 <RouteErrorBoundaryWithLocation>
-                  <Suspense fallback={<PageLoader />}>
+                  <Suspense fallback={null}>
                     <RouteAnalytics />
                     <ScrollToTop />
                     <AnimatedRoutes />

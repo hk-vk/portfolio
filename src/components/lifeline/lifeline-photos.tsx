@@ -8,7 +8,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react"
 import { createPortal } from "react-dom"
-import { X } from "lucide-react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LifelineEventMedia } from "./lifeline-event"
 import {
@@ -43,9 +43,102 @@ function LifelinePreviewModal({
   photo: LifelinePhoto
   onClose: () => void
 }) {
+  const [gallery] = useState<LifelinePhoto[]>(() =>
+    Array.from(document.querySelectorAll<HTMLElement>("[data-lifeline-preview-url]"))
+      .map((element) => ({
+        previewUrl: element.dataset.lifelinePreviewUrl,
+        src: element.dataset.lifelinePreviewSrc,
+        alt: element.dataset.lifelinePreviewAlt || "Portfolio preview",
+      })),
+  )
+  const [current, setCurrent] = useState(photo)
+  const swipeStart = useRef<{ x: number; y: number } | null>(null)
+  const didSwipe = useRef(false)
+  const windowRef = useRef<HTMLDivElement>(null)
+  const swapAnimation = useRef<Animation | null>(null)
+  const swapRequest = useRef(0)
+  const entrance = useRef<{ x: number; y: number; scale: number } | null>(null)
+  const index = gallery.findIndex((item) => item.previewUrl === current.previewUrl)
+  const previous = index > 0 ? gallery[index - 1] : null
+  const next = index >= 0 && index < gallery.length - 1 ? gallery[index + 1] : null
+
+  const show = async (item: LifelinePhoto | null, nextDirection: "left" | "right" | "up" | "down" | null = null) => {
+    if (!item || item.previewUrl === current.previewUrl) return
+    const request = ++swapRequest.current
+    const node = windowRef.current
+    const restingStyle = node ? getComputedStyle(node) : null
+    const fromTransform = restingStyle?.transform || "none"
+    const fromOpacity = restingStyle?.opacity || "1"
+    swapAnimation.current?.cancel()
+    entrance.current = null
+    if (node && nextDirection && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const vertical = nextDirection === "up" || nextDirection === "down"
+      const forward = nextDirection === "left" || nextDirection === "up"
+      const rect = { left: node.offsetLeft, top: node.offsetTop, width: node.offsetWidth, height: node.offsetHeight }
+      const selector = vertical
+        ? `[aria-label^="View ${forward ? "older" : "newer"} version"]`
+        : `[aria-label="${forward ? "Next" : "Previous"} portfolio version"]`
+      const target = document.querySelector<HTMLElement>(selector)
+      const peek = target?.getBoundingClientRect()
+      const x = vertical ? 0 : (peek ? peek.left + peek.width / 2 - rect.left - rect.width / 2 : rect.width * 0.6)
+      const y = vertical ? (peek ? peek.top + peek.height / 2 - rect.top - rect.height / 2 : rect.height * 0.6) : 0
+      const scale = 0.94
+      const travelX = x * 0.18
+      const travelY = y * 0.18
+      const animation = node.animate([
+        { transform: fromTransform, opacity: fromOpacity },
+        { transform: `translate(${-travelX}px, ${-travelY}px) scale(${scale})`, opacity: 0.3 },
+      ], { duration: 220, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" })
+      swapAnimation.current = animation
+      try { await animation.finished } catch { return }
+      if (request !== swapRequest.current) return
+      entrance.current = { x: travelX, y: travelY, scale }
+    }
+    setCurrent(item)
+  }
+
+  const swipeHandlers = (item: LifelinePhoto, direction: "up" | "down") => ({
+    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (!event.isPrimary || event.button !== 0) return
+      didSwipe.current = false
+      swipeStart.current = { x: event.clientX, y: event.clientY }
+      event.currentTarget.setPointerCapture(event.pointerId)
+    },
+    onPointerUp: (event: React.PointerEvent<HTMLButtonElement>) => {
+      const start = swipeStart.current
+      swipeStart.current = null
+      if (!start) return
+      const dy = event.clientY - start.y
+      const dx = event.clientX - start.x
+      if (Math.abs(dy) > Math.abs(dx) && (direction === "up" ? dy < -24 : dy > 24)) {
+        didSwipe.current = true
+        void show(item, direction)
+      }
+    },
+    onPointerCancel: () => { swipeStart.current = null },
+  })
+
+  useEffect(() => {
+    swapAnimation.current?.cancel()
+    const offset = entrance.current
+    entrance.current = null
+    if (!offset || !windowRef.current) return
+    swapAnimation.current = windowRef.current.animate([
+      { transform: `translate(${offset.x}px, ${offset.y}px) scale(${offset.scale})`, opacity: 0.3 },
+      { transform: "translate(0, 0) scale(1)", opacity: 1 },
+    ], { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" })
+  }, [current])
+
+  useEffect(() => () => {
+    swapRequest.current++
+    swapAnimation.current?.cancel()
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") onClose()
+      if (event.key === "ArrowLeft") show(previous)
+      if (event.key === "ArrowRight") show(next)
     }
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = "hidden"
@@ -54,29 +147,56 @@ function LifelinePreviewModal({
       document.body.style.overflow = previousOverflow
       window.removeEventListener("keydown", onKeyDown)
     }
-  }, [onClose])
+  }, [onClose, previous, next])
 
-  if (!photo.previewUrl) return null
+  if (!current.previewUrl) return null
 
-  const displayPath = photo.previewUrl
+  const displayPath = current.previewUrl
     .replace(/^https?:\/\/[^/]+/, 'hari.works')
     .replace('/archive-builds/', '/archive/')
     .replace(/[?].*$/, '')
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+      className="archive-carousel-backdrop fixed inset-0 z-[999] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label={photo.alt}
+      aria-label={current.alt}
       onClick={onClose}
     >
+      <button
+        type="button"
+        onClick={(event) => { event.stopPropagation(); show(previous, "right") }}
+        disabled={!previous}
+        aria-label="Previous portfolio version"
+        className="group absolute left-3 top-1/2 hidden w-[12vw] -translate-y-1/2 overflow-hidden rounded-xl border border-white/20 bg-card text-left shadow-xl transition hover:-translate-y-1/2 hover:scale-[1.03] disabled:hidden lg:block"
+      >
+        {previous?.src ? <img src={previous.src} alt="" className="aspect-[16/10] w-full object-cover opacity-60" /> : <div className="aspect-[16/10] bg-muted" />}
+        <span className="flex items-center gap-1 px-3 py-2 text-xs text-foreground"><ChevronLeft className="size-4" />{previous?.alt.replace(/ site preview$/, "")}</span>
+      </button>
+
+      {previous && (
+        <button
+          type="button"
+          {...swipeHandlers(previous, "down")}
+          style={{ touchAction: "none" }}
+          onClick={(event) => { event.stopPropagation(); if (!didSwipe.current || event.detail === 0) void show(previous, "down"); didSwipe.current = false }}
+          className="absolute top-4 z-0 flex h-11 w-[calc(100%-2rem)] items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-card text-xs text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:hidden"
+          aria-label={`View newer version, ${previous.alt}`}
+        >
+          {previous.src && <img src={previous.src} alt="" className="absolute inset-0 h-full w-full object-cover object-bottom" />}
+          <span className="absolute inset-0 bg-black/55" />
+          <span className="relative flex items-center"><ChevronLeft className="mr-1 size-4 rotate-90" /> {previous.alt}</span>
+        </button>
+      )}
+
       <div
-        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl"
+        ref={windowRef}
+        className="archive-carousel-shell relative z-10 flex h-[calc(100dvh-9rem)] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-2rem)]"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center gap-3 border-b border-border/60 bg-muted/30 px-3 py-2">
-          <div className="flex shrink-0 items-center gap-1.5" aria-hidden="true">
+        <div className="flex shrink-0 items-center gap-3 border-b border-border/60 bg-muted/30 px-3 py-2">
+          <div className="hidden shrink-0 items-center gap-1.5 sm:flex" aria-hidden="true">
             <button
               type="button"
               onClick={onClose}
@@ -86,26 +206,57 @@ function LifelinePreviewModal({
             <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
             <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
           </div>
-          <div className="min-w-0 flex-1 truncate rounded-md border border-border/60 bg-background px-3 py-1 font-mono text-[10px] text-muted-foreground">
-            {displayPath}
+          <div className="min-w-0 flex-1 truncate px-3 py-1 text-sm font-medium text-foreground sm:rounded-md sm:border sm:border-border/60 sm:bg-background sm:text-center sm:text-xs">
+            {current.alt}
+            <span className="ml-2 hidden font-mono text-[9px] text-muted-foreground sm:inline">{displayPath}</span>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:ring-offset-1 focus-visible:ring-offset-card"
+            className="inline-flex h-11 w-11 shrink-0 sm:h-8 sm:w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground/50 focus-visible:ring-offset-1 focus-visible:ring-offset-card"
             aria-label="Close site preview"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="aspect-[9/16] max-h-[calc(100dvh-8rem)] bg-background sm:aspect-[16/10] sm:max-h-none">
+        <div
+          key={current.previewUrl}
+          className="relative min-h-0 flex-1 bg-background sm:aspect-[16/10] sm:flex-none"
+        >
           <iframe
-            src={photo.previewUrl}
-            title={photo.alt}
+            src={current.previewUrl}
+            title={current.alt}
             className="archive-preview-frame h-full w-full border-0 bg-background"
           />
+          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/65 px-2 py-1 font-mono text-[10px] text-white backdrop-blur sm:hidden">{index + 1}/{gallery.length}</span>
         </div>
       </div>
+
+      {next && (
+        <button
+          type="button"
+          {...swipeHandlers(next, "up")}
+          style={{ touchAction: "none" }}
+          onClick={(event) => { event.stopPropagation(); if (!didSwipe.current || event.detail === 0) void show(next, "up"); didSwipe.current = false }}
+          className="absolute bottom-4 z-0 flex h-11 w-[calc(100%-2rem)] items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-card text-xs text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:hidden"
+          aria-label={`View older version, ${next.alt}`}
+        >
+          {next.src && <img src={next.src} alt="" className="absolute inset-0 h-full w-full object-cover object-top" />}
+          <span className="absolute inset-0 bg-black/55" />
+          <span className="relative flex items-center">{next.alt} <ChevronRight className="ml-1 size-4 rotate-90" /></span>
+        </button>
+      )}
+
+      <button
+        type="button"
+        onClick={(event) => { event.stopPropagation(); show(next, "left") }}
+        disabled={!next}
+        aria-label="Next portfolio version"
+        className="group absolute right-3 top-1/2 hidden w-[12vw] -translate-y-1/2 overflow-hidden rounded-xl border border-white/20 bg-card text-left shadow-xl transition hover:-translate-y-1/2 hover:scale-[1.03] disabled:hidden lg:block"
+      >
+        {next?.src ? <img src={next.src} alt="" className="aspect-[16/10] w-full object-cover opacity-60" /> : <div className="aspect-[16/10] bg-muted" />}
+        <span className="flex items-center justify-end gap-1 px-3 py-2 text-xs text-foreground">{next?.alt.replace(/ site preview$/, "")}<ChevronRight className="size-4" /></span>
+      </button>
     </div>,
     document.body,
   )
@@ -190,6 +341,9 @@ export function LifelinePhotoCard({
         role="button"
         tabIndex={0}
         aria-label={`Open ${photo.alt}`}
+        data-lifeline-preview-url={photo.previewUrl || undefined}
+        data-lifeline-preview-src={photo.src || undefined}
+        data-lifeline-preview-alt={photo.alt}
         className={cn(
           "group/photo pointer-events-auto cursor-pointer touch-pan-y rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           "z-20 hover:z-40",
@@ -224,17 +378,30 @@ export function LifelinePhotoCard({
         >
           {photo.previewUrl ? (
             <>
-              <img
-                src={photo.src}
-                alt={photo.alt}
-                loading="lazy"
-                className="pointer-events-none block aspect-[16/10] w-full rounded-[0.85rem] object-cover"
-              />
+              {photo.src ? (
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  className="pointer-events-none block aspect-[16/10] w-full rounded-[0.85rem] object-cover"
+                />
+              ) : (
+                <div className="pointer-events-none aspect-[16/10] w-full overflow-hidden rounded-[0.85rem] bg-background">
+                  <iframe
+                    src={photo.previewUrl}
+                    title={photo.alt}
+                    loading="lazy"
+                    tabIndex={-1}
+                    scrolling="no"
+                    className="h-[160%] w-[160%] origin-top-left scale-[0.625] border-0 bg-background"
+                  />
+                </div>
+              )}
               <span
-                className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/90 px-2.5 py-1 font-mono text-[10px] font-medium tracking-wide text-foreground shadow-sm"
+                className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent px-3 pb-2 pt-6 text-[10px] font-medium tracking-wide text-white"
                 aria-hidden="true"
               >
-                Open preview
+                <span className="truncate">{photo.alt.replace(/ site preview$/, '')}</span>
               </span>
             </>
           ) : (

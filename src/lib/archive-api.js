@@ -1,5 +1,5 @@
 const configuredOrigin = (import.meta.env.VITE_ARCHIVE_ORIGIN || '').replace(/\/$/, '')
-const archiveOrigin = configuredOrigin || (import.meta.env.DEV ? 'http://127.0.0.1:8787' : '')
+const archiveOrigin = configuredOrigin || (import.meta.env.DEV ? 'https://portfolio-archive-backend-preview.vkharikrishnan45.workers.dev' : '')
 
 export const archiveApiUrl = (path) => `${archiveOrigin}${path}`
 

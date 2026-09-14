@@ -69,5 +69,5 @@ export function getMarkerWidth(marker: LifelineMarker, nextYear?: number) {
   if (peopleOnly) return 220
 
   const gap = Math.max(1, nextYear - marker.year)
-  return Math.min(420, Math.max(290, gap * 36))
+  return Math.min(640, Math.max(420, gap * 36))
 }

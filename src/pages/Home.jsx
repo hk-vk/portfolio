@@ -8,7 +8,7 @@ import {
 import { useMotionSafe } from '../utils/useMotionSafe';
 import { cardMotion, motionTransition, sequenceDelay } from '../utils/motionContract';
 import { Link } from 'react-router-dom';
-import { lazy, Suspense, memo, useMemo, useState, useEffect, useRef } from 'react';
+import { lazy, Suspense, memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useIntersectionObserver } from '../utils/usePerformanceHooks';
 import { useSmoothScroll } from '../context/SmoothScrollContext';
 import SEOHead from '../components/SEOHead';
@@ -166,6 +166,8 @@ ProjectCard.displayName = 'ProjectCard';
 
 // Ultra-fast skill tag with reduced animations
 // Skills data with icons and brand colors
+const EMAIL = 'hi@hari.works';
+
 const skillsData = [
   { name: "React", icon: "simple-icons:react", color: "#61DAFB" },
   { name: "TypeScript", icon: "simple-icons:typescript", color: "#3178C6" },
@@ -359,7 +361,49 @@ const Home = memo(() => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const heroCardRef = useRef(null);
+  const emailPopoverRef = useRef(null);
+  const emailTriggerRef = useRef(null);
+  const emailMouseHoveringRef = useRef(false);
+  const [emailPopoverOpen, setEmailPopoverOpen] = useState(false);
+  const [copyStatus, setCopyStatus] = useState('idle');
 
+  const closeEmailPopover = useCallback((restoreFocus = false) => {
+    emailMouseHoveringRef.current = false;
+    setEmailPopoverOpen(false);
+    setCopyStatus('idle');
+    if (restoreFocus) emailTriggerRef.current?.focus();
+  }, []);
+
+  const toggleEmailPopover = () => {
+    setCopyStatus('idle');
+    setEmailPopoverOpen((open) => emailMouseHoveringRef.current || !open);
+  };
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopyStatus('copied');
+    } catch {
+      setCopyStatus('error');
+    }
+  };
+
+  useEffect(() => {
+    if (!emailPopoverOpen) return undefined;
+
+    const close = (event) => {
+      if (event.type === 'keydown' && event.key !== 'Escape') return;
+      if (event.type === 'pointerdown' && emailPopoverRef.current?.contains(event.target)) return;
+      closeEmailPopover(event.type === 'keydown');
+    };
+
+    window.addEventListener('pointerdown', close);
+    window.addEventListener('keydown', close);
+    return () => {
+      window.removeEventListener('pointerdown', close);
+      window.removeEventListener('keydown', close);
+    };
+  }, [closeEmailPopover, emailPopoverOpen]);
 
   useEffect(() => {
     const checkDarkMode = () => {
@@ -559,9 +603,72 @@ const Home = memo(() => {
                     {' '}<Link to="/projects" className="hero-link">
                       projects
                     </Link>, send me an
-                    {' '}<a href="mailto:hi@hari.works" className="hero-link">
-                      email
-                    </a>, or find the code on
+                    {' '}<span
+                      ref={emailPopoverRef}
+                      className="relative inline-block whitespace-nowrap"
+                      onPointerEnter={(event) => {
+                        if (event.pointerType === 'mouse') {
+                          emailMouseHoveringRef.current = true;
+                          setEmailPopoverOpen(true);
+                        }
+                      }}
+                      onPointerLeave={(event) => {
+                        if (event.pointerType === 'mouse') closeEmailPopover();
+                      }}
+                      onBlur={(event) => {
+                        if (!event.currentTarget.contains(event.relatedTarget)) closeEmailPopover();
+                      }}
+                    >
+                      <button
+                        ref={emailTriggerRef}
+                        type="button"
+                        className="hero-link"
+                        aria-expanded={emailPopoverOpen}
+                        aria-controls="hero-email-actions"
+                        onClick={toggleEmailPopover}
+                      >
+                        email
+                      </button>
+                      {emailPopoverOpen && (
+                        <motion.span
+                          id="hero-email-actions"
+                          role="group"
+                          aria-label="Email actions"
+                          className="absolute bottom-full left-0 z-30 pb-2"
+                          initial={motionSafe ? { opacity: 0, y: 5, scale: 0.96 } : false}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ duration: 0.16, ease: [0.215, 0.61, 0.355, 1] }}
+                        >
+                          <span className="block overflow-hidden rounded-xl border border-border/60 bg-popover/95 shadow-lg backdrop-blur-md">
+                            <code className="block border-b border-border/50 px-3 py-2 text-xs text-muted-foreground">
+                              {EMAIL}
+                            </code>
+                            <span className="flex gap-1 p-1">
+                              <button
+                                type="button"
+                                onClick={copyEmail}
+                                className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-xs font-semibold text-foreground hover:bg-muted/70 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                              >
+                                <Icon icon={copyStatus === 'copied' ? 'hugeicons:tick-02' : 'hugeicons:copy-01'} className="size-3.5" />
+                                {copyStatus === 'copied' ? 'Copied' : copyStatus === 'error' ? 'Retry' : 'Copy'}
+                              </button>
+                              <a
+                                href={`mailto:${EMAIL}`}
+                                onClick={() => closeEmailPopover()}
+                                className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-xs font-semibold text-foreground hover:bg-muted/70 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                              >
+                                <Icon icon="hugeicons:sent" className="size-3.5" />
+                                Send
+                              </a>
+                            </span>
+                          </span>
+                          <span className="sr-only" aria-live="polite">
+                            {copyStatus === 'copied' && 'Email copied to clipboard.'}
+                            {copyStatus === 'error' && 'Could not copy email.'}
+                          </span>
+                        </motion.span>
+                      )},
+                    </span> or find the code on
                     {' '}<a href="https://github.com/hk-vk" target="_blank" rel="noopener noreferrer" className="hero-link">
                       GitHub
                     </a>.
@@ -692,6 +799,7 @@ const Home = memo(() => {
           </div>
         </div>
       </div>
+
     </>
   );
 });

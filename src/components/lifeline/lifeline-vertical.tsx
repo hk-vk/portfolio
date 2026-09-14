@@ -283,13 +283,13 @@ const LifelineVerticalEntry = forwardRef<
               )}
 
               {photos.length > 0 && (
-                <div className="mt-6 flex w-full flex-col gap-4">
+                <div className={cn("mt-6 flex flex-col gap-4", photos.some((photo) => photo.previewUrl) ? "-ml-[5rem] w-[calc(100%+5rem)]" : "w-full")}>
                   {photos.map((photo, index) => (
                     <LifelinePhotoCard
                       key={`${photo.src}-${index}`}
                       photo={photo}
                       rotate={photo.rotate ?? photoTilts[index] ?? 0}
-                      width={photo.previewUrl ? 280 : 160}
+                      width={photo.previewUrl ? 420 : 160}
                       className="relative max-w-full"
                     />
                   ))}
