@@ -36,6 +36,113 @@ const CASCADE_Y = 170
 /** Event text column: max-w-[18rem] plus breathing room. */
 const TEXT_ZONE = 288 + 24
 
+const peekClass = (position: string) =>
+  cn(
+    "absolute z-0 flex h-12 w-[calc(100%-2rem)] max-w-md items-center gap-3 rounded-xl border border-white/10 bg-white/[0.06] py-1.5 pl-1.5 pr-3 text-sm text-white/85 backdrop-blur-md transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:hidden",
+    position,
+  )
+
+function PeekThumb({ item }: { item: LifelinePhoto }) {
+  return item.src ? (
+    <img src={item.src} alt="" className="aspect-[16/10] h-full shrink-0 rounded-md object-cover object-top outline outline-1 -outline-offset-1 outline-white/10" />
+  ) : (
+    <span className="aspect-[16/10] h-full shrink-0 rounded-md bg-white/10" aria-hidden="true" />
+  )
+}
+
+const SITE_FRAME_WIDTH = 1200
+
+/** Renders a live site at desktop width, scaled to fit, so it matches the screenshot thumbnails. */
+function ScaledSiteFrame({ src, title }: { src: string; title: string }) {
+  const hostRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(0)
+
+  useEffect(() => {
+    const host = hostRef.current
+    if (!host) return
+    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / SITE_FRAME_WIDTH))
+    observer.observe(host)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={hostRef} className="h-full w-full">
+      {scale > 0 && (
+        <iframe
+          src={src}
+          title={title}
+          loading="lazy"
+          tabIndex={-1}
+          scrolling="no"
+          className="origin-top-left border-0 bg-background"
+          style={{ width: SITE_FRAME_WIDTH, height: SITE_FRAME_WIDTH / 1.6, transform: `scale(${scale})` }}
+        />
+      )}
+    </div>
+  )
+}
+
+type SlideDirection = "left" | "right" | "up" | "down"
+
+/**
+ * One version inside the preview window. The outgoing layer keeps its
+ * iframe mounted while it slides away, and the incoming one shows its
+ * screenshot (desktop) until the live build has loaded underneath.
+ */
+function PreviewLayer({
+  item,
+  phase,
+  direction,
+  onExited,
+}: {
+  item: LifelinePhoto
+  phase: "enter" | "exit"
+  direction: SlideDirection | null
+  onExited?: () => void
+}) {
+  const [loaded, setLoaded] = useState(false)
+  const exiting = phase === "exit"
+
+  return (
+    <div
+      className={cn(
+        "absolute inset-0",
+        exiting ? `pointer-events-none archive-slide-out-${direction}` : direction && `archive-slide-in-${direction}`,
+      )}
+      aria-hidden={exiting || undefined}
+      onAnimationEnd={(event) => {
+        if (exiting && event.target === event.currentTarget) onExited?.()
+      }}
+    >
+      <iframe
+        src={item.previewUrl}
+        title={item.alt}
+        tabIndex={exiting ? -1 : undefined}
+        onLoad={() => setLoaded(true)}
+        className={cn(
+          "archive-preview-frame h-full w-full border-0 bg-background transition-opacity duration-300 ease-out",
+          loaded ? "opacity-100" : "opacity-0",
+        )}
+      />
+      {item.src && (
+        <img
+          src={item.src}
+          alt=""
+          className={cn(
+            "pointer-events-none absolute inset-0 hidden h-full w-full object-cover object-top transition-opacity duration-300 ease-out sm:block",
+            loaded && "opacity-0",
+          )}
+        />
+      )}
+      {!loaded && (
+        <span className={cn("pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-muted-foreground", item.src && "sm:hidden")}>
+          Loading {item.alt}…
+        </span>
+      )}
+    </div>
+  )
+}
+
 function LifelinePreviewModal({
   photo,
   onClose,
@@ -52,48 +159,18 @@ function LifelinePreviewModal({
       })),
   )
   const [current, setCurrent] = useState(photo)
+  const [direction, setDirection] = useState<SlideDirection | null>(null)
+  const [leaving, setLeaving] = useState<{ item: LifelinePhoto; direction: SlideDirection } | null>(null)
   const swipeStart = useRef<{ x: number; y: number } | null>(null)
   const didSwipe = useRef(false)
-  const windowRef = useRef<HTMLDivElement>(null)
-  const swapAnimation = useRef<Animation | null>(null)
-  const swapRequest = useRef(0)
-  const entrance = useRef<{ x: number; y: number; scale: number } | null>(null)
   const index = gallery.findIndex((item) => item.previewUrl === current.previewUrl)
   const previous = index > 0 ? gallery[index - 1] : null
   const next = index >= 0 && index < gallery.length - 1 ? gallery[index + 1] : null
 
-  const show = async (item: LifelinePhoto | null, nextDirection: "left" | "right" | "up" | "down" | null = null) => {
+  const show = (item: LifelinePhoto | null, nextDirection: SlideDirection) => {
     if (!item || item.previewUrl === current.previewUrl) return
-    const request = ++swapRequest.current
-    const node = windowRef.current
-    const restingStyle = node ? getComputedStyle(node) : null
-    const fromTransform = restingStyle?.transform || "none"
-    const fromOpacity = restingStyle?.opacity || "1"
-    swapAnimation.current?.cancel()
-    entrance.current = null
-    if (node && nextDirection && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const vertical = nextDirection === "up" || nextDirection === "down"
-      const forward = nextDirection === "left" || nextDirection === "up"
-      const rect = { left: node.offsetLeft, top: node.offsetTop, width: node.offsetWidth, height: node.offsetHeight }
-      const selector = vertical
-        ? `[aria-label^="View ${forward ? "older" : "newer"} version"]`
-        : `[aria-label="${forward ? "Next" : "Previous"} portfolio version"]`
-      const target = document.querySelector<HTMLElement>(selector)
-      const peek = target?.getBoundingClientRect()
-      const x = vertical ? 0 : (peek ? peek.left + peek.width / 2 - rect.left - rect.width / 2 : rect.width * 0.6)
-      const y = vertical ? (peek ? peek.top + peek.height / 2 - rect.top - rect.height / 2 : rect.height * 0.6) : 0
-      const scale = 0.94
-      const travelX = x * 0.18
-      const travelY = y * 0.18
-      const animation = node.animate([
-        { transform: fromTransform, opacity: fromOpacity },
-        { transform: `translate(${-travelX}px, ${-travelY}px) scale(${scale})`, opacity: 0.3 },
-      ], { duration: 220, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" })
-      swapAnimation.current = animation
-      try { await animation.finished } catch { return }
-      if (request !== swapRequest.current) return
-      entrance.current = { x: travelX, y: travelY, scale }
-    }
+    setLeaving({ item: current, direction: nextDirection })
+    setDirection(nextDirection)
     setCurrent(item)
   }
 
@@ -119,26 +196,10 @@ function LifelinePreviewModal({
   })
 
   useEffect(() => {
-    swapAnimation.current?.cancel()
-    const offset = entrance.current
-    entrance.current = null
-    if (!offset || !windowRef.current) return
-    swapAnimation.current = windowRef.current.animate([
-      { transform: `translate(${offset.x}px, ${offset.y}px) scale(${offset.scale})`, opacity: 0.3 },
-      { transform: "translate(0, 0) scale(1)", opacity: 1 },
-    ], { duration: 360, easing: "cubic-bezier(0.22, 1, 0.36, 1)" })
-  }, [current])
-
-  useEffect(() => () => {
-    swapRequest.current++
-    swapAnimation.current?.cancel()
-  }, [])
-
-  useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") onClose()
-      if (event.key === "ArrowLeft") show(previous)
-      if (event.key === "ArrowRight") show(next)
+      if (event.key === "ArrowLeft") show(previous, "right")
+      if (event.key === "ArrowRight") show(next, "left")
     }
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = "hidden"
@@ -171,7 +232,7 @@ function LifelinePreviewModal({
         aria-label="Previous portfolio version"
         className="group absolute left-3 top-1/2 hidden w-[12vw] -translate-y-1/2 overflow-hidden rounded-xl border border-white/20 bg-card text-left shadow-xl transition hover:-translate-y-1/2 hover:scale-[1.03] disabled:hidden lg:block"
       >
-        {previous?.src ? <img src={previous.src} alt="" className="aspect-[16/10] w-full object-cover opacity-60" /> : <div className="aspect-[16/10] bg-muted" />}
+        {previous?.src ? <img src={previous.src} alt="" className="aspect-[16/10] w-full object-cover opacity-60" /> : <div className="pointer-events-none aspect-[16/10] bg-muted opacity-60">{previous?.previewUrl && <ScaledSiteFrame src={previous.previewUrl} title="" />}</div>}
         <span className="flex items-center gap-1 px-3 py-2 text-xs text-foreground"><ChevronLeft className="size-4" />{previous?.alt.replace(/ site preview$/, "")}</span>
       </button>
 
@@ -181,18 +242,17 @@ function LifelinePreviewModal({
           {...swipeHandlers(previous, "down")}
           style={{ touchAction: "none" }}
           onClick={(event) => { event.stopPropagation(); if (!didSwipe.current || event.detail === 0) void show(previous, "down"); didSwipe.current = false }}
-          className="absolute top-4 z-0 flex h-11 w-[calc(100%-2rem)] items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-card text-xs text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:hidden"
+          className={peekClass("top-4")}
           aria-label={`View newer version, ${previous.alt}`}
         >
-          {previous.src && <img src={previous.src} alt="" className="absolute inset-0 h-full w-full object-cover object-bottom" />}
-          <span className="absolute inset-0 bg-black/55" />
-          <span className="relative flex items-center"><ChevronLeft className="mr-1 size-4 rotate-90" /> {previous.alt}</span>
+          <PeekThumb item={previous} />
+          <span className="min-w-0 flex-1 truncate text-left">{previous.alt}</span>
+          <ChevronLeft className="size-4 shrink-0 rotate-90 text-white/60" aria-hidden="true" />
         </button>
       )}
 
       <div
-        ref={windowRef}
-        className="archive-carousel-shell relative z-10 flex h-[calc(100dvh-9rem)] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-2rem)]"
+        className="archive-carousel-shell relative z-10 flex h-[calc(100dvh-10.5rem)] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-2rem)]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-center gap-3 border-b border-border/60 bg-muted/30 px-3 py-2">
@@ -208,6 +268,7 @@ function LifelinePreviewModal({
           </div>
           <div className="min-w-0 flex-1 truncate px-3 py-1 text-sm font-medium text-foreground sm:rounded-md sm:border sm:border-border/60 sm:bg-background sm:text-center sm:text-xs">
             {current.alt}
+            <span className="ml-2 font-normal tabular-nums text-muted-foreground sm:hidden">{index + 1} of {gallery.length}</span>
             <span className="ml-2 hidden font-mono text-[9px] text-muted-foreground sm:inline">{displayPath}</span>
           </div>
           <button
@@ -219,16 +280,17 @@ function LifelinePreviewModal({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div
-          key={current.previewUrl}
-          className="relative min-h-0 flex-1 bg-background sm:aspect-[16/10] sm:flex-none"
-        >
-          <iframe
-            src={current.previewUrl}
-            title={current.alt}
-            className="archive-preview-frame h-full w-full border-0 bg-background"
-          />
-          <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/65 px-2 py-1 font-mono text-[10px] text-white backdrop-blur sm:hidden">{index + 1}/{gallery.length}</span>
+        <div className="relative min-h-0 flex-1 overflow-hidden bg-background sm:aspect-[16/10] sm:flex-none">
+          {leaving && (
+            <PreviewLayer
+              key={leaving.item.previewUrl}
+              item={leaving.item}
+              phase="exit"
+              direction={leaving.direction}
+              onExited={() => setLeaving(null)}
+            />
+          )}
+          <PreviewLayer key={current.previewUrl} item={current} phase="enter" direction={direction} />
         </div>
       </div>
 
@@ -238,12 +300,12 @@ function LifelinePreviewModal({
           {...swipeHandlers(next, "up")}
           style={{ touchAction: "none" }}
           onClick={(event) => { event.stopPropagation(); if (!didSwipe.current || event.detail === 0) void show(next, "up"); didSwipe.current = false }}
-          className="absolute bottom-4 z-0 flex h-11 w-[calc(100%-2rem)] items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-card text-xs text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:hidden"
+          className={peekClass("bottom-4")}
           aria-label={`View older version, ${next.alt}`}
         >
-          {next.src && <img src={next.src} alt="" className="absolute inset-0 h-full w-full object-cover object-top" />}
-          <span className="absolute inset-0 bg-black/55" />
-          <span className="relative flex items-center">{next.alt} <ChevronRight className="ml-1 size-4 rotate-90" /></span>
+          <PeekThumb item={next} />
+          <span className="min-w-0 flex-1 truncate text-left">{next.alt}</span>
+          <ChevronRight className="size-4 shrink-0 rotate-90 text-white/60" aria-hidden="true" />
         </button>
       )}
 
@@ -254,7 +316,7 @@ function LifelinePreviewModal({
         aria-label="Next portfolio version"
         className="group absolute right-3 top-1/2 hidden w-[12vw] -translate-y-1/2 overflow-hidden rounded-xl border border-white/20 bg-card text-left shadow-xl transition hover:-translate-y-1/2 hover:scale-[1.03] disabled:hidden lg:block"
       >
-        {next?.src ? <img src={next.src} alt="" className="aspect-[16/10] w-full object-cover opacity-60" /> : <div className="aspect-[16/10] bg-muted" />}
+        {next?.src ? <img src={next.src} alt="" className="aspect-[16/10] w-full object-cover opacity-60" /> : <div className="pointer-events-none aspect-[16/10] bg-muted opacity-60">{next?.previewUrl && <ScaledSiteFrame src={next.previewUrl} title="" />}</div>}
         <span className="flex items-center justify-end gap-1 px-3 py-2 text-xs text-foreground">{next?.alt.replace(/ site preview$/, "")}<ChevronRight className="size-4" /></span>
       </button>
     </div>,
@@ -362,10 +424,11 @@ export function LifelinePhotoCard({
       >
         <div
           className={cn(
-            "relative overflow-hidden rounded-2xl shadow-xl ring-1 ring-[oklch(0_0_0_/_0.1)] transition-[transform,box-shadow] duration-200 ease-out dark:ring-[oklch(1_0_0_/_0.1)]",
-            photo.previewUrl && "bg-background/80 p-1.5",
+            "relative overflow-hidden ring-1 transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.25,1,0.5,1)]",
+            photo.previewUrl
+              ? "rounded-xl bg-card shadow-md shadow-black/10 ring-border group-hover/photo:-translate-y-1 group-hover/photo:ring-muted-foreground/50 group-focus-visible/photo:ring-muted-foreground/50 motion-reduce:group-hover/photo:translate-y-0"
+              : "rounded-2xl shadow-xl ring-[oklch(0_0_0_/_0.1)] group-hover/photo:scale-[1.03] group-hover/photo:shadow-2xl dark:ring-[oklch(1_0_0_/_0.1)]",
             animateIntro && "lifeline-marker-intro",
-            "group-hover/photo:scale-[1.03] group-hover/photo:shadow-2xl",
           )}
           style={
             animateIntro
@@ -378,31 +441,27 @@ export function LifelinePhotoCard({
         >
           {photo.previewUrl ? (
             <>
-              {photo.src ? (
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  loading="lazy"
-                  className="pointer-events-none block aspect-[16/10] w-full rounded-[0.85rem] object-cover"
-                />
-              ) : (
-                <div className="pointer-events-none aspect-[16/10] w-full overflow-hidden rounded-[0.85rem] bg-background">
-                  <iframe
-                    src={photo.previewUrl}
-                    title={photo.alt}
+              <div className="flex h-6 items-center gap-1 border-b border-border/60 bg-muted/40 px-2.5" aria-hidden="true">
+                <span className="size-1.5 rounded-full bg-muted-foreground/30" />
+                <span className="size-1.5 rounded-full bg-muted-foreground/30" />
+                <span className="size-1.5 rounded-full bg-muted-foreground/30" />
+              </div>
+              <div className="pointer-events-none aspect-[16/10] w-full overflow-hidden bg-muted/40">
+                {photo.src ? (
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
                     loading="lazy"
-                    tabIndex={-1}
-                    scrolling="no"
-                    className="h-[160%] w-[160%] origin-top-left scale-[0.625] border-0 bg-background"
+                    decoding="async"
+                    width={1200}
+                    height={750}
+                    onLoad={(event) => { event.currentTarget.dataset.loaded = "" }}
+                    className="block h-full w-full object-cover object-top opacity-0 transition-opacity duration-300 ease-out data-[loaded]:opacity-100"
                   />
-                </div>
-              )}
-              <span
-                className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent px-3 pb-2 pt-6 text-[10px] font-medium tracking-wide text-white"
-                aria-hidden="true"
-              >
-                <span className="truncate">{photo.alt.replace(/ site preview$/, '')}</span>
-              </span>
+                ) : (
+                  <ScaledSiteFrame src={photo.previewUrl} title={photo.alt} />
+                )}
+              </div>
             </>
           ) : (
             <LifelineEventMedia

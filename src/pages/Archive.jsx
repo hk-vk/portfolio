@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { Link, useParams } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
@@ -21,9 +21,9 @@ const formatTimelineDate = (date) => new Intl.DateTimeFormat('en', {
 const BrowserFrame = ({ version, title, className = '' }) => (
   <div className={`flex flex-col overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm ${className}`}>
     <div className="flex h-9 items-center gap-2 border-b border-border/50 bg-muted/30 px-3">
-      <span className="h-2 w-2 rounded-full bg-primary/70" />
-      <span className="h-2 w-2 rounded-full bg-muted-foreground/25" />
-      <span className="h-2 w-2 rounded-full bg-muted-foreground/25" />
+      <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+      <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+      <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
       <span className="ml-2 truncate font-mono text-[10px] text-muted-foreground">
         hari.works/archive/{version.year}/{version.id}
       </span>
@@ -40,10 +40,9 @@ const BrowserFrame = ({ version, title, className = '' }) => (
 const createArchiveMarkers = (versions) => versions.map((version, index) => ({
   id: version.id,
   year: index,
-  age: `0${index + 1}`,
   label: formatTimelineDate(version.date),
   events: [[
-    { type: 'text', value: `${version.title}.` },
+    { type: 'text', value: version.title },
   ]],
   photos: [{
     src: version.id === 'live' ? '' : version.previewUrl,
@@ -71,133 +70,6 @@ const ArchiveLifeline = ({ versions }) => (
   </ThemeProvider>
 );
 
-const CompareViewer = ({ older, newer, versions, onOlderChange, onNewerChange }) => {
-  const [position, setPosition] = useState(50);
-  const stageRef = useRef(null);
-
-  const olderIndex = versions.findIndex((v) => v.id === older.id);
-  const newerIndex = versions.findIndex((v) => v.id === newer.id);
-  const nextIndex = (current, dir, otherId) => {
-    let i = current + dir;
-    while (i >= 0 && i < versions.length && versions[i].id === otherId) i += dir;
-    return i;
-  };
-  const step = (setter, current, dir, otherId) => {
-    const i = nextIndex(current, dir, otherId);
-    if (i >= 0 && i < versions.length) setter(versions[i].id);
-  };
-  const canStep = (current, dir, otherId) => {
-    const i = nextIndex(current, dir, otherId);
-    return i >= 0 && i < versions.length;
-  };
-
-
-  const setPositionFromPointer = (event) => {
-    const bounds = stageRef.current?.getBoundingClientRect();
-    if (!bounds) return;
-    const next = ((event.clientX - bounds.left) / bounds.width) * 100;
-    setPosition(Math.min(96, Math.max(4, next)));
-  };
-
-  const handlePointerDown = (event) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setPositionFromPointer(event);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'ArrowLeft') setPosition((value) => Math.max(4, value - 2));
-    if (event.key === 'ArrowRight') setPosition((value) => Math.min(96, value + 2));
-  };
-
-  return (
-    <section className="mt-10" aria-labelledby="compare-heading">
-      <div className="mb-5 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h2 id="compare-heading" className="text-2xl font-bold md:text-3xl">Same portfolio. Different time.</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Choose two versions and drag the seam across them.</p>
-        </div>
-        <div className="grid grid-cols-2 gap-2 sm:min-w-[24rem]">
-          <div className="min-w-0">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Older</span>
-            <select
-              value={older.id}
-              onChange={(event) => onOlderChange(event.target.value)}
-              className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
-            >
-              {versions.map((version) => (
-                <option key={version.id} value={version.id} disabled={version.id === newer.id}>
-                  {version.year} / {version.title}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="min-w-0">
-            <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Newer</span>
-            <select
-              value={newer.id}
-              onChange={(event) => onNewerChange(event.target.value)}
-              className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
-            >
-              {versions.map((version) => (
-                <option key={version.id} value={version.id} disabled={version.id === older.id}>
-                  {version.year} / {version.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div
-        ref={stageRef}
-        className="relative aspect-[4/3] touch-none select-none overflow-hidden rounded-xl border border-border bg-card shadow-xl md:aspect-[16/9]"
-        onPointerDown={handlePointerDown}
-        onPointerMove={(event) => event.currentTarget.hasPointerCapture(event.pointerId) && setPositionFromPointer(event)}
-      >
-        <iframe src={older.buildUrl} title={`${older.title}, older version`} className="pointer-events-none absolute inset-0 h-full w-full bg-background" />
-        <div className="pointer-events-none absolute inset-0" style={{ clipPath: `inset(0 0 0 ${position}%)` }}>
-          <iframe src={newer.buildUrl} title={`${newer.title}, newer version`} className="pointer-events-none h-full w-full bg-background" />
-        </div>
-        <div className="pointer-events-none absolute inset-y-0 w-px bg-white shadow-[0_0_0_1px_rgba(0,0,0,.25)]" style={{ left: `${position}%` }} />
-        <button
-          type="button"
-          role="slider"
-          aria-label="Portfolio comparison position"
-          aria-valuemin="4"
-          aria-valuemax="96"
-          aria-valuenow={Math.round(position)}
-          onKeyDown={handleKeyDown}
-          className="absolute top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-background text-foreground shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
-          style={{ left: `${position}%` }}
-        >
-          <Icon icon="tabler:arrows-left-right" className="h-5 w-5" />
-        </button>
-        <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">{older.title}</span>
-        <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-background/90 px-3 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">{newer.title}</span>
-
-        <button
-          type="button"
-          aria-label="Step both versions back"
-          disabled={!canStep(newerIndex, 1, older.id) && !canStep(olderIndex, 1, newer.id)}
-          onClick={() => { step(onNewerChange, newerIndex, 1, older.id); step(onOlderChange, olderIndex, 1, newer.id); }}
-          className="absolute left-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-white/40 bg-background/80 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-30"
-        >
-          <Icon icon="tabler:chevron-left" className="size-5" />
-        </button>
-        <button
-          type="button"
-          aria-label="Step both versions forward"
-          disabled={!canStep(olderIndex, -1, newer.id) && !canStep(newerIndex, -1, older.id)}
-          onClick={() => { step(onOlderChange, olderIndex, -1, newer.id); step(onNewerChange, newerIndex, -1, older.id); }}
-          className="absolute right-3 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-white/40 bg-background/80 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-30"
-        >
-          <Icon icon="tabler:chevron-right" className="size-5" />
-        </button>
-      </div>
-    </section>
-  );
-};
-
 const VersionDetail = ({ version }) => (
   <section className="pt-8">
     <Link to="/archive" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
@@ -206,7 +78,7 @@ const VersionDetail = ({ version }) => (
     </Link>
     <div className="mb-7 mt-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
       <div>
-        <p className="mb-3 font-mono text-xs text-muted-foreground">{formatDate(version.date)} / {version.commit}</p>
+        <p className="mb-3 font-mono text-xs text-muted-foreground">{formatDate(version.date)}</p>
         <h1 className="text-4xl font-bold tracking-tight md:text-6xl">{version.title}</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">{version.description}</p>
       </div>
@@ -219,11 +91,11 @@ const Archive = () => {
   const { year, slug } = useParams();
   const [archiveVersions, setArchiveVersions] = useState([]);
   const [archiveError, setArchiveError] = useState('');
-  const [olderId, setOlderId] = useState('');
-  const [newerId, setNewerId] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
+    setArchiveError('');
     fetchArchiveVersions(controller.signal)
       .then((versions) => {
         const live = {
@@ -240,21 +112,17 @@ const Archive = () => {
         };
         const all = [live, ...versions];
         setArchiveVersions(all);
-        setOlderId((current) => current || all.at(-1)?.id || '');
-        setNewerId((current) => current || all[0]?.id || '');
       })
       .catch((error) => {
         if (error.name !== 'AbortError') setArchiveError('The archive is unavailable right now.');
       });
     return () => controller.abort();
-  }, []);
+  }, [attempt]);
 
   const selectedVersion = useMemo(
     () => archiveVersions.find((version) => version.year === year && version.id === slug),
     [archiveVersions, year, slug],
   );
-  const newer = archiveVersions.find((version) => version.id === newerId) || archiveVersions[0];
-  const older = archiveVersions.find((version) => version.id === olderId) || archiveVersions.at(-1);
   const isLoading = archiveVersions.length === 0 && !archiveError;
 
   return (
@@ -273,25 +141,37 @@ const Archive = () => {
               <h1 className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
                 My little Wayback Machine.
               </h1>
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground text-pretty md:text-base" aria-live="polite">
                 {archiveError || (isLoading ? 'Winding back the clock…' : 'See how my portfolio has changed over time. Pick a version to look around.')}
               </p>
+              {archiveError && (
+                <button
+                  type="button"
+                  onClick={() => setAttempt((value) => value + 1)}
+                  className="mt-5 inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  <Icon icon="tabler:refresh" className="size-4" aria-hidden="true" />
+                  Try again
+                </button>
+              )}
             </header>
 
-            {!isLoading && !archiveError && (
-              <>
-                <section aria-label="Archive milestones">
-                  <ArchiveLifeline versions={archiveVersions} />
-                </section>
+            {isLoading && (
+              <div className="mt-10 flex gap-6 overflow-hidden md:ml-24" aria-hidden="true">
+                {[0, 1, 2].map((item) => (
+                  <div key={item} className="w-full max-w-[21rem] shrink-0 space-y-3">
+                    <div className="h-3 w-28 rounded-full bg-muted motion-safe:animate-pulse" />
+                    <div className="h-4 w-40 rounded-full bg-muted motion-safe:animate-pulse" />
+                    <div className="aspect-[16/11] rounded-xl bg-muted/70 motion-safe:animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            )}
 
-                <CompareViewer
-                  older={older}
-                  newer={newer}
-                  versions={archiveVersions}
-                  onOlderChange={setOlderId}
-                  onNewerChange={setNewerId}
-                />
-              </>
+            {!isLoading && !archiveError && (
+              <section aria-label="Archive milestones">
+                <ArchiveLifeline versions={archiveVersions} />
+              </section>
             )}
           </>
         )}
