@@ -41,9 +41,9 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
   }, [isOpen, onClose, triggerRef]);
 
   const links = [
-    { href: 'https://github.com/hk-vk', icon: 'hugeicons:github', label: 'GitHub' },
-    { href: 'https://linkedin.com/in/harikrishnanvk', icon: 'hugeicons:linkedin-01', label: 'LinkedIn' },
-    { href: 'mailto:vkharikrishnan45@gmail.com', icon: 'hugeicons:mail-01', label: 'Email' },
+    { href: 'https://github.com/hk-vk', icon: 'tabler:brand-github', label: 'GitHub' },
+    { href: 'https://linkedin.com/in/harikrishnanvk', icon: 'tabler:brand-linkedin', label: 'LinkedIn' },
+    { href: 'mailto:vkharikrishnan45@gmail.com', icon: 'tabler:mail', label: 'Email' },
   ];
 
   return (
