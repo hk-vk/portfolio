@@ -16,6 +16,8 @@ import { Icon } from '@iconify/react';
 import { HoverPreviewProvider, HoverPreviewLink } from '../components/HoverPreview';
 import Waves from '../components/Waves/Waves';
 import SparkleIllustration from '../components/SparkleIllustration';
+import ArchiveSticker from '../components/ArchiveSticker';
+import ArchiveDoodle from '../components/ArchiveDoodle';
 import HeroHighlightLine from '../components/HeroHighlightLine';
 import MagnetLines from '../components/MagnetLines';
 import { posthog } from '../utils/analytics';
@@ -708,6 +710,10 @@ const Home = memo(() => {
               </div>
             </motion.div>
 
+            <div className="relative z-20 -mb-4 -mt-8 flex items-end justify-end pr-2 sm:-mt-24 sm:mb-0 sm:pr-10">
+              <ArchiveDoodle className="mb-7 -mr-4 sm:mb-10 sm:-mr-6" />
+              <ArchiveSticker className="origin-top-right scale-[0.82] sm:scale-100" />
+            </div>
           </div>
         </div>
 
