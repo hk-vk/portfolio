@@ -15,12 +15,13 @@ import SEOHead from '../components/SEOHead';
 import { Icon } from '@iconify/react';
 import { HoverPreviewProvider, HoverPreviewLink } from '../components/HoverPreview';
 import Waves from '../components/Waves/Waves';
-import SparkleIllustration from '../components/SparkleIllustration';
 import ArchiveSticker from '../components/ArchiveSticker';
-import ArchiveDoodle from '../components/ArchiveDoodle';
+import SparkleIllustration from '../components/SparkleIllustration';
 import HeroHighlightLine from '../components/HeroHighlightLine';
 import MagnetLines from '../components/MagnetLines';
 import { posthog } from '../utils/analytics';
+
+const MotionLink = motion.create(Link);
 
 // Lazy load heavy components for better performance
 const AnimatedSection = lazy(() => import('../components/AnimatedSection'));
@@ -505,7 +506,7 @@ const Home = memo(() => {
         description="Explore my portfolio showcasing modern web applications built with React, Node.js, and cutting-edge technologies. Full-stack developer passionate about creating exceptional user experiences."
         url="/"
       />
-      <div className="pt-6 sm:pt-16 md:pt-24 pb-20 overflow-hidden relative">
+      <div className="pt-6 sm:pt-10 md:pt-10 pb-20 overflow-hidden relative">
         {/* Waves Background - hero section only */}
         <div ref={heroRef} className="mb-0 relative overflow-hidden">
           {/* Hero content container */}
@@ -677,6 +678,13 @@ const Home = memo(() => {
                       </HoverPreviewLink>
                     </a>.
                   </motion.p>
+                  <motion.div variants={childVariants} className="mt-6 text-base leading-relaxed sm:text-lg lg:flex lg:items-center lg:gap-2">
+                    <p className="text-muted-foreground">I’ve rebuilt this site a few times.</p>
+                    <MotionLink to="/archive" initial="rest" animate="rest" whileHover={motionSafe ? 'hover' : undefined} whileFocus={motionSafe ? 'hover' : undefined} className="group -mt-1 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md lg:mt-0 text-foreground/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+                      <span className="hero-link whitespace-nowrap">Browse earlier versions</span>
+                      <ArchiveSticker />
+                    </MotionLink>
+                  </motion.div>
 
                   <motion.div variants={childVariants} className="mt-8 w-full sm:mt-10">
                     <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
@@ -712,10 +720,6 @@ const Home = memo(() => {
               </div>
             </motion.div>
 
-            <div className="absolute right-2 top-1 z-20 flex items-end sm:right-[9%] sm:top-[42%] sm:-translate-y-1/2">
-              <ArchiveDoodle className="mb-8 -mr-3 sm:mb-16 sm:-mr-12" />
-              <ArchiveSticker />
-            </div>
           </div>
         </div>
 

@@ -38,6 +38,7 @@ const Navbar = () => {
       transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.05 }}
       className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] inset-x-0 z-50 flex justify-center px-2 sm:px-4"
     >
+      <div className="relative">
       <nav
         aria-label="Primary navigation"
         className="surface-shadow navbar-controls relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
@@ -135,6 +136,7 @@ const Navbar = () => {
           triggerRef={triggerRef}
         />
       </nav>
+      </div>
     </motion.header>
   );
 };
