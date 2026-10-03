@@ -108,7 +108,8 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Syne Variable', system-ui, sans-serif;
     font-weight: 700;
-    line-height: 1.08;
+    line-height: 1.2;
+    padding-bottom: 0.08em;
     letter-spacing: -0.035em;
     text-wrap: balance;
   }
@@ -1045,6 +1046,30 @@ html::view-transition-new(root) {
 }
 
 @layer components {
+  .archive-timeline [style][class*="--lifeline-rail"] { --lifeline-rail: 2rem; }
+  .archive-timeline .lifeline-stage { align-items: flex-start; padding-top: 1.5rem; }
+  .archive-timeline .lifeline-labels,
+  .archive-timeline .lifeline-rail-tick,
+  .archive-timeline .lifeline-rail-line { display: none; }
+  .archive-timeline .lifeline-sketch-rail { display: block; }
+  .archive-timeline .lifeline-scroll-cue { display: flex; }
+  @media (max-width: 767px) {
+    .archive-timeline [role="button"][data-lifeline-preview-url] { width: min(340px, calc(100vw - 4rem)) !important; }
+  }
+
+  .archive-timeline .lifeline-vertical-dashed { display: none; }
+  .archive-timeline .lifeline-sketch-vertical { display: block; }
+
+  @media (min-width: 768px) {
+    .archive-timeline [style][class*="--lifeline-rail"] { --lifeline-rail: 2rem; }
+    .archive-timeline .lifeline-stage { align-items: flex-start; padding-top: 1.5rem; }
+    .archive-timeline .lifeline-labels,
+    .archive-timeline .lifeline-rail-tick { display: none; }
+    .archive-timeline .lifeline-rail-line { display: none; }
+    .archive-timeline .lifeline-sketch-rail { display: block; }
+    .archive-timeline .lifeline-scroll-cue { display: flex; }
+  }
+
   .metal-hero-frame {
     border-radius: inherit;
   }

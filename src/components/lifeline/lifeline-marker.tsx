@@ -60,7 +60,7 @@ export const LifelineMarkerColumn = forwardRef<
         }}
       >
         <span
-          className="absolute left-0 top-[var(--lifeline-rail)] z-10 h-[10px] w-px -translate-y-1/2 bg-border transition-colors duration-300 group-hover:bg-muted-foreground"
+          className="lifeline-rail-tick absolute left-0 top-[var(--lifeline-rail)] z-10 h-[10px] w-px -translate-y-1/2 bg-border transition-colors duration-300 group-hover:bg-muted-foreground"
           aria-hidden="true"
         />
 

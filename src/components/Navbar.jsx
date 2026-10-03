@@ -1,4 +1,3 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "../lib/motion";
 import { Icon } from "@iconify/react";
@@ -20,67 +19,13 @@ const MetalNavItem = ({ active, children }) =>
 
 const Navbar = () => {
   const motionSafe = useMotionSafe();
-  const [layoutReady, setLayoutReady] = useState(false);
 
   const location = useLocation();
   const { socialOpen, toggleSocialPopover, closeSocialPopover, triggerRef } = useSocialPopover();
   const socialPopoverId = "navbar-social-popover";
-  const navRef = useRef(null);
-  const tabRefs = useRef(new Map());
-  const [activeIndicator, setActiveIndicator] = useState(null);
-
-  useEffect(() => {
-    let frame;
-    let cancelled = false;
-
-    document.fonts.ready.then(() => {
-      frame = requestAnimationFrame(() => {
-        if (!cancelled) setLayoutReady(true);
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-
   const isActive = (path) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
-  const activeTabName = socialOpen
-    ? "Connect"
-    : mainLinks.find((link) => isActive(link.path))?.name || "Home";
-
-  const setTabRef = (name, node) => {
-    if (node) {
-      tabRefs.current.set(name, node);
-    } else {
-      tabRefs.current.delete(name);
-    }
-  };
-
-  useLayoutEffect(() => {
-    const nav = navRef.current;
-    const tab = tabRefs.current.get(activeTabName);
-    if (!nav || !tab) return undefined;
-
-    const updateIndicator = () => {
-      const navRect = nav.getBoundingClientRect();
-      const tabRect = tab.getBoundingClientRect();
-      const inset = 1.6;
-      setActiveIndicator({
-        x: tabRect.left - navRect.left + inset,
-        y: tabRect.top - navRect.top + inset,
-        width: tabRect.width - inset * 2,
-        height: tabRect.height - inset * 2,
-      });
-    };
-
-    updateIndicator();
-    window.addEventListener("resize", updateIndicator);
-    return () => window.removeEventListener("resize", updateIndicator);
-  }, [activeTabName, layoutReady]);
   const itemClass = (active) =>
     `nav-control group relative flex h-10 items-center justify-center overflow-hidden rounded-2xl text-foreground transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-12 ${
       active ? "w-[6.5rem] gap-1.5 bg-card px-2.5 shadow-lg sm:w-32 sm:gap-2.5 sm:px-5" : "w-10 border border-border/50 bg-muted/40 hover:bg-muted/60 sm:w-12"
@@ -94,21 +39,9 @@ const Navbar = () => {
       className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] inset-x-0 z-50 flex justify-center px-2 sm:px-4"
     >
       <nav
-        ref={navRef}
         aria-label="Primary navigation"
         className="surface-shadow navbar-controls relative flex max-w-full items-center gap-1 rounded-[1.2rem] bg-background/90 p-1.5 backdrop-blur-xl sm:gap-1.5 sm:rounded-[1.35rem] sm:p-2"
       >
-        {activeIndicator && (
-          <span
-            style={{
-              width: activeIndicator.width,
-              height: activeIndicator.height,
-              transform: `translate3d(${activeIndicator.x}px, ${activeIndicator.y}px, 0)`,
-            }}
-            className="nav-active-indicator"
-            aria-hidden="true"
-          />
-        )}
         {mainLinks.map((link) => {
           const active = socialOpen ? link.name === "Connect" : isActive(link.path);
           const content = (
@@ -152,7 +85,6 @@ const Navbar = () => {
               <button
                 ref={(node) => {
                   triggerRef.current = node;
-                  setTabRef(link.name, node);
                 }}
                 type="button"
                 aria-label="Open contact links"
@@ -173,7 +105,6 @@ const Navbar = () => {
           ) : (
             <MetalNavItem key={link.path} active={active}>
               <NavLink
-                ref={(node) => setTabRef(link.name, node)}
                 to={link.path}
                 end={link.path === "/"}
                 aria-label={link.name}

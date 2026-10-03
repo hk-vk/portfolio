@@ -218,8 +218,15 @@ const HoverPreviewCard = forwardRef((_, ref) => {
               <img
                 src={activePreview.image}
                 alt={activePreview.title || ""}
-                className="aspect-video w-full object-cover"
+                className={`aspect-video w-full ${activePreview.imageFit === 'contain' ? 'object-contain bg-muted/30' : 'object-cover'} ${activePreview.darkImage ? 'dark:hidden' : ''}`}
               />
+              {activePreview.darkImage && (
+                <img
+                  src={activePreview.darkImage}
+                  alt={activePreview.title || ''}
+                  className="hidden aspect-video w-full object-contain bg-muted/30 dark:block"
+                />
+              )}
             </motion.div>
 
             {/* Text staggered in after image */}
@@ -236,6 +243,28 @@ const HoverPreviewCard = forwardRef((_, ref) => {
                 {activePreview.subtitle && (
                   <div className="mt-0.5 text-muted-foreground text-xs">
                     {activePreview.subtitle}
+                  </div>
+                )}
+                {activePreview.url && (
+                  <div className="mt-2 flex gap-1.5">
+                    <a
+                      href={activePreview.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex h-7 items-center justify-center rounded-md border border-border px-2 text-[11px] font-medium hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      Visit ↗
+                    </a>
+                    {activePreview.sponsorUrl && (
+                      <a
+                        href={activePreview.sponsorUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex h-7 items-center justify-center rounded-md border border-border px-2 text-[11px] font-medium hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      >
+                        Sponsor ↗
+                      </a>
+                    )}
                   </div>
                 )}
               </div>

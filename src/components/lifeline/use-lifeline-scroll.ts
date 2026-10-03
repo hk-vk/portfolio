@@ -265,12 +265,16 @@ export function useLifelineScroll(
       ? LEFT_EXIT_FADE_ZONE_COARSE
       : LEFT_EXIT_FADE_ZONE
 
+    let closest: HTMLElement | null = null
+    let closestDistance = Infinity
     markerRefs.current.forEach((marker) => {
       if (!marker) return
 
       const rect = marker.getBoundingClientRect()
       const markerLeft = rect.left - stageRect.left
       const center = markerLeft + rect.width / 2
+      const distance = Math.abs(center - stageRect.width / 2)
+      if (distance < closestDistance) { closest = marker; closestDistance = distance }
 
       let opacity = 1
 
@@ -300,7 +304,11 @@ export function useLifelineScroll(
         }
       }
 
-      marker.style.opacity = String(clamp(opacity, 0, 1))
+      marker.style.opacity = String(stageRect.width < 768 ? 1 : clamp(opacity, 0, 1))
+    })
+    const active = translatePx.current <= 1 ? markerRefs.current[0] : closest
+    markerRefs.current.forEach((marker) => {
+      if (marker) marker.toggleAttribute('data-lifeline-current', marker === active)
     })
   }, [])
 
@@ -318,6 +326,13 @@ export function useLifelineScroll(
         )}px, 0, 0)`
       }
 
+      const rail = sectionRef.current?.querySelector<SVGElement>('.lifeline-sketch-rail')
+      if (rail && sectionRef.current) {
+        rail.style.width = `${sectionRef.current.clientWidth}px`
+        rail.style.transform = `translateX(${-snapToDevicePixel(startInset.current - next)}px)`
+      }
+      const progress = sectionRef.current?.querySelector<HTMLElement>('[data-lifeline-progress]')
+      if (progress) progress.style.transform = `scaleX(${max > 0 ? next / max : 1})`
       applyLabelSticky(next)
       updateFades()
     },

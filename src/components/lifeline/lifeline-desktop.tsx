@@ -14,6 +14,7 @@ import { LifelineFloatingPhotos } from "./lifeline-photos"
 import { useLifelineIntro } from "./use-lifeline-intro"
 import { useLifelineScroll } from "./use-lifeline-scroll"
 import { getMarkerWidth } from "./lifeline-utils"
+import { LifelineSketchRail } from "./lifeline-sketch-rail"
 
 export function LifelineDesktop({
   markers,
@@ -126,7 +127,7 @@ export function LifelineDesktop({
         inline so browsers without it simply keep the `items-center` class.
       */}
       <div
-        className="flex h-full items-center overflow-hidden"
+        className="lifeline-stage flex h-full items-center overflow-hidden"
         style={isEmbed ? { alignItems: "safe center" } : undefined}
       >
         <div
@@ -161,7 +162,7 @@ export function LifelineDesktop({
           <div className="relative">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 top-[var(--lifeline-rail)] h-px overflow-hidden"
+              className="lifeline-rail-line pointer-events-none absolute inset-x-0 top-[var(--lifeline-rail)] h-px overflow-hidden"
             >
               <div
                 className={cn(
@@ -170,6 +171,8 @@ export function LifelineDesktop({
                 )}
               />
             </div>
+
+            <LifelineSketchRail className="lifeline-sketch-rail pointer-events-none absolute inset-x-0 hidden h-5 w-full" style={{ top: 'calc(var(--lifeline-rail) - 10px)' }} />
 
             <div className="relative flex items-start">
               {markers.map((marker, index) => (
@@ -199,6 +202,13 @@ export function LifelineDesktop({
       </div>
 
       </LifelineHoverImageProvider>
+      <div className="lifeline-scroll-cue pointer-events-none absolute bottom-2 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-[11px] text-muted-foreground">
+        <span>Scroll or drag to explore</span>
+        <span className="h-px w-24 overflow-hidden bg-border" aria-hidden="true">
+          <span data-lifeline-progress className="block h-full w-full origin-left bg-foreground/60" style={{ transform: 'scaleX(0)' }} />
+        </span>
+        <span aria-hidden="true">→</span>
+      </div>
     </section>
   )
 }

@@ -1,5 +1,7 @@
 "use client"
 
+import { LifelineSketchRail } from "./lifeline-sketch-rail"
+
 import {
   forwardRef,
   useCallback,
@@ -446,7 +448,7 @@ export function LifelineVertical({
       <div className="relative">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 top-0 overflow-hidden -translate-x-1/2"
+          className="lifeline-vertical-dashed pointer-events-none absolute bottom-0 top-0 overflow-hidden -translate-x-1/2"
           style={{ left: RAIL_LEFT, width: 1 }}
         >
           <div
@@ -456,6 +458,8 @@ export function LifelineVertical({
             )}
           />
         </div>
+
+        <LifelineSketchRail vertical className="lifeline-sketch-vertical pointer-events-none absolute inset-y-0 hidden h-full w-5 -translate-x-1/2" style={{ left: RAIL_LEFT }} />
 
         <ol className="relative">
           {markers.map((marker, index) => (

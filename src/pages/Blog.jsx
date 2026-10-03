@@ -13,6 +13,14 @@ import { client, urlFor } from '../lib/sanity';
 
 const BLOG_LIST_CACHE_KEY = 'blog:list:v1';
 const BLOG_LAST_COUNT_KEY = 'blog:last-count:v1';
+const readCachedPosts = () => {
+  try {
+    const posts = JSON.parse(sessionStorage.getItem(BLOG_LIST_CACHE_KEY) || '[]');
+    return Array.isArray(posts) ? posts : [];
+  } catch {
+    return [];
+  }
+};
 const formatViews = (count) => `${new Intl.NumberFormat().format(count || 0)} views`;
 const fetcher = async (url) => {
   const response = await fetch(url);
@@ -118,9 +126,16 @@ const BlogPostCard = ({ post, onCardClick }) => (
 );
 
 const Blog = () => {
-  const [blogPosts, setBlogPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [skeletonCount, setSkeletonCount] = useState(1);
+  const [blogPosts, setBlogPosts] = useState(readCachedPosts);
+  const [isLoading, setIsLoading] = useState(() => readCachedPosts().length === 0);
+  const [skeletonCount] = useState(() => {
+    try {
+      const count = Number(sessionStorage.getItem(BLOG_LAST_COUNT_KEY));
+      return Number.isFinite(count) && count > 0 ? Math.min(3, count) : 3;
+    } catch {
+      return 3;
+    }
+  });
   const { data: viewCountsData } = useSWR('/api/blog-view-counts', fetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 60_000,
@@ -136,28 +151,6 @@ const Blog = () => {
   };
 
   useEffect(() => {
-    try {
-      const lastCount = Number(sessionStorage.getItem(BLOG_LAST_COUNT_KEY) || 0);
-      if (Number.isFinite(lastCount) && lastCount > 0) {
-        setSkeletonCount(Math.min(3, Math.max(1, lastCount)));
-      }
-    } catch {
-      // ignore cache read issues
-    }
-
-    try {
-      const cached = sessionStorage.getItem(BLOG_LIST_CACHE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setBlogPosts(parsed);
-          setIsLoading(false);
-        }
-      }
-    } catch {
-      // ignore cache parse issues
-    }
-
     const query = `*[_type == "post"] | order(publishedAt desc) {
       _id,
       title,
@@ -225,8 +218,8 @@ const Blog = () => {
         </div>
       </AnimatedSection>
 
-      <AnimatedSection animation="fadeIn" delay={0.3}>
-        <div className="content-container">
+      <div className="content-container" aria-busy={isLoading}>
+        <div>
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
               {Array.from({ length: skeletonCount }).map((_, i) => (
@@ -239,7 +232,7 @@ const Blog = () => {
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
               variants={cardMotion.gridVariants}
-              initial="hidden"
+              initial={false}
               animate="visible"
             >
               {blogPosts.map((post) => (
@@ -274,7 +267,7 @@ const Blog = () => {
             </div>
           )}
         </div>
-      </AnimatedSection>
+      </div>
     </div>
     </>
   );

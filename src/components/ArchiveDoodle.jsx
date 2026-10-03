@@ -14,25 +14,25 @@ const ArchiveDoodle = ({ className = '' }) => {
       transition={{ delay: 1.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <span
-        className="block -rotate-6 pl-2 text-[15px] leading-none text-muted-foreground/70 sm:text-[17px]"
+        className="block -rotate-6 pl-2 text-[15px] leading-none text-muted-foreground/70 sm:text-[19px]"
         style={{ fontFamily: "'Caveat', cursive" }}
       >
-        time travel
+        the archive
       </span>
       <svg
         viewBox="0 0 110 64"
-        className="mt-1 h-11 w-[4.75rem] text-muted-foreground/60 sm:h-14 sm:w-24"
+        className="mt-1 h-11 w-[4.75rem] text-muted-foreground/60 sm:h-16 sm:w-28"
         fill="none"
       >
         <path
-          d="M8 6 C 34 0, 74 8, 88 28 C 95 38, 99 48, 101 56"
+          d="M8 6 C 36 0, 78 10, 90 32 C 96 42, 100 50, 102 57"
           stroke="currentColor"
           strokeWidth="3"
           strokeLinecap="round"
           strokeDasharray="0.1 8"
         />
         <path
-          d="M93 49 L 102 58 L 107 46"
+          d="M94 50 L 103 59 L 108 47"
           stroke="currentColor"
           strokeWidth="2.6"
           strokeLinecap="round"

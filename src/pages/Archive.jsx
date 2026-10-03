@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { Link, useParams } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
-import { Lifeline } from '../components/lifeline/lifeline';
+import { LifelineDesktop } from '../components/lifeline/lifeline-desktop';
+import { LifelineFireworksProvider } from '../components/lifeline/lifeline-fireworks';
+import { LifelinePhotoCard } from '../components/lifeline/lifeline-photos';
+import { LifelineSketchRail } from '../components/lifeline/lifeline-sketch-rail';
 import SEOHead from '../components/SEOHead';
 import { fetchArchiveVersions } from '../lib/archive-api';
 
@@ -55,20 +58,58 @@ const createArchiveMarkers = (versions) => versions.map((version, index) => ({
   }],
 }));
 
-const ArchiveLifeline = ({ versions }) => (
+const ArchiveLifeline = ({ versions }) => {
+  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  const carouselRef = useRef(null);
+  useEffect(() => {
+    const root = carouselRef.current;
+    if (!mobile || !root) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, intersectionRatio }) => {
+        target.style.opacity = intersectionRatio >= 0.8 ? '1' : '0.55';
+      });
+    }, { root, threshold: [0, 0.8, 1] });
+    root.querySelectorAll('[data-archive-slide]').forEach((slide) => observer.observe(slide));
+    return () => observer.disconnect();
+  }, [mobile, versions]);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)');
+    const update = () => setMobile(query.matches);
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  if (mobile) return (
+    <div className="relative h-full pt-6">
+      <LifelineSketchRail className="pointer-events-none absolute left-0 top-[3.5rem] h-5 w-full" />
+      <div ref={carouselRef} data-lenis-prevent className="flex h-full snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain px-1 pb-8 [scrollbar-width:none]" style={{ scrollPaddingLeft: 4 }} tabIndex={0} aria-label="Swipe through portfolio versions">
+        {createArchiveMarkers(versions).map((marker) => (
+          <div key={marker.id} data-archive-slide className="w-[85%] shrink-0 snap-start snap-always transition-opacity duration-150 ease-out motion-reduce:transition-none">
+            <p className="text-sm text-muted-foreground">{marker.label}</p>
+            <p className="mb-4 mt-8 text-base font-medium">{marker.events[0][0].value}</p>
+            <LifelinePhotoCard photo={marker.photos[0]} rotate={0} width={340} className="relative !w-full" />
+          </div>
+        ))}
+        <div className="w-[15%] shrink-0" aria-hidden="true" />
+      </div>
+    </div>
+  );
+  return (
   <ThemeProvider attribute="class" disableTransitionOnChange>
-    <div className="overflow-hidden">
-      <Lifeline
+    <div className="archive-timeline h-full overflow-hidden">
+      <LifelineFireworksProvider>
+      <LifelineDesktop
         markers={createArchiveMarkers(versions)}
         birthYear={0}
         title="Portfolio archive timeline"
         mode="auto"
         playIntro={false}
-        className="h-[27rem] md:h-[29rem]"
+        className="h-full"
       />
+      </LifelineFireworksProvider>
     </div>
   </ThemeProvider>
-);
+  );
+};
 
 const VersionDetail = ({ version }) => (
   <section className="pt-8">
@@ -132,16 +173,16 @@ const Archive = () => {
         description="Browse and compare earlier versions of Harikrishnan's portfolio."
         url={selectedVersion ? `/archive/${selectedVersion.year}/${selectedVersion.id}` : '/archive'}
       />
-      <div className="content-container min-h-[100dvh] pb-32 pt-16 md:pt-24">
+      <div className={`content-container min-h-[100dvh] pb-32 pt-16 ${selectedVersion ? 'md:pt-24' : 'flex h-[100dvh] min-h-0 flex-col pb-24 pt-6 md:pt-8'}`}>
         {selectedVersion ? (
           <VersionDetail version={selectedVersion} />
         ) : (
           <>
-            <header className="max-w-3xl pb-4 md:pb-6">
-              <h1 className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
+            <header className="max-w-3xl shrink-0 pb-4 md:max-w-none md:pb-2">
+              <h1 className="text-2xl font-bold leading-[1.15] tracking-tight md:text-3xl">
                 My little Wayback Machine.
               </h1>
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground text-pretty md:text-base" aria-live="polite">
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground text-pretty md:max-w-none" aria-live="polite">
                 {archiveError || (isLoading ? 'Winding back the clock…' : 'See how my portfolio has changed over time. Pick a version to look around.')}
               </p>
               {archiveError && (
@@ -169,7 +210,7 @@ const Archive = () => {
             )}
 
             {!isLoading && !archiveError && (
-              <section aria-label="Archive milestones">
+              <section className="min-h-0 flex-1" aria-label="Archive milestones">
                 <ArchiveLifeline versions={archiveVersions} />
               </section>
             )}

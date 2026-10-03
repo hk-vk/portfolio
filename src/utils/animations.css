@@ -207,10 +207,10 @@
 /* Shimmer loading effect */
 @keyframes shimmer {
   0% {
-    background-position: -1000px 0;
+    transform: translateX(-100%);
   }
   100% {
-    background-position: 1000px 0;
+    transform: translateX(100%);
   }
 }
 
@@ -221,8 +221,11 @@
     rgba(255, 255, 255, 0.2) 50%,
     rgba(255, 255, 255, 0) 100%
   );
-  background-size: 1000px 100%;
-  animation: shimmer 2s var(--ease-in-out) infinite;
+  animation: shimmer 1.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer { animation: none; background: none; }
 }
 
 /* === STAGGER UTILITIES === */

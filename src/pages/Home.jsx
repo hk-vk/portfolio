@@ -671,8 +671,10 @@ const Home = memo(() => {
                         </motion.span>
                       )},
                     </span> or find the code on
-                    {' '}<a href="https://github.com/hk-vk" target="_blank" rel="noopener noreferrer" className="hero-link">
-                      GitHub
+                    {' '}<a href="https://github.com/hk-vk" target="_blank" rel="noopener noreferrer">
+                      <HoverPreviewLink previewKey="github" className="hero-link">
+                        GitHub
+                      </HoverPreviewLink>
                     </a>.
                   </motion.p>
 
@@ -710,9 +712,9 @@ const Home = memo(() => {
               </div>
             </motion.div>
 
-            <div className="relative z-20 -mb-4 -mt-8 flex items-end justify-end pr-2 sm:-mt-24 sm:mb-0 sm:pr-10">
-              <ArchiveDoodle className="mb-7 -mr-4 sm:mb-10 sm:-mr-6" />
-              <ArchiveSticker className="origin-top-right scale-[0.82] sm:scale-100" />
+            <div className="absolute right-2 top-1 z-20 flex items-end sm:right-[9%] sm:top-[42%] sm:-translate-y-1/2">
+              <ArchiveDoodle className="mb-8 -mr-3 sm:mb-16 sm:-mr-12" />
+              <ArchiveSticker />
             </div>
           </div>
         </div>
@@ -874,7 +876,18 @@ const companyPreviews = {
   },
 };
 
-const heroPreviews = { comini: companyPreviews.comini };
+const heroPreviews = {
+  comini: companyPreviews.comini,
+  github: {
+    image: '/images/previews/github-light.png',
+    darkImage: '/images/previews/github-dark.webp',
+    imageFit: 'contain',
+    title: 'hk-vk on GitHub',
+    subtitle: 'My repositories and open-source projects',
+    url: 'https://github.com/hk-vk',
+    sponsorUrl: 'https://github.com/sponsors/hk-vk',
+  },
+};
 
 
 const experienceItems = [

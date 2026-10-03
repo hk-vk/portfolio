@@ -1,10 +1,11 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
 import AnimatedSection from '../components/AnimatedSection';
 import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
 import SEOHead from '../components/SEOHead';
+import { useSmoothScroll } from '../context/SmoothScrollContext';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
 import { posthog } from '../utils/analytics';
@@ -259,7 +260,21 @@ ProjectCard.displayName = 'ProjectCard';
 const Projects = () => {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const { toggleSocialPopover } = useSocialPopover();
+  const { lenis } = useSmoothScroll();
   const contactButtonRef = useRef(null);
+  const isModalOpen = selectedProjectId !== null;
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const wasStopped = lenis?.isStopped;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop();
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      if (!wasStopped) lenis?.start();
+    };
+  }, [isModalOpen, lenis]);
 
   const filteredProjects = useMemo(() => projects, []);
 
@@ -362,7 +377,8 @@ const Projects = () => {
             onClick={() => setSelectedProjectId(null)}
           >
             <motion.div
-              className="bg-background border border-border/60 rounded-2xl max-w-5xl mx-auto h-full md:h-auto md:max-h-[92vh] overflow-y-auto"
+              data-lenis-prevent
+              className="bg-background border border-border/60 rounded-2xl max-w-5xl mx-auto h-full md:h-auto md:max-h-[92vh] overflow-y-auto overscroll-contain"
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{
                 opacity: 1,
