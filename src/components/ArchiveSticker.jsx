@@ -11,10 +11,10 @@ const ArchiveSticker = ({ className = '' }) => {
   const motionSafe = useMotionSafe();
   return (
   <span aria-hidden="true" className={`relative inline-block h-9 w-14 shrink-0 sm:w-16 ${className}`}>
-    {snapshots.map(({ src, x, y, rotate, fanX, fanY, fanRotate }, index) => (
+    {snapshots.map(({ src, x, y, rotate, fanX, fanY, fanRotate }) => (
       <motion.span
         key={src}
-        className={`absolute left-0 top-1.5 w-9 rounded p-px sm:left-1 sm:w-11 ${index === snapshots.length - 1 ? 'hero-silver-line' : 'bg-border/60'}`}
+        className="hero-silver-line absolute left-0 top-1.5 w-9 rounded p-px sm:left-1 sm:w-11"
         variants={{ rest: { x, y, rotate }, hover: { x: fanX, y: fanY, rotate: fanRotate } }}
         transition={{ duration: motionSafe ? 0.22 : 0, ease: [0.22, 1, 0.36, 1] }}
       >

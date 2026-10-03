@@ -583,7 +583,7 @@ const Home = memo(() => {
                         className="w-full pb-[0.08em] font-bold leading-[1.12] tracking-tighter font-display"
                         style={{ fontSize: 'clamp(1.5rem, 7vw, 4rem)' }}
                       >
-                        HARIKRISHNAN V K
+                        HARIKRISHNAN
                       </h1>
                       <div aria-hidden="true" className="hero-silver-line metal-sheen mt-2 h-1 w-16 rounded-full sm:w-20" />
                     </motion.div>
@@ -602,10 +602,10 @@ const Home = memo(() => {
                   </motion.p>
 
                   <motion.p variants={childVariants} className="mt-5 max-w-2xl text-base leading-loose text-muted-foreground sm:text-lg">
-                    After hours, I make small things for problems that keep bothering me. You can browse my
-                    {' '}<Link to="/projects" className="hero-link">
+                    After hours, I build small{' '}
+                    <Link to="/projects" className="hero-link">
                       projects
-                    </Link>, send me an
+                    </Link> to solve everyday problems. You can send me an
                     {' '}<span
                       ref={emailPopoverRef}
                       className="relative inline-block whitespace-nowrap"

@@ -1,13 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from '../lib/motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion } from '../lib/motion';
 import { Icon } from '@iconify/react';
-import AnimatedSection from '../components/AnimatedSection';
+import { useMotionSafe } from '../utils/useMotionSafe';
 import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
 import SEOHead from '../components/SEOHead';
 import { useSmoothScroll } from '../context/SmoothScrollContext';
-import { duration } from '../utils/motionSettings';
-import { cardMotion, motionTransition } from '../utils/motionContract';
 import { posthog } from '../utils/analytics';
 
 const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
@@ -122,407 +120,261 @@ const projects = [
   },
 ];
 
-const SectionDivider = () => (
-  <div className="section-divider" aria-hidden="true">
-    <span className="section-divider-rail" />
-    <span className="section-divider-core" />
+const settle = [0.22, 1, 0.36, 1];
+const focusRing = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring';
+
+const ProjectPreview = ({ project, className = '' }) => {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className={'flex items-center justify-center overflow-hidden bg-muted/30 ' + className}>
+      {failed ? (
+        <div className="flex flex-col items-center gap-2 p-8 text-center text-muted-foreground">
+          <Icon icon="tabler:photo-off" className="size-6" aria-hidden="true" />
+          <p className="text-sm">Preview unavailable</p>
+        </div>
+      ) : (
+        <img src={project.image} alt={project.title + ' project preview'} loading="lazy" decoding="async"
+          onError={() => setFailed(true)}
+          className="h-full w-full object-contain outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10" />
+      )}
+    </div>
+  );
+};
+
+const ProjectLinks = ({ project, source }) => (
+  <div className="flex flex-wrap items-center gap-3">
+    {[{ url: project.liveUrl, label: 'Visit site', icon: 'tabler:arrow-up-right', type: 'live_demo' },
+      { url: project.githubUrl, label: 'Source code', icon: 'tabler:brand-github', type: 'source_code' }]
+      .filter((link) => link.url).map((link) => (
+        <a key={link.type} href={link.url} target="_blank" rel="noopener noreferrer"
+          className={'pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-md text-sm text-foreground/90 underline decoration-border underline-offset-4 hover:decoration-current ' + focusRing}
+          onClick={() => posthog?.capture('project_link_clicked', {
+            source, link_type: link.type, project_id: project.id, project_title: project.title, link_url: link.url,
+          })}>
+          <Icon icon={link.icon} className="size-4" aria-hidden="true" />
+          {link.label}<span className="sr-only"> for {project.title} (opens in a new tab)</span>
+        </a>
+      ))}
   </div>
 );
 
-
-const ProjectCard = React.memo(({ project, onClick }) => {
-  const divRef = useRef(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-
-  const handleMouseMove = (e) => {
-    if (!divRef.current) return;
-    const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  const handleMouseEnter = () => setOpacity(1);
-  const handleMouseLeave = () => setOpacity(0);
-
+const ProjectCard = React.memo(({ project, onOpen }) => {
   return (
-    <motion.article
-      ref={divRef}
-      className="group relative flex flex-col h-full p-[1px] rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-      variants={cardMotion.itemVariants}
-      whileHover={cardMotion.hover}
-      whileTap={cardMotion.press}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      layout
-    >
-      {/* Spotlight Border Layer */}
-      <div 
-        className="absolute inset-0 z-0 transition-opacity duration-300"
-        style={{
-          opacity,
-          background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, hsl(var(--primary) / 0.15), transparent 40%)`
-        }}
-      />
-      
-      {/* Main Content Card Wrapper */}
-      <div className="metal-edge relative z-10 flex flex-col h-full bg-card/60 backdrop-blur-md border rounded-[11px] overflow-hidden hover:bg-card/80 transition-colors">
-        {/* Image Container */}
-        <div className="relative aspect-video overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]">
-          <img
-            src={project.image}
-            alt={project.title}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-          />
-          
-          {/* Overlay Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-
-          {/* Top Badges */}
-          <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
-            <span className="bg-background/90 backdrop-blur text-[10px] font-mono font-bold tracking-wider px-2 py-1 rounded border border-border/50 text-foreground shadow-sm">
-              {project.id}
-            </span>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col flex-grow p-5">
-          <div className="flex-grow">
-            <h2 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-200">
-              {project.title}
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-4">
-              {project.description}
-            </p>
-          </div>
-
-          {/* Tech Stack */}
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {project.tags.slice(0, 3).map((tag) => (
-              <span 
-                key={tag} 
-                className="px-2 py-0.5 rounded text-[10px] font-mono text-muted-foreground bg-muted/30 border border-border/30"
-              >
-                {tag}
-              </span>
-            ))}
-            {project.tags.length > 3 && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono text-muted-foreground bg-muted/30 border border-border/30">
-                +{project.tags.length - 3}
-              </span>
-            )}
-          </div>
-
-          {/* Actions Footer */}
-          <div className="flex items-center gap-3 pt-4 mt-auto border-t border-border/30">
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-background border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all duration-200 hover:scale-110"
-                title="Live Demo"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  posthog?.capture('project_link_clicked', { source: 'projects_card', link_type: 'live_demo', project_id: project.id });
-                }}
-              >
-                <Icon icon="tabler:external-link" className="w-4 h-4" />
-              </a>
-            )}
-            {project.githubUrl && (
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-8 h-8 rounded-full bg-background border border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 hover:scale-110"
-                title="Source Code"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  posthog?.capture('project_link_clicked', { source: 'projects_card', link_type: 'source_code', project_id: project.id });
-                }}
-              >
-                <Icon icon="tabler:brand-github" className="w-4 h-4" />
-              </a>
-            )}
-          </div>
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card">
+      <button type="button" onClick={onOpen}
+        aria-label={'View ' + project.title + ' project details'}
+        aria-haspopup="dialog"
+        className="peer absolute inset-0 z-10 cursor-pointer rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring">
+        <span className="sr-only">View {project.title} project details</span>
+      </button>
+      <div className="overflow-hidden transition-transform duration-150 motion-safe:peer-active:scale-[0.96] motion-reduce:transition-none">
+        <div className="transition-transform duration-200 ease-out motion-safe:group-hover:scale-[1.02] motion-reduce:transition-none">
+          <ProjectPreview project={project} className="aspect-video" />
         </div>
       </div>
-    </motion.article>
+      <div className="flex flex-1 flex-col px-4 pb-3 pt-4">
+        <p className="mb-2 text-xs text-muted-foreground">{project.category}</p>
+        <h2 className="text-lg font-semibold leading-tight">{project.title}</h2>
+        <p className="mb-3 mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{project.description}</p>
+        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{project.tags.slice(0, 3).join(' · ')}</p>
+        <div className="pointer-events-none relative z-20 mt-auto flex flex-wrap items-center justify-between gap-x-3 border-t border-border/50 pt-1">
+          <ProjectLinks project={project} source="projects_card" />
+          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            Details <Icon icon="tabler:arrow-right" className="size-3.5" aria-hidden="true" />
+          </span>
+        </div>
+      </div>
+    </article>
   );
 });
 ProjectCard.displayName = 'ProjectCard';
 
-const Projects = () => {
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const { toggleSocialPopover } = useSocialPopover();
+const ProjectDetails = ({ project, index, count, onClose, onMove, animateProject }) => {
+  const dialogRef = useRef(null);
+  const scrollRef = useRef(null);
+  const opened = useRef(false);
+  const motionSafe = useMotionSafe() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && animateProject;
   const { lenis } = useSmoothScroll();
-  const contactButtonRef = useRef(null);
-  const isModalOpen = selectedProjectId !== null;
 
   useEffect(() => {
-    if (!isModalOpen) return;
+    const dialog = dialogRef.current;
+    const trigger = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     const wasStopped = lenis?.isStopped;
     document.body.style.overflow = 'hidden';
     lenis?.stop();
+    dialog.showModal();
     return () => {
+      dialog.close();
       document.body.style.overflow = previousOverflow;
       if (!wasStopped) lenis?.start();
+      if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus({ preventScroll: true });
     };
-  }, [isModalOpen, lenis]);
+  }, [lenis]);
 
-  const filteredProjects = useMemo(() => projects, []);
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 });
+    opened.current = true;
+  }, [project.id]);
 
-  const selectedProject = useMemo(
-    () => filteredProjects.find((project) => project.id === selectedProjectId) || projects.find((project) => project.id === selectedProjectId) || null,
-    [selectedProjectId, filteredProjects]
+  const close = (method) => {
+    posthog?.capture('project_modal_closed', {
+      project_id: project.id, project_title: project.title, close_method: method,
+    });
+    onClose();
+  };
+  const previous = projects[(index - 1 + count) % count];
+  const next = projects[(index + 1) % count];
+
+  return (
+    <motion.dialog ref={dialogRef} aria-labelledby="project-detail-title" aria-describedby="project-detail-summary"
+      data-lenis-prevent
+      className="fixed inset-0 m-0 h-[100dvh] max-h-none w-full max-w-none overflow-hidden bg-black/60 p-0 text-foreground backdrop:bg-transparent sm:p-5 lg:p-8"
+      initial={false}
+      onCancel={(event) => { event.preventDefault(); close('escape'); }}
+      onClick={(event) => { if (event.target === event.currentTarget) close('backdrop'); }}>
+      <motion.div
+        className="mx-auto flex h-full max-w-5xl flex-col overflow-hidden bg-background sm:rounded-2xl"
+        initial={motionSafe ? { opacity: 0, transform: 'translateY(8px) scale(0.98)' } : false}
+        animate={motionSafe ? { opacity: 1, transform: 'translateY(0px) scale(1)' } : { opacity: 1 }}
+        transition={{ duration: 0.22, ease: settle }}>
+        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-border/50 px-5 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-8">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">{project.category} <span aria-hidden="true">·</span> {index + 1} of {count}</p>
+            <h2 id="project-detail-title" className="mt-1 truncate text-lg font-semibold sm:text-xl">{project.title}</h2>
+          </div>
+          <motion.button type="button" autoFocus aria-label="Close project details" onClick={() => close('close_button')}
+            whileTap={motionSafe ? { scale: 0.96 } : undefined} transition={{ duration: 0.15 }}
+            className={'grid size-11 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-muted/60 hover:text-foreground ' + focusRing}>
+            <Icon icon="tabler:x" className="size-5" aria-hidden="true" />
+          </motion.button>
+        </header>
+        <div ref={scrollRef} data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <motion.div key={project.id}
+            initial={opened.current && motionSafe ? { opacity: 0, transform: 'translateY(8px)' } : false}
+            animate={motionSafe ? { opacity: 1, transform: 'translateY(0px)' } : { opacity: 1 }}
+            transition={{ duration: 0.18, ease: settle }}>
+            <div className="grid items-start gap-6 px-5 pt-5 sm:px-8 sm:pt-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+              <ProjectPreview key={project.id} project={project} className="order-2 aspect-[16/10] w-full rounded-xl lg:order-1" />
+              <div className="order-1 lg:order-2">
+                <p id="project-detail-summary" className="mb-3 max-w-[65ch] text-base leading-relaxed text-muted-foreground sm:text-lg">{project.description}</p>
+                <ProjectLinks project={project} source="projects_modal" />
+                <div className="mt-5 hidden lg:block">
+                  <h3 className="mb-3 text-sm font-medium">Built with</h3>
+                  <p className="text-sm leading-7 text-muted-foreground">{project.techStack.join(' · ')}</p>
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-8 px-5 py-7 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-8">
+              <div className="space-y-7">
+                <section>
+                  <h3 className="mb-3 text-lg font-semibold">About the project</h3>
+                  <p className="max-w-[65ch] text-sm leading-7 text-muted-foreground">{project.fullDescription}</p>
+                </section>
+                <section>
+                  <h3 className="mb-3 text-lg font-semibold">Building it</h3>
+                  <p className="max-w-[65ch] text-sm leading-7 text-muted-foreground">{project.challenges}</p>
+                  <p className="mt-3 max-w-[65ch] text-sm leading-7 text-muted-foreground">{project.solutions}</p>
+                </section>
+              </div>
+              <div className="space-y-7">
+                <section>
+                  <h3 className="mb-3 text-lg font-semibold">What it does</h3>
+                  <ul className="space-y-2">
+                    {project.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2.5 text-sm leading-6">
+                        <Icon icon="tabler:check" className="mt-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+                <section className="lg:hidden">
+                  <h3 className="mb-3 text-lg font-semibold">Built with</h3>
+                  <p className="text-sm leading-7 text-muted-foreground">{project.techStack.join(' · ')}</p>
+                </section>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-border/50 bg-background px-4 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-7">
+          <button type="button" onClick={(event) => onMove(-1, event.detail === 0)} disabled={count <= 1}
+            aria-label={'Previous project: ' + previous.title}
+            className={'flex min-h-11 min-w-0 items-center gap-2 rounded-md px-1 text-sm hover:text-primary ' + focusRing}>
+            <Icon icon="tabler:arrow-left" className="size-4 shrink-0" aria-hidden="true" />
+            <span><span className="block text-left text-xs text-muted-foreground">Previous</span><span className="hidden max-w-64 truncate sm:block">{previous.title}</span></span>
+          </button>
+          <button type="button" onClick={(event) => onMove(1, event.detail === 0)} disabled={count <= 1}
+            aria-label={'Next project: ' + next.title}
+            className={'flex min-h-11 min-w-0 items-center gap-2 rounded-md px-1 text-sm hover:text-primary ' + focusRing}>
+            <span><span className="block text-right text-xs text-muted-foreground">Next</span><span className="hidden max-w-64 truncate sm:block">{next.title}</span></span>
+            <Icon icon="tabler:arrow-right" className="size-4 shrink-0" aria-hidden="true" />
+          </button>
+        </footer>
+      </motion.div>
+    </motion.dialog>
   );
+};
 
-  const selectedProjectIndex = useMemo(
-    () => (selectedProject ? filteredProjects.findIndex((project) => project.id === selectedProject.id) : -1),
-    [filteredProjects, selectedProject]
-  );
+const Projects = () => {
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [animateProject, setAnimateProject] = useState(true);
+  const { toggleSocialPopover } = useSocialPopover();
+  const contactButtonRef = useRef(null);
+  const selectedProjectIndex = projects.findIndex((project) => project.id === selectedProjectId);
+  const selectedProject = projects[selectedProjectIndex];
 
-  const moveModal = (direction) => {
-    if (!selectedProject || filteredProjects.length <= 1) return;
-    const nextIndex = (selectedProjectIndex + direction + filteredProjects.length) % filteredProjects.length;
-    setSelectedProjectId(filteredProjects[nextIndex].id);
+  const moveModal = (direction, keyboard = false) => {
+    setAnimateProject(!keyboard);
+    const nextIndex = (selectedProjectIndex + direction + projects.length) % projects.length;
+    posthog?.capture('project_modal_navigated', {
+      direction: direction > 0 ? 'next' : 'previous', project_id: selectedProjectId,
+    });
+    setSelectedProjectId(projects[nextIndex].id);
   };
 
   return (
     <>
-      <SEOHead
-        title="Projects | Harikrishnan V K"
-        description="Explore my portfolio of web applications, mobile apps, and development projects. Built with React, Node.js, Python, and modern technologies."
-        url="/projects"
-      />
-
-      <div className="pt-20 md:pt-24 pb-20 overflow-hidden relative">
+      <SEOHead title="Projects | Harikrishnan V K"
+        description="Explore web applications and developer tools built by Harikrishnan V K." url="/projects" />
+      <div className="relative overflow-hidden pb-28 pt-10 md:pt-14">
         <div className="content-container">
-          <AnimatedSection>
-            <motion.div
-              className="text-center mb-8"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
-            >
-              <div className="flex items-center justify-center mb-4">
-                <SparkleIllustration className="text-primary mr-3" size={22} />
-                <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider leading-[1.12] pb-[0.08em]">PROJECTS</h1>
+          <header className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
+            <div>
+              <div className="flex items-center gap-3">
+                <SparkleIllustration className="text-primary" size={22} />
+                <h1 className="text-3xl font-bold leading-tight sm:text-4xl">Projects</h1>
               </div>
-              <div className="w-14 h-px bg-primary/40 mx-auto" />
-            </motion.div>
-          </AnimatedSection>
-
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-            variants={cardMotion.gridVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {filteredProjects.map((project) => (
-              <ProjectCard 
-                key={project.id}
-                project={project}
-                onClick={() => {
-                  setSelectedProjectId(project.id);
-                  posthog?.capture('project_modal_opened', {
-                    project_id: project.id,
-                    project_title: project.title,
-                    category: project.category,
-                  });
-                }}
-              />
-            ))}
-          </motion.div>
-
-          <SectionDivider />
-
-          <AnimatedSection className="mt-2">
-            <div className="rounded-xl border border-border/50 bg-card/80 p-8 text-center">
-              <h3 className="text-2xl font-bold mb-3">Interested in collaborating?</h3>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Open to building high-quality product experiences, frontend systems, and full-stack features.
-              </p>
-              <button
-                ref={contactButtonRef}
-                onClick={() => {
-                  posthog?.capture('projects_contact_cta_clicked', {
-                    cta_label: 'Get in Touch',
-                  });
-                  toggleSocialPopover(contactButtonRef);
-                }}
-                className="button-primary inline-flex items-center active:scale-[0.97] transition-transform duration-150"
-              >
-                Get in Touch
-                <Icon icon="tabler:arrow-right" className="ml-2 w-4 h-4" />
-              </button>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">Web apps, developer tools, and things I built to solve everyday problems.</p>
             </div>
-          </AnimatedSection>
+          </header>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} onOpen={(event) => {
+                setAnimateProject(event.detail > 0);
+                setSelectedProjectId(project.id);
+                posthog?.capture('project_modal_opened', { project_id: project.id, project_title: project.title, category: project.category });
+              }} />
+            ))}
+          </div>
+          <section className="mt-12 flex flex-col items-start justify-between gap-5 border-t border-border/60 pt-8 sm:flex-row sm:items-center">
+            <div>
+              <h2 className="text-xl font-semibold">Have something in mind?</h2>
+              <p className="mt-2 text-sm text-muted-foreground">Open to collaborating on useful, thoughtfully built products.</p>
+            </div>
+            <button ref={contactButtonRef} type="button"
+              onClick={() => {
+                posthog?.capture('projects_contact_cta_clicked', { cta_label: 'Get in touch' });
+                toggleSocialPopover(contactButtonRef);
+              }}
+              className={'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-current ' + focusRing}>
+              Get in touch <Icon icon="tabler:arrow-up-right" className="size-4" aria-hidden="true" />
+            </button>
+          </section>
         </div>
       </div>
-
-      <AnimatePresence>
-        {selectedProject && (
-          <motion.div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4 md:p-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease } }}
-            exit={{ opacity: 0, transition: { duration: duration.quick / 1000, ease: motionTransition.componentExit.ease } }}
-            onClick={() => setSelectedProjectId(null)}
-          >
-            <motion.div
-              data-lenis-prevent
-              className="bg-background border border-border/60 rounded-2xl max-w-5xl mx-auto h-full md:h-auto md:max-h-[92vh] overflow-y-auto overscroll-contain"
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                transition: { duration: duration.standard / 1000, ease: motionTransition.componentEnter.ease },
-              }}
-              exit={{
-                opacity: 0,
-                y: 8,
-                scale: 0.98,
-                transition: { duration: duration.quick / 1000, ease: motionTransition.componentExit.ease },
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-5 md:p-7">
-                <div className="flex items-start justify-between gap-4 mb-5">
-                  <div>
-                    <h2 className="text-2xl md:text-3xl font-bold leading-tight">{selectedProject.title}</h2>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSelectedProjectId(null);
-                      posthog?.capture('project_modal_closed', {
-                        project_id: selectedProject.id,
-                        project_title: selectedProject.title,
-                        close_method: 'close_button',
-                      });
-                    }}
-                    className="text-muted-foreground hover:text-foreground active:scale-[0.97] transition-[color,transform] duration-150"
-                    aria-label="Close project details"
-                  >
-                    <Icon icon="tabler:x" className="w-6 h-6" />
-                  </button>
-                </div>
-
-                <div className="relative rounded-xl overflow-hidden mb-6 border border-border/40">
-                  <img src={selectedProject.image} alt={selectedProject.title} className="w-full h-56 md:h-80 object-cover" />
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
-                    <h3 className="text-sm uppercase tracking-[0.16em] text-muted-foreground mb-2">Overview</h3>
-                    <p className="text-muted-foreground leading-relaxed">{selectedProject.fullDescription}</p>
-
-                    <h3 className="text-sm uppercase tracking-[0.16em] text-muted-foreground mt-6 mb-2">Key Features</h3>
-                    <ul className="space-y-2">
-                      {selectedProject.features.map((feature) => (
-                        <li key={feature} className="text-sm text-foreground/90 flex items-start gap-2">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary/70" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <aside>
-                    <h3 className="text-sm uppercase tracking-[0.16em] text-muted-foreground mb-2">Tech Stack</h3>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {selectedProject.techStack.map((tech) => (
-                        <span key={tech} className="skill-tag">{tech}</span>
-                      ))}
-                    </div>
-
-                    <div className="space-y-3">
-                      {selectedProject.liveUrl && (
-                        <a
-                          href={selectedProject.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="button-primary inline-flex items-center w-full justify-center"
-                          onClick={() =>
-                            posthog?.capture('project_link_clicked', {
-                              source: 'projects_modal',
-                              link_type: 'visit_live',
-                              project_id: selectedProject.id,
-                              project_title: selectedProject.title,
-                              link_url: selectedProject.liveUrl,
-                            })
-                          }
-                        >
-                          Visit Live
-                        </a>
-                      )}
-                      {selectedProject.githubUrl && (
-                        <a
-                          href={selectedProject.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="button-secondary inline-flex items-center w-full justify-center"
-                          onClick={() =>
-                            posthog?.capture('project_link_clicked', {
-                              source: 'projects_modal',
-                              link_type: 'view_source',
-                              project_id: selectedProject.id,
-                              project_title: selectedProject.title,
-                              link_url: selectedProject.githubUrl,
-                            })
-                          }
-                        >
-                          View Source
-                        </a>
-                      )}
-                    </div>
-                  </aside>
-                </div>
-
-                <div className="mt-7 pt-4 border-t border-border/40 flex items-center justify-between">
-                  <button
-                    onClick={() => {
-                      moveModal(-1);
-                      posthog?.capture('project_modal_navigated', {
-                        direction: 'previous',
-                        project_id: selectedProject.id,
-                        project_title: selectedProject.title,
-                      });
-                    }}
-                    className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 active:scale-[0.97] transition-[color,transform] duration-150"
-                    disabled={filteredProjects.length <= 1}
-                  >
-                    <Icon icon="tabler:arrow-left" className="w-4 h-4" />
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => {
-                      moveModal(1);
-                      posthog?.capture('project_modal_navigated', {
-                        direction: 'next',
-                        project_id: selectedProject.id,
-                        project_title: selectedProject.title,
-                      });
-                    }}
-                    className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 active:scale-[0.97] transition-[color,transform] duration-150"
-                    disabled={filteredProjects.length <= 1}
-                  >
-                    Next
-                    <Icon icon="tabler:arrow-right" className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {selectedProject && <ProjectDetails project={selectedProject} index={selectedProjectIndex} count={projects.length} animateProject={animateProject}
+        onClose={() => setSelectedProjectId(null)} onMove={moveModal} />}
     </>
   );
 };
