@@ -407,7 +407,7 @@ export function LifelinePhotoCard({
         data-lifeline-preview-src={photo.src || undefined}
         data-lifeline-preview-alt={photo.alt}
         className={cn(
-          "group/photo pointer-events-auto cursor-pointer touch-pan-y rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          "group/photo pointer-events-auto cursor-pointer touch-auto rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           "z-20 hover:z-40",
           lightboxStart && "invisible",
           className,
