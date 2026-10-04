@@ -21,7 +21,6 @@ const Projects = lazyWithRetry(() => import('./pages/Projects'));
 const Contact = lazyWithRetry(() => import('./pages/Contact'));
 const Blog = lazyWithRetry(() => import('./pages/Blog'));
 const BlogPostPage = lazyWithRetry(() => import('./pages/BlogPostPage'));
-const OGPreview = lazyWithRetry(() => import('./pages/OGPreview'));
 const Archive = lazyWithRetry(() => import('./pages/Archive')); 
 
 class RouteErrorBoundary extends React.Component {
@@ -102,7 +101,6 @@ const AnimatedRoutes = () => {
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/archive" element={<PageTransition><Archive /></PageTransition>} />
         <Route path="/archive/:year/:slug" element={<PageTransition><Archive /></PageTransition>} />
-        <Route path="/og-preview" element={<PageTransition><OGPreview /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>

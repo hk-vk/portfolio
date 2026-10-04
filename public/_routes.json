@@ -5,6 +5,7 @@
   ],
   "exclude": [
     "/assets/*",
+    "/social/*",
     "/fonts/*",
     "/favicon.svg",
     "/*.js",

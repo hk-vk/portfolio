@@ -20,6 +20,10 @@ pnpm preview
 
 The production build goes into `dist/`. The site uses React, Vite, Tailwind CSS, Framer Motion, and Lenis.
 
+## Social previews
+
+The site uses two JPEGs in `public/social/`: a 1200 × 630 image for Open Graph and a 1200 × 675 image for X. Run `node scripts/check-og.mjs` after changing them. Use a new filename when replacing an image so cached previews can pick up the change.
+
 ## Credits
 
 Some parts of this site started with other people's work:

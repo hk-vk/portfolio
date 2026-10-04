@@ -29,12 +29,6 @@ importers:
       '@sanity/image-url':
         specifier: ^2.0.3
         version: 2.0.3
-      '@vercel/og':
-        specifier: ^0.6.8
-        version: 0.6.8
-      canvas:
-        specifier: ^3.1.2
-        version: 3.1.2
       framer-motion:
         specifier: ^12.18.1
         version: 12.18.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

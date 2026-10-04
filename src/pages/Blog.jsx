@@ -184,7 +184,6 @@ const Blog = () => {
         description="Read my thoughts on web development, programming, and technology. Discover insights about React, Node.js, and modern web development practices."
         url="/blog"
         type="website"
-        image="/og.jpg"
       />
       <div className="pt-32 pb-20 min-h-screen bg-gradient-to-br from-background via-background to-muted/5">
       <AnimatedSection animation="fadeUp">

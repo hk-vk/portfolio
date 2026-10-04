@@ -641,7 +641,7 @@ const BlogPostPage = () => {
         description={post.excerpt || `${stripMarkdown(safeContent).substring(0, 160)}...`}
         url={`/blog/${post.slug}`}
         type="article"
-        image={post.imageUrl || "/og.jpg"}
+        image={post.imageUrl || undefined}
       />
       
       <AnimatePresence>
