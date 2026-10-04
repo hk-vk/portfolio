@@ -1,50 +1,30 @@
-# React + TypeScript + Vite
+# hari.works
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+I'm Harikrishnan, a full-stack developer. [hari.works](https://hari.works) is my personal site, with projects I've built, blog posts, and ways to get in touch.
 
-Currently, two official plugins are available:
+I've rebuilt it a few times. The archive keeps earlier versions around so you can browse the actual sites, not just screenshots.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Run locally
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```sh
+pnpm install
+pnpm dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+For blog content and analytics, copy `.env.example` to `.env.local` and fill in the relevant values. Keep API keys out of version control.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```sh
+pnpm build
+pnpm preview
 ```
+
+The production build goes into `dist/`. The site uses React, Vite, Tailwind CSS, Framer Motion, and Lenis.
+
+## Credits
+
+Some parts of this site started with other people's work:
+
+- The archive timeline adapts [Evil Rabbit's Lifeline](https://lifeline.evilrabbit.com/).
+- The Waves and MagnetLines components come from [React Bits](https://reactbits.dev/), with changes for this site.
+- Icons come from [Hugeicons](https://hugeicons.com/) and [Tabler Icons](https://tabler.io/icons), through [Iconify](https://iconify.design/).
+- The fonts are [Syne](https://fonts.google.com/specimen/Syne) and [Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans).
