@@ -545,7 +545,7 @@ const Home = memo(() => {
 
               <HeroHighlightLine />
 
-              <div className="relative px-1 py-4 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
+              <div className="relative px-1 py-3 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
                 {/* Conditional MagnetLines for better performance */}
                 {sectionsVisible.hero && (
                   <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
@@ -594,14 +594,16 @@ const Home = memo(() => {
                     className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
                   >
                     I’m a full-stack developer at{' '}
-                    <a href="https://www.comini.in" target="_blank" rel="noopener noreferrer">
-                      <HoverPreviewLink previewKey="comini" className="hero-link !font-normal !text-foreground">
-                        Comini Learning
-                      </HoverPreviewLink>
-                    </a>, where I build tools for playful, practical learning.
+                    <span className="whitespace-nowrap">
+                      <a href="https://www.comini.in" target="_blank" rel="noopener noreferrer">
+                        <HoverPreviewLink previewKey="comini" className="hero-link !font-normal !text-foreground">
+                          Comini Learning
+                        </HoverPreviewLink>
+                      </a>,
+                    </span>{' '}where I build tools for playful, practical learning.
                   </motion.p>
 
-                  <motion.p variants={childVariants} className="mt-5 max-w-2xl text-base leading-loose text-muted-foreground sm:text-lg">
+                  <motion.p variants={childVariants} className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg sm:leading-loose">
                     After hours, I build small{' '}
                     <Link to="/projects" className="hero-link">
                       projects
@@ -678,7 +680,7 @@ const Home = memo(() => {
                       </HoverPreviewLink>
                     </a>.
                   </motion.p>
-                  <motion.div variants={childVariants} className="mt-6 text-base leading-relaxed sm:text-lg lg:flex lg:items-center lg:gap-2">
+                  <motion.div variants={childVariants} className="mt-4 text-base leading-relaxed sm:mt-6 sm:text-lg lg:flex lg:items-center lg:gap-2">
                     <p className="text-muted-foreground">I’ve rebuilt this site a few times.</p>
                     <MotionLink to="/archive" initial="rest" animate="rest" whileHover={motionSafe ? 'hover' : undefined} whileFocus={motionSafe ? 'hover' : undefined} className="group -mt-1 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md lg:mt-0 text-foreground/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
                       <span className="hero-link whitespace-nowrap">Browse earlier versions</span>
@@ -686,7 +688,7 @@ const Home = memo(() => {
                     </MotionLink>
                   </motion.div>
 
-                  <motion.div variants={childVariants} className="mt-8 w-full sm:mt-10">
+                  <motion.div variants={childVariants} className="mt-5 w-full sm:mt-10">
                     <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
                     <div className="skill-row sm:hidden">
                       <div className="skill-marquee-track">
