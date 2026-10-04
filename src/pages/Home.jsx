@@ -529,7 +529,7 @@ const Home = memo(() => {
               transition={{ duration: duration.moderate / 1000, ease: motionTransition.componentEnter.ease }}
             >
               <div className="metal-hero-frame relative block w-full">
-              <div className="hero-surface relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 p-4 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
+              <div className="hero-surface relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 py-4 pl-4 pr-2 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
               <div className="absolute inset-0 -z-10 pointer-events-none select-none">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
@@ -545,7 +545,7 @@ const Home = memo(() => {
 
               <HeroHighlightLine />
 
-              <div className="relative px-1 py-3 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
+              <div className="relative pl-1 py-3 sm:p-6 md:p-10 flex flex-col items-start justify-center text-left">
                 {/* Conditional MagnetLines for better performance */}
                 {sectionsVisible.hero && (
                   <div className="absolute inset-0 -z-10 opacity-60 hidden md:block">
