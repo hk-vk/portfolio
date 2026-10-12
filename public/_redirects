@@ -1,0 +1,12 @@
+# Keep previously published preview image URLs usable by cached social cards.
+/og.jpg /social/hero-silver-og-v1.jpg 301
+/og.png /social/hero-silver-og-v1.jpg 301
+/social/og-universal-1200x630.jpg /social/hero-silver-og-v1.jpg 301
+/social/discord-1200x630.jpg /social/hero-silver-og-v1.jpg 301
+/social/facebook-1200x630.jpg /social/hero-silver-og-v1.jpg 301
+/social/telegram-1200x630.jpg /social/hero-silver-og-v1.jpg 301
+/social/whatsapp-1200x630.jpg /social/hero-silver-og-v1.jpg 301
+/social/linkedin-1200x627.jpg /social/hero-silver-og-v1.jpg 301
+/social/linkedin-featured-square-1080.jpg /social/hero-silver-og-v1.jpg 301
+/social/x-1200x675.jpg /social/hero-silver-x-v2.jpg 301
+/social/x-1600x900.jpg /social/hero-silver-x-v2.jpg 301

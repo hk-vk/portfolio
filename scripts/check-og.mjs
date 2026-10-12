@@ -7,7 +7,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 
 const og = '/social/hero-silver-og-v1.jpg';
-const twitter = '/social/hero-silver-x-v1.jpg';
+const twitter = '/social/hero-silver-x-v2.jpg';
 const meta = (html, key) => {
   const tags = [...html.matchAll(/<meta\b[^>]*>/g)].map(match => match[0]);
   const matches = tags.filter(tag => tag.includes(`property="${key}"`) || tag.includes(`name="${key}"`));
@@ -30,6 +30,18 @@ const dimensions = (path) => {
 assert.deepEqual(dimensions(og), [1200, 630]);
 assert.deepEqual(dimensions(twitter), [1200, 675]);
 for (const path of [og, twitter]) assert.ok(readFileSync(`public${path}`).length < 200_000, 'Image is too large');
+
+const robots = readFileSync('public/robots.txt', 'utf8');
+assert.match(robots, /^User-agent: \*\nAllow: \/\n$/);
+const redirects = readFileSync('public/_redirects', 'utf8').split('\n').filter(line => line && !line.startsWith('#'));
+assert.equal(redirects.length, 11, 'Keep all retired static preview URLs working');
+for (const line of redirects) {
+  const [source, destination, status] = line.split(/\s+/);
+  assert.match(source, /\.(jpg|png)$/);
+  assert.ok(destination === og || destination === twitter);
+  assert.equal(status, '301');
+  assert.ok(existsSync(`public${destination}`));
+}
 
 const index = readFileSync('index.html', 'utf8');
 assert.equal(meta(index, 'og:image'), `https://hari.works${og}`);

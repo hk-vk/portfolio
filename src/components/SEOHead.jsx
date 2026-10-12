@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const DEFAULT_IMAGE = '/social/hero-silver-og-v1.jpg';
-const TWITTER_IMAGE = '/social/hero-silver-x-v1.jpg';
+const TWITTER_IMAGE = '/social/hero-silver-x-v2.jpg';
 
 const SEOHead = ({
   title = 'Harikrishnan V K | Portfolio',

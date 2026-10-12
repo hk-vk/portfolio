@@ -32,7 +32,7 @@ export async function onRequest({ request, next }) {
   const [title, description] = page.map(escapeHtml);
   const canonical = escapeHtml(new URL(path, url.origin).href);
   const image = escapeHtml(new URL('/social/hero-silver-og-v1.jpg', url.origin).href);
-  const twitterImage = escapeHtml(new URL('/social/hero-silver-x-v1.jpg', url.origin).href);
+  const twitterImage = escapeHtml(new URL('/social/hero-silver-x-v2.jpg', url.origin).href);
   const secureImage = url.protocol === 'https:' ? `<meta property="og:image:secure_url" content="${image}" />` : '';
   const html = `<!doctype html>
 <html lang="en"><head>
