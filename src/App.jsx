@@ -143,11 +143,10 @@ function App() {
   useEffect(() => {
     const initTheme = () => {
       const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      const theme = savedTheme === 'light' ? 'light' : 'dark';
 
       document.documentElement.classList.toggle('dark', theme === 'dark');
-      localStorage.setItem('theme', theme);
+      document.documentElement.style.colorScheme = theme;
     };
 
     initTheme();

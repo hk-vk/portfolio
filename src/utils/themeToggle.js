@@ -4,18 +4,11 @@
  * @returns {Object} Theme control functions
  */
 export const themeToggle = () => {
-  // Check if user prefers dark mode
-  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  // Check for saved theme preference or use system preference
+  // Default to dark; only a saved light preference overrides it.
   const getInitialTheme = () => {
     const savedTheme = localStorage.getItem('theme');
     
-    if (savedTheme) {
-      return savedTheme;
-    }
-    
-    return prefersDarkMode ? 'dark' : 'light';
+    return savedTheme === 'light' ? 'light' : 'dark';
   };
   
   // Initialize theme
@@ -28,12 +21,13 @@ export const themeToggle = () => {
       root.classList.remove('dark');
     }
     
+    root.style.colorScheme = theme;
     localStorage.setItem('theme', theme);
   };
   
   // Toggle between light and dark
   const toggleTheme = () => {
-    const currentTheme = localStorage.getItem('theme') || (prefersDarkMode ? 'dark' : 'light');
+    const currentTheme = getInitialTheme();
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
     setTheme(newTheme);
@@ -42,7 +36,9 @@ export const themeToggle = () => {
   
   // Initialize theme on load
   const initializeTheme = () => {
-    setTheme(getInitialTheme());
+    const theme = getInitialTheme();
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.style.colorScheme = theme;
   };
   
   return {
