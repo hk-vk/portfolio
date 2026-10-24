@@ -5,7 +5,7 @@ import ThemeToggle from "./ThemeToggle";
 import SocialPopover from "./SocialPopover";
 import { useSocialPopover } from "../context/SocialPopoverContext";
 import { useMotionSafe } from "../utils/useMotionSafe";
-import { posthog } from "../utils/analytics";
+import { trackEvent } from "../utils/analytics";
 
 const mainLinks = [
   { name: "Home", path: "/", icon: "hugeicons:home-01" },
@@ -93,7 +93,7 @@ const Navbar = () => {
                 aria-controls={socialPopoverId}
                 className={itemClass(active)}
                 onClick={() => {
-                  posthog?.capture("navbar_connect_clicked", {
+                  trackEvent("navbar_connect_clicked", {
                     action: socialOpen ? "close" : "open",
                     from_path: location.pathname,
                   });
@@ -112,7 +112,7 @@ const Navbar = () => {
                 className={itemClass(active)}
                 onClick={() => {
                   closeSocialPopover();
-                  posthog?.capture("navbar_link_clicked", {
+                  trackEvent("navbar_link_clicked", {
                     link_name: link.name,
                     link_path: link.path,
                     from_path: location.pathname,

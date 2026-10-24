@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from '../lib/motion';
 import { Icon } from '@iconify/react';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 import { useMotionSafe } from '../utils/useMotionSafe';
 
 /**
@@ -70,7 +70,7 @@ const SocialPopover = ({ id, isOpen, onClose, triggerRef }) => {
               aria-label={l.label}
               title={l.label}
               onClick={() =>
-                posthog?.capture('social_popover_link_clicked', {
+                trackEvent('social_popover_link_clicked', {
                   link_label: l.label,
                   link_href: l.href,
                   path: window.location.pathname,

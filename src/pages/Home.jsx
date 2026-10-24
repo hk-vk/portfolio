@@ -19,7 +19,7 @@ import ArchiveSticker from '../components/ArchiveSticker';
 import SparkleIllustration from '../components/SparkleIllustration';
 import HeroHighlightLine from '../components/HeroHighlightLine';
 import MagnetLines from '../components/MagnetLines';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 
 const MotionLink = motion.create(Link);
 
@@ -43,8 +43,6 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
   const handleMouseEnter = () => setOpacity(1);
   const handleMouseLeave = () => setOpacity(0);
 
-  // We KEEP the existing posthog capture code intact inside the footer.
-  // We ONLY change the layout wrapping.
 
   return (
     <motion.div
@@ -125,7 +123,7 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
               rel="noopener noreferrer"
               onClick={(e) => {
                 e.stopPropagation();
-                posthog?.capture('featured_project_link_clicked', {
+                trackEvent('featured_project_link_clicked', {
                   link_type: 'live_demo',
                   project_id: project.id,
                   project_title: project.title,
@@ -145,7 +143,7 @@ const ProjectCard = memo(({ project, motionSafe, isVisible }) => {
               rel="noopener noreferrer"
               onClick={(e) => {
                 e.stopPropagation();
-                posthog?.capture('featured_project_link_clicked', {
+                trackEvent('featured_project_link_clicked', {
                   link_type: 'source_code',
                   project_id: project.id,
                   project_title: project.title,
@@ -793,7 +791,7 @@ const Home = memo(() => {
               <Link
                 to="/projects"
                 onClick={() =>
-                  posthog?.capture('home_view_all_projects_clicked', {
+                  trackEvent('home_view_all_projects_clicked', {
                     from_path: window.location.pathname,
                   })
                 }

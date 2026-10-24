@@ -13,7 +13,7 @@ import { SmoothScrollProvider } from './context/SmoothScrollContext';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import Home from './pages/Home';
 import ScrollToTop from './utils/ScrollToTop';
-import { posthog } from './utils/analytics';
+import { trackEvent } from './utils/analytics';
 
 // Lazy load all pages for code splitting and faster initial load
 const About = lazyWithRetry(() => import('./pages/About'));
@@ -126,10 +126,9 @@ const RouteAnalytics = () => {
     const fullPath = `${location.pathname}${location.search}`;
     if (lastTrackedPathRef.current === fullPath) return;
 
-    posthog?.capture('page_viewed', {
+    trackEvent('page_viewed', {
       page_name: getPageNameFromPath(location.pathname),
       path: location.pathname,
-      search: location.search || '',
       title: document.title || '',
     });
     lastTrackedPathRef.current = fullPath;

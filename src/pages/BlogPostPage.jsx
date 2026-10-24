@@ -9,7 +9,7 @@ import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
 import { Icon } from "@iconify/react";
 import { client, urlFor } from '../lib/sanity';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 const toPlainContent = (value) => {
   if (typeof value === 'string') return value;
   if (!value) return '';
@@ -616,15 +616,14 @@ const BlogPostPage = () => {
 
     const canonicalSlug = post.slug || postId;
 
-    posthog?.capture('blog_post_viewed', {
+    trackEvent('blog_post_viewed', {
       post_slug: canonicalSlug,
       post_title: post.title,
       post_category: post.category || 'Article',
       current_path: `/blog/${canonicalSlug}`,
-      referrer: document.referrer || null,
     });
     trackedViewRef.current = canonicalSlug;
-  }, [post, postId, posthog]);
+  }, [post, postId]);
 
   if (loading) {
     return <BlogPostSkeleton />;
@@ -673,7 +672,7 @@ const BlogPostPage = () => {
               className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted/30 border border-border/50 hover:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all duration-200 group"
               aria-label="Back to Blog"
               onClick={() =>
-                posthog?.capture('blog_post_back_clicked', {
+                trackEvent('blog_post_back_clicked', {
                   post_slug: postId,
                   post_title: post?.title,
                 })
@@ -711,7 +710,7 @@ const BlogPostPage = () => {
               <button 
                 onClick={() => {
                   setIsReaderOpen(true);
-                  posthog?.capture('blog_speed_reader_opened', {
+                  trackEvent('blog_speed_reader_opened', {
                     post_slug: postId,
                     post_title: post?.title,
                   });

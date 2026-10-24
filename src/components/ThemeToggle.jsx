@@ -4,7 +4,7 @@ import { motion } from '../lib/motion';
 import { themeToggle } from '../utils/themeToggle';
 import { motionInteraction } from '../utils/motionContract';
 import { useMotionSafe } from '../utils/useMotionSafe';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 
 /**
  * Theme toggle button component that allows switching between light and dark mode
@@ -28,7 +28,7 @@ const ThemeToggle = () => {
       const previousTheme = isDark ? 'dark' : 'light';
       const newTheme = toggleTheme();
       setIsDark(newTheme === 'dark');
-      posthog?.capture('theme_toggled', {
+      trackEvent('theme_toggled', {
         from_theme: previousTheme,
         to_theme: newTheme,
         path: window.location.pathname,

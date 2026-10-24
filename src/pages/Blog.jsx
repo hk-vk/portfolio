@@ -5,11 +5,10 @@ import { Link } from 'react-router-dom';
 import SparkleIllustration from '../components/SparkleIllustration';
 import Shimmer from '../components/Shimmer';
 import SEOHead from '../components/SEOHead';
-import useSWR from 'swr';
 import { duration } from '../utils/motionSettings';
 import { cardMotion, motionTransition } from '../utils/motionContract';
-import { posthog } from '../utils/analytics';
 import { client, urlFor } from '../lib/sanity';
+import { trackEvent } from '../utils/analytics';
 
 const BLOG_LIST_CACHE_KEY = 'blog:list:v1';
 const BLOG_LAST_COUNT_KEY = 'blog:last-count:v1';
@@ -21,15 +20,6 @@ const readCachedPosts = () => {
     return [];
   }
 };
-const formatViews = (count) => `${new Intl.NumberFormat().format(count || 0)} views`;
-const fetcher = async (url) => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}`);
-  }
-  return response.json();
-};
-
 const BlogCardSkeleton = () => (
   <div className="border border-border/50 p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm rounded-xl">
     <div className="w-full h-48 bg-muted/60 rounded-md mb-4" />
@@ -48,14 +38,22 @@ const BlogCardSkeleton = () => (
   </div>
 );
 
-const BlogPostCard = ({ post, onCardClick }) => (
+const BlogPostCard = ({ post }) => (
   <motion.div
     className="group h-full"
     variants={cardMotion.itemVariants}
     whileHover={cardMotion.hover}
     whileTap={cardMotion.press}
   >
-    <Link to={`/blog/${post.slug.current}`} className="block h-full" onClick={() => onCardClick(post)}>
+    <Link
+      to={`/blog/${post.slug.current}`}
+      className="block h-full"
+      onClick={() => trackEvent('blog_card_clicked', {
+        post_slug: post.slug.current,
+        post_title: post.title,
+        current_path: window.location.pathname,
+      })}
+    >
       <div className="metal-edge border p-6 h-full flex flex-col bg-card/80 backdrop-blur-sm
                       hover:border-primary/40 hover:shadow-lg
                       transition-[border-color,box-shadow,transform,background-color] duration-200 rounded-xl
@@ -99,12 +97,6 @@ const BlogPostCard = ({ post, onCardClick }) => (
           </h2>
           <p className="text-xs text-muted-foreground/80 mb-3 uppercase tracking-wider font-medium">
             {new Date(post.publishedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-            {post.viewCount > 0 ? (
-              <>
-                {' '}•{' '}
-                {formatViews(post.viewCount)}
-              </>
-            ) : null}
           </p>
           <p className="text-muted-foreground mb-6 text-sm leading-relaxed line-clamp-3">
             {post.excerpt}
@@ -136,20 +128,6 @@ const Blog = () => {
       return 3;
     }
   });
-  const { data: viewCountsData } = useSWR('/api/blog-view-counts', fetcher, {
-    revalidateOnFocus: false,
-    dedupingInterval: 60_000,
-  });
-  const viewCounts = viewCountsData?.ok && viewCountsData?.counts ? viewCountsData.counts : {};
-
-  const handleBlogCardClick = (post) => {
-    posthog?.capture('blog_card_clicked', {
-      post_slug: post?.slug?.current,
-      post_title: post?.title,
-      current_path: window.location.pathname,
-    });
-  };
-
   useEffect(() => {
     const query = `*[_type == "post"] | order(publishedAt desc) {
       _id,
@@ -237,11 +215,7 @@ const Blog = () => {
               {blogPosts.map((post) => (
                 <BlogPostCard
                   key={post._id}
-                  post={{
-                    ...post,
-                    viewCount: viewCounts[post?.slug?.current] || 0,
-                  }}
-                  onCardClick={handleBlogCardClick}
+                  post={post}
                 />
               ))}
             </motion.div>

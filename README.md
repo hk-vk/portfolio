@@ -11,7 +11,7 @@ pnpm install
 pnpm dev
 ```
 
-For blog content and analytics, copy `.env.example` to `.env.local` and fill in the relevant values. Keep API keys out of version control.
+For blog content, copy `.env.example` to `.env.local` and fill in the relevant values. Keep API keys out of version control.
 
 ```sh
 pnpm build

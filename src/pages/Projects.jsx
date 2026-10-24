@@ -6,7 +6,7 @@ import SparkleIllustration from '../components/SparkleIllustration';
 import { useSocialPopover } from '../context/SocialPopoverContext';
 import SEOHead from '../components/SEOHead';
 import { useSmoothScroll } from '../context/SmoothScrollContext';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 
 const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 
@@ -148,7 +148,7 @@ const ProjectLinks = ({ project, source }) => (
       .filter((link) => link.url).map((link) => (
         <a key={link.type} href={link.url} target="_blank" rel="noopener noreferrer"
           className={'pointer-events-auto inline-flex min-h-11 items-center gap-2 rounded-md text-sm text-foreground/90 underline decoration-border underline-offset-4 hover:decoration-current ' + focusRing}
-          onClick={() => posthog?.capture('project_link_clicked', {
+          onClick={() => trackEvent('project_link_clicked', {
             source, link_type: link.type, project_id: project.id, project_title: project.title, link_url: link.url,
           })}>
           <Icon icon={link.icon} className="size-4" aria-hidden="true" />
@@ -218,7 +218,7 @@ const ProjectDetails = ({ project, index, count, onClose, onMove, animateProject
   }, [project.id]);
 
   const close = (method) => {
-    posthog?.capture('project_modal_closed', {
+    trackEvent('project_modal_closed', {
       project_id: project.id, project_title: project.title, close_method: method,
     });
     onClose();
@@ -327,7 +327,7 @@ const Projects = () => {
   const moveModal = (direction, keyboard = false) => {
     setAnimateProject(!keyboard);
     const nextIndex = (selectedProjectIndex + direction + projects.length) % projects.length;
-    posthog?.capture('project_modal_navigated', {
+    trackEvent('project_modal_navigated', {
       direction: direction > 0 ? 'next' : 'previous', project_id: selectedProjectId,
     });
     setSelectedProjectId(projects[nextIndex].id);
@@ -353,7 +353,7 @@ const Projects = () => {
               <ProjectCard key={project.id} project={project} onOpen={(event) => {
                 setAnimateProject(event.detail > 0);
                 setSelectedProjectId(project.id);
-                posthog?.capture('project_modal_opened', { project_id: project.id, project_title: project.title, category: project.category });
+                trackEvent('project_modal_opened', { project_id: project.id, project_title: project.title, category: project.category });
               }} />
             ))}
           </div>
@@ -364,7 +364,7 @@ const Projects = () => {
             </div>
             <button ref={contactButtonRef} type="button"
               onClick={() => {
-                posthog?.capture('projects_contact_cta_clicked', { cta_label: 'Get in touch' });
+                trackEvent('projects_contact_cta_clicked', { cta_label: 'Get in touch' });
                 toggleSocialPopover(contactButtonRef);
               }}
               className={'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-current ' + focusRing}>

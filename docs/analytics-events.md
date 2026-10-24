@@ -1,16 +1,20 @@
-# Analytics Events (PostHog)
+# Analytics (InsightFlare)
 
-## View Counts on Blog Cards
+Analytics is loaded by the deferred script in `index.html`:
 
-- API route: `GET /api/blog-view-counts`
-- Server file: `functions/api/blog-view-counts.js`
-- Reads PostHog `blog_post_viewed` events and aggregates by `post_slug`
-- Blog card UI file: `src/pages/Blog.jsx`
+```html
+<script defer src="https://analytics.hari.works/script.js?siteId=355582c8-1a4e-4e83-9664-d75efee87183"></script>
+```
 
-Required server env:
-- `POSTHOG_API_HOST` (for example `https://us.posthog.com`)
-- `POSTHOG_PROJECT_ID`
-- `POSTHOG_PERSONAL_API_KEY`
+Custom events use `trackEvent(name, properties)` from `src/utils/analytics.js`, which calls `window.insightflare?.track(name, properties)`. Tracking is a no-op if the script is unavailable; failures never interrupt user actions.
+
+No analytics SDK or environment variables are required. Provider-backed blog view counts remain removed.
+
+Open the site's **Events** page in InsightFlare to see received events; no advance registration is needed. Events before the tracking script becomes available are not queued.
+
+Do not include passwords, contact form contents, or other sensitive information in event properties. Route events omit query strings, and blog events omit referrer URLs.
+
+The contact form currently simulates submission locally; its submitted event reflects that UI flow, not confirmed server delivery.
 
 ## Event Names Wired
 
@@ -22,7 +26,6 @@ Required server env:
 - `hover_preview_opened`
 - `featured_project_link_clicked`
 - `home_view_all_projects_clicked`
-- `projects_filter_selected`
 - `project_modal_opened`
 - `project_modal_closed`
 - `project_modal_navigated`
@@ -40,3 +43,10 @@ Required server env:
 - `footer_nav_clicked`
 - `footer_expertise_clicked`
 - `footer_policy_clicked`
+
+## Checks
+
+```sh
+node --test src/utils/analytics.test.js
+npm run build
+```

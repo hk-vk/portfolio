@@ -9,7 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "../lib/motion";
-import { posthog } from "../utils/analytics";
+import { trackEvent } from "../utils/analytics";
 
 // Context
 const HoverPreviewContext = createContext(null);
@@ -98,7 +98,7 @@ export function HoverPreviewProvider({
       const previewData = data[key];
       if (previewData) {
         if (!trackedPreviewKeysRef.current.has(key)) {
-          posthog?.capture("hover_preview_opened", {
+          trackEvent("hover_preview_opened", {
             preview_key: key,
             preview_title: previewData.title || null,
             path: window.location.pathname,
@@ -110,7 +110,7 @@ export function HoverPreviewProvider({
         setIsVisible(true);
       }
     },
-    [data, snapPosition, posthog]
+    [data, snapPosition]
   );
 
   const handleHoverMove = useCallback(

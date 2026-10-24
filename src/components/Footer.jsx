@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SparkleIllustration from './SparkleIllustration';
 import FlowerIllustration from './FlowerIllustration';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const socialLinks = [
@@ -110,7 +110,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
-                    posthog?.capture('footer_social_clicked', {
+                    trackEvent('footer_social_clicked', {
                       social_name: link.name,
                       social_url: link.url,
                       path: window.location.pathname,
@@ -148,7 +148,7 @@ const Footer = () => {
                   <Link
                     to="/"
                     className="text-muted-foreground hover:text-primary transition-colors animated-underline"
-                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'Home', link_path: '/' })}
+                    onClick={() => trackEvent('footer_nav_clicked', { link_name: 'Home', link_path: '/' })}
                   >
                     Home
                   </Link>
@@ -157,7 +157,7 @@ const Footer = () => {
                   <Link
                     to="/about"
                     className="text-muted-foreground hover:text-primary transition-colors animated-underline"
-                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'About', link_path: '/about' })}
+                    onClick={() => trackEvent('footer_nav_clicked', { link_name: 'About', link_path: '/about' })}
                   >
                     About
                   </Link>
@@ -166,7 +166,7 @@ const Footer = () => {
                   <Link
                     to="/projects"
                     className="text-muted-foreground hover:text-primary transition-colors animated-underline"
-                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'Projects', link_path: '/projects' })}
+                    onClick={() => trackEvent('footer_nav_clicked', { link_name: 'Projects', link_path: '/projects' })}
                   >
                     Projects
                   </Link>
@@ -175,7 +175,7 @@ const Footer = () => {
                   <Link
                     to="/contact"
                     className="text-muted-foreground hover:text-primary transition-colors animated-underline"
-                    onClick={() => posthog?.capture('footer_nav_clicked', { link_name: 'Contact', link_path: '/contact' })}
+                    onClick={() => trackEvent('footer_nav_clicked', { link_name: 'Contact', link_path: '/contact' })}
                   >
                     Contact
                   </Link>
@@ -199,7 +199,7 @@ const Footer = () => {
                       to={category.path}
                       className="text-muted-foreground hover:text-primary transition-colors text-sm animated-underline"
                       onClick={() =>
-                        posthog?.capture('footer_expertise_clicked', {
+                        trackEvent('footer_expertise_clicked', {
                           category_name: category.name,
                           category_path: category.path,
                         })
@@ -227,7 +227,7 @@ const Footer = () => {
               <Link
                 to="/privacy"
                 className="hover:text-primary transition-colors"
-                onClick={() => posthog?.capture('footer_policy_clicked', { policy: 'privacy' })}
+                onClick={() => trackEvent('footer_policy_clicked', { policy: 'privacy' })}
               >
                 Privacy Policy
               </Link>
@@ -236,7 +236,7 @@ const Footer = () => {
               <Link
                 to="/terms"
                 className="hover:text-primary transition-colors"
-                onClick={() => posthog?.capture('footer_policy_clicked', { policy: 'terms' })}
+                onClick={() => trackEvent('footer_policy_clicked', { policy: 'terms' })}
               >
                 Terms of Service
               </Link>

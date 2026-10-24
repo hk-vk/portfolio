@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from '../lib/motion';
 import SEOHead from '../components/SEOHead';
 import { duration } from '../utils/motionSettings';
-import { posthog } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -21,7 +21,7 @@ const Contact = () => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.message) {
-      posthog?.capture('contact_form_submit_failed', {
+      trackEvent('contact_form_submit_failed', {
         reason: 'missing_required_fields',
       });
       return;
@@ -32,7 +32,7 @@ const Contact = () => {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-      posthog?.capture('contact_form_submitted', {
+      trackEvent('contact_form_submitted', {
         has_name: Boolean(formData.name),
         has_email: Boolean(formData.email),
         message_length: formData.message.length,
@@ -219,7 +219,7 @@ const Contact = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() =>
-                    posthog?.capture('contact_social_clicked', {
+                    trackEvent('contact_social_clicked', {
                       social_name: link.name,
                       social_href: link.href,
                     })
@@ -254,7 +254,7 @@ const Contact = () => {
             <a
               href="mailto:vkharikrishnan45@gmail.com?subject=Project Inquiry"
               onClick={() =>
-                posthog?.capture('contact_quick_action_clicked', {
+                trackEvent('contact_quick_action_clicked', {
                   action_name: 'quick_email',
                   action_href: 'mailto:vkharikrishnan45@gmail.com?subject=Project Inquiry',
                 })
@@ -266,7 +266,7 @@ const Contact = () => {
             <a
               href="/projects"
               onClick={() =>
-                posthog?.capture('contact_quick_action_clicked', {
+                trackEvent('contact_quick_action_clicked', {
                   action_name: 'view_my_work',
                   action_href: '/projects',
                 })
