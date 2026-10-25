@@ -824,6 +824,15 @@ const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 const featuredProjects = [
   {
     id: '01',
+    title: 'BadgeBar',
+    description: 'A macOS menu bar app that shows Dock badge counts, one icon per app. Hide the Dock, keep the badges.',
+    tags: ['Swift', 'AppKit', 'macOS', 'Menu Bar', 'Homebrew'],
+    image: '/projects/images/badgebar.png',
+    liveUrl: 'https://badgebar.hari.works',
+    githubUrl: 'https://github.com/hk-vk/badgebar',
+  },
+  {
+    id: '02',
     title: 'TXTSKILLS',
     description: 'Convert any llms.txt documentation into installable skills for AI agents like Claude Code, Cursor, Windsurf, and Copilot.',
     tags: ['Next.js', 'TypeScript', 'Cloudflare', 'AI Agents', 'Developer Tooling'],
@@ -832,7 +841,7 @@ const featuredProjects = [
     githubUrl: 'https://github.com/hk-vk/txtskills',
   },
   {
-    id: '02',
+    id: '03',
     title: 'Git Talks',
     description: 'Turn any GitHub repository into an AI-generated podcast episode that explains architecture, design decisions, and code.',
     tags: ['AI', 'GitHub', 'Podcast', 'Code Analysis', 'TTS'],
@@ -841,21 +850,12 @@ const featuredProjects = [
     githubUrl: 'https://github.com/hkvk/gittalks',
   },
   {
-    id: '03',
+    id: '04',
     title: 'CodexPilot',
     description: 'A fork of Codex CLI for using Codex models through your GitHub Copilot subscription.',
     tags: ['Rust', 'CLI', 'GitHub Copilot', 'OpenAI', 'Developer Tooling'],
     image: 'https://repository-images.githubusercontent.com/1200509020/64db259f-1b41-4887-b4bc-257f45696fc1',
     githubUrl: 'https://github.com/hk-vk/codexpilot',
-  },
-  {
-    id: '04',
-    title: 'PDFx - Offline PDF Toolkit',
-    description: 'A fully offline PDF manipulation toolkit with all processing done in your browser',
-    tags: ['TypeScript', 'WebAssembly', 'PDF', 'Privacy', 'Offline-First'],
-    image: `${R2_BASE_URL}/image.png`,
-    liveUrl: 'https://pdfx-8su.pages.dev/',
-    githubUrl: 'https://github.com/hk-vk/pdfX',
   },
 ];
 

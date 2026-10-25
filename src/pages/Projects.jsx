@@ -13,6 +13,21 @@ const R2_BASE_URL = 'https://pub-cb8a9661c7ce4889b03ae3b69d7df50f.r2.dev';
 const projects = [
   {
     id: '01',
+    title: 'BadgeBar',
+    description: 'A macOS menu bar app that shows Dock badge counts, one icon per app, so you can hide the Dock and keep the badges.',
+    fullDescription: 'BadgeBar is a native macOS menu bar app for people who hide the Dock. It mirrors each app\'s Dock badge as its own menu bar icon, shows recent messages in a menu, keeps its own notification history, and lets you open, mark as read or quit apps from the menu bar. It runs locally with no analytics and installs through Homebrew.',
+    category: 'Desktop App',
+    tags: ['Swift', 'AppKit', 'macOS', 'Menu Bar', 'Homebrew'],
+    image: '/projects/images/badgebar.png',
+    liveUrl: 'https://badgebar.hari.works',
+    githubUrl: 'https://github.com/hk-vk/badgebar',
+    techStack: ['Swift', 'AppKit', 'SwiftUI', 'Accessibility API', 'Homebrew Cask', 'GitHub Pages'],
+    features: ['Per-App Badge Icons', 'Recent Message Previews', 'Notification History', 'Mark as Read', 'Hide Icons for Closed Apps'],
+    challenges: 'macOS has no public API for other apps\' Dock badges, and the menu bar has to stay light on CPU and memory while watching them.',
+    solutions: 'Read each app\'s badge from the Dock through the Accessibility API on a light 1.5-second poll, plus right away when an app launches, and read message text from Notification Center\'s local history.'
+  },
+  {
+    id: '02',
     title: 'TXTSKILLS',
     description: 'Convert llms.txt documentation into installable agent skills for Claude Code, Cursor, Windsurf, Copilot, and more.',
     fullDescription: 'txtskills is a developer tool that transforms llms.txt documentation into installable skills for AI agents. It streamlines the workflow from docs ingestion to generated skill output, with a web interface, CLI packaging, and publishing-ready outputs for agent ecosystems.',
@@ -27,7 +42,7 @@ const projects = [
     solutions: 'Implemented structured parsing, validation-first generation steps, and a clean web workflow that maps directly to installable skill artifacts.'
   },
   {
-    id: '02',
+    id: '03',
     title: 'Git Talks',
     description: 'Transform any GitHub repository into an immersive audio experience with AI-generated podcast episodes about architecture, design decisions, and code.',
     fullDescription: 'Git Talks turns repositories into listenable technical breakdowns. It analyzes GitHub projects, generates a script around architecture and implementation decisions, and produces a two-host podcast-style audio experience for developers who want to understand codebases faster.',
@@ -42,7 +57,7 @@ const projects = [
     solutions: 'Structured the pipeline around repository analysis, focused script generation, and natural-sounding TTS output so the result stays informative and easy to consume.',
   },
   {
-    id: '03',
+    id: '04',
     title: 'CodexPilot',
     description: 'A fork of Codex CLI for using Codex models through your GitHub Copilot subscription.',
     fullDescription: 'CodexPilot is an independent fork of OpenAI Codex that keeps its own local app state while supporting both OpenAI and GitHub Copilot providers. It adds practical developer workflows like provider switching and resuming upstream Codex sessions from /resume.',
@@ -56,7 +71,7 @@ const projects = [
     solutions: 'Maintained separate runtime/auth/config paths and added explicit resume pathways that surface upstream sessions without inheriting upstream runtime config.'
   },
   {
-    id: '04',
+    id: '05',
     title: 'YEAH - Fake News Detector',
     description: 'This web app integrates text analysis, image recognition, URL examination, and reverse image search to effectively detect fake news.',
     fullDescription: 'A comprehensive fake news detection system that combines multiple AI technologies including natural language processing, computer vision, and web scraping to analyze and verify news content across different media formats.',
@@ -72,7 +87,7 @@ const projects = [
     solutions: 'Implemented efficient caching, parallel processing, and progressive enhancement for optimal user experience.'
   },
   {
-    id: '05',
+    id: '06',
     title: 'CommitStoryGen',
     description: 'A web App that generates a storyline based on the commit history of a github repo',
     fullDescription: 'An innovative tool that transforms boring commit histories into engaging narratives, helping developers showcase their project journey in a more compelling way.',
@@ -88,7 +103,7 @@ const projects = [
     solutions: 'Implemented smart filtering, natural language processing, and progressive loading for better performance.'
   },
   {
-    id: '06',
+    id: '07',
     title: 'PDFx - Offline PDF Toolkit',
     description: 'A fully offline PDF manipulation toolkit with all processing done in your browser',
     fullDescription: 'A privacy-focused PDF manipulation suite that runs entirely in the browser, ensuring your documents never leave your device while providing professional-grade PDF editing capabilities.',
@@ -104,7 +119,7 @@ const projects = [
     solutions: 'Leveraged WebAssembly for heavy computations and implemented chunked processing for large files.'
   },
   {
-    id: '07',
+    id: '08',
     title: 'Cricket Score Widget',
     description: 'An always-on-top Windows desktop application for live cricket scores built with Electron and React',
     fullDescription: 'A simple system tray widget for Windows that displays live cricket scores from Cricbuzz. Features include fetching live match lists, detailed scorecards, match status updates, pinning functionality, light/dark theme toggling, and auto-refresh capabilities.',
