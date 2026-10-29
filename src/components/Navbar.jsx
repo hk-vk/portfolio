@@ -32,11 +32,8 @@ const Navbar = () => {
     }`;
 
   return (
-    <motion.header
-      initial={motionSafe ? { y: 60, opacity: 0 } : false}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.05 }}
-      className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] inset-x-0 z-50 flex justify-center px-2 sm:px-4"
+    <header
+      className="enter-dock fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] sm:bottom-[max(1rem,env(safe-area-inset-bottom))] inset-x-0 z-50 flex justify-center px-2 sm:px-4"
     >
       <div className="relative">
       <nav
@@ -137,7 +134,7 @@ const Navbar = () => {
         />
       </nav>
       </div>
-    </motion.header>
+    </header>
   );
 };
 

@@ -1,6 +1,13 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 
 const EMPTY_STYLE = {};
+// A fixed seed and a grid anchored on the container's top centre make the waves' first frame the same on
+// every load, so the pre-rendered page can show it as an SVG until the canvas takes over.
+const NOISE_SEED = 0.42;
+// The area the SVG snapshot covers: half the widest hero card, and the tallest (on phones), plus the
+// wave amplitude. It hangs from the top edge, which stays put while the card's height settles.
+const SNAPSHOT_HALF_WIDTH = 660;
+const SNAPSHOT_HEIGHT = 1040;
 
 class Grad {
   constructor(x, y, z) {
@@ -88,6 +95,35 @@ class Noise {
   }
 }
 
+// The wave's displacement at a point given relative to the container's top centre.
+const waveOffset = (noise, rx, ry, time, { waveSpeedX, waveSpeedY, waveAmpX, waveAmpY }) => {
+  const move = noise.perlin2((rx + time * waveSpeedX) * 0.002, (ry + time * waveSpeedY) * 0.0015) * 12;
+  return { x: Math.cos(move) * waveAmpX, y: Math.sin(move) * waveAmpY };
+};
+
+// The first frame as one SVG path (blurred half a pixel in the markup to match the canvas's softness), with (0, 0) at the top centre, in whole pixels with relative steps to stay small.
+const snapshotPath = (config) => {
+  const noise = new Noise(NOISE_SEED);
+  const columns = Math.ceil(SNAPSHOT_HALF_WIDTH / config.xGap);
+  const rows = Math.ceil(SNAPSHOT_HEIGHT / config.yGap);
+  let path = "";
+  for (let i = -columns; i <= columns; i++) {
+    let lastX = 0;
+    let lastY = 0;
+    for (let j = -1; j <= rows; j++) {
+      const rx = i * config.xGap;
+      const ry = j * config.yGap;
+      const wave = waveOffset(noise, rx, ry, 0, config);
+      const x = Math.round(rx + wave.x);
+      const y = Math.round(ry + wave.y);
+      path += j === -1 ? `M${x} ${y}` : `l${x - lastX} ${y - lastY}`;
+      lastX = x;
+      lastY = y;
+    }
+  }
+  return path;
+};
+
 const Waves = ({
   lineColor = "black",
   backgroundColor = "transparent",
@@ -105,9 +141,10 @@ const Waves = ({
 }) => {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
+  const snapshotRef = useRef(null);
   const ctxRef = useRef(null);
   const boundingRef = useRef({ width: 0, height: 0, left: 0, top: 0 });
-  const noiseRef = useRef(new Noise(Math.random()));
+  const noiseRef = useRef(new Noise(NOISE_SEED));
   const linesRef = useRef([]);
   const mouseRef = useRef({
     x: -10,
@@ -135,6 +172,10 @@ const Waves = ({
     yGap,
   });
   const frameIdRef = useRef(null);
+  const snapshot = useMemo(
+    () => snapshotPath({ xGap, yGap, waveSpeedX, waveSpeedY, waveAmpX, waveAmpY }),
+    [xGap, yGap, waveSpeedX, waveSpeedY, waveAmpX, waveAmpY],
+  );
 
   useEffect(() => {
     configRef.current = {
@@ -169,26 +210,28 @@ const Waves = ({
 
     function setSize() {
       boundingRef.current = container.getBoundingClientRect();
-      canvas.width = boundingRef.current.width;
-      canvas.height = boundingRef.current.height;
+      // Draw at half the screen's resolution: the browser's upscaling gives the lines their soft look,
+      // the same on a 2x laptop (drawn at 1x) as on a 3x phone (drawn at 1.5x).
+      const ratio = Math.max(1, (window.devicePixelRatio || 1) / 2);
+      canvas.width = Math.round(boundingRef.current.width * ratio);
+      canvas.height = Math.round(boundingRef.current.height * ratio);
+      ctxRef.current.setTransform(ratio, 0, 0, ratio, 0, 0);
     }
 
     function setLines() {
       const { width, height } = boundingRef.current;
       linesRef.current = [];
-      const oWidth = width + 200,
-        oHeight = height + 30;
       const { xGap, yGap } = configRef.current;
-      const totalLines = Math.ceil(oWidth / xGap);
-      const totalPoints = Math.ceil(oHeight / yGap);
-      const xStart = (width - xGap * totalLines) / 2;
-      const yStart = (height - yGap * totalPoints) / 2;
-      for (let i = 0; i <= totalLines; i++) {
+      const columns = Math.ceil((width / 2 + 100) / xGap);
+      const rows = Math.ceil((height + 15) / yGap);
+      for (let i = -columns; i <= columns; i++) {
         const pts = [];
-        for (let j = 0; j <= totalPoints; j++) {
+        for (let j = -1; j <= rows; j++) {
           pts.push({
-            x: xStart + xGap * i,
-            y: yStart + yGap * j,
+            rx: xGap * i,
+            ry: yGap * j,
+            x: width / 2 + xGap * i,
+            y: yGap * j,
             wave: { x: 0, y: 0 },
             cursor: { x: 0, y: 0, vx: 0, vy: 0 },
           });
@@ -199,6 +242,8 @@ const Waves = ({
 
     let isActive = !document.hidden;
     let isIntersecting = true;
+    // The animation starts from time 0, which is the frame the SVG snapshot shows.
+    let startTime = null;
 
     function stop() {
       if (frameIdRef.current !== null) {
@@ -217,24 +262,11 @@ const Waves = ({
       const lines = linesRef.current,
         mouse = mouseRef.current,
         noise = noiseRef.current;
-      const {
-        waveSpeedX,
-        waveSpeedY,
-        waveAmpX,
-        waveAmpY,
-        friction,
-        tension,
-        maxCursorMove,
-      } = configRef.current;
+      const config = configRef.current;
+      const { friction, tension, maxCursorMove } = config;
       lines.forEach((pts) => {
         pts.forEach((p) => {
-          const move =
-            noise.perlin2(
-              (p.x + time * waveSpeedX) * 0.002,
-              (p.y + time * waveSpeedY) * 0.0015,
-            ) * 12;
-          p.wave.x = Math.cos(move) * waveAmpX;
-          p.wave.y = Math.sin(move) * waveAmpY;
+          p.wave = waveOffset(noise, p.rx, p.ry, time, config);
 
           const dx = p.x - mouse.sx,
             dy = p.y - mouse.sy;
@@ -311,8 +343,10 @@ const Waves = ({
       mouse.ly = mouse.y;
       mouse.a = Math.atan2(dy, dx);
 
-      movePoints(t);
+      if (startTime === null) startTime = t;
+      movePoints(t - startTime);
       drawLines();
+      if (snapshotRef.current) snapshotRef.current.style.visibility = "hidden";
       schedule();
     }
 
@@ -447,7 +481,17 @@ const Waves = ({
       }}
       className={`absolute top-0 left-0 w-full h-full overflow-hidden ${className}`}
     >
-      <canvas ref={canvasRef} className="block w-full h-full" />
+      <svg
+        ref={snapshotRef}
+        aria-hidden="true"
+        className="absolute left-1/2 top-0 -translate-x-1/2 blur-[0.5px]"
+        width={SNAPSHOT_HALF_WIDTH * 2}
+        height={SNAPSHOT_HEIGHT}
+        viewBox={`${-SNAPSHOT_HALF_WIDTH} 0 ${SNAPSHOT_HALF_WIDTH * 2} ${SNAPSHOT_HEIGHT}`}
+      >
+        <path d={snapshot} fill="none" stroke="currentColor" strokeWidth="1" />
+      </svg>
+      <canvas ref={canvasRef} className="relative block w-full h-full" />
     </div>
   );
 };

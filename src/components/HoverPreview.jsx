@@ -182,6 +182,10 @@ export function HoverPreviewLink({ previewKey, children, className = "" }) {
 // Preview Card — rendered via portal at document.body to escape ancestor CSS transforms
 const HoverPreviewCard = forwardRef((_, ref) => {
   const { activePreview, position, isVisible, cardWidth, handleCardEnter, handleCardLeave } = useHoverPreview();
+  // document.body only exists in the browser; the pre-rendered homepage leaves the portal out.
+  const [canPortal, setCanPortal] = useState(false);
+  useEffect(() => setCanPortal(true), []);
+  if (!canPortal) return null;
 
   return createPortal(
     <AnimatePresence>

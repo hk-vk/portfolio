@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AnimatePresence } from './lib/motion';
 import { useRef } from 'react';
@@ -137,7 +137,8 @@ const RouteAnalytics = () => {
   return null;
 };
 
-function App() {
+// The build pre-renders the homepage with a StaticRouter (src/entry-prerender.jsx).
+function App({ Router = BrowserRouter, routerProps, helmetContext }) {
   // Theme initialization
   useEffect(() => {
     const initTheme = () => {
@@ -153,9 +154,9 @@ function App() {
   }, []);
 
   return (
-    <HelmetProvider>
+    <HelmetProvider context={helmetContext}>
       <MotionProvider>
-        <Router>
+        <Router {...routerProps}>
           <SmoothScrollProvider>
             <div className="min-h-screen bg-background">
               <Navbar />

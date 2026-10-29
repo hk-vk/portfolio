@@ -13,11 +13,21 @@ const pages = {
   '/archive': ['Archive | Harikrishnan V K', 'Browse earlier versions of hari.works.'],
 };
 
-export async function onRequest({ request, next }) {
-  if (!crawler.test(request.headers.get('user-agent') || '')) return next();
-  if (!['GET', 'HEAD'].includes(request.method)) return next();
+// dist/index.html carries the pre-rendered homepage (scripts/prerender.mjs). Other app routes get the
+// empty shell, or React would try to hydrate the homepage markup as a different page.
+const serveShell = (request, url, env) => {
+  const path = url.pathname.replace(/\/$/, '') || '/';
+  if (path === '/' || path.startsWith('/api/') || /\.[a-z0-9]+$/i.test(path)) return null;
+  if (!(request.headers.get('accept') || '').includes('text/html')) return null;
+  // Pages serves shell.html at /shell (it drops the extension).
+  return env.ASSETS.fetch(new URL('/shell', url.origin), { method: request.method });
+};
 
+export async function onRequest({ request, next, env }) {
+  if (!['GET', 'HEAD'].includes(request.method)) return next();
   const url = new URL(request.url);
+  if (!crawler.test(request.headers.get('user-agent') || '')) return (await serveShell(request, url, env)) ?? next();
+
   const path = url.pathname.replace(/\/$/, '') || '/';
   let page = pages[path];
   let type = 'website';

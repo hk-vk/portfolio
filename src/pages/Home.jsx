@@ -2,8 +2,7 @@ import { motion, AnimatePresence } from '../lib/motion';
 import {
   duration,
   entrance,
-  stagger,
-  container
+  stagger
 } from '../utils/motionSettings';
 import { useMotionSafe } from '../utils/useMotionSafe';
 import { cardMotion, motionTransition, sequenceDelay } from '../utils/motionContract';
@@ -180,36 +179,24 @@ const skillsData = [
   { name: "Tailwind", icon: "simple-icons:tailwindcss", color: "#06B6D4" },
 ];
 
-const SkillTag = memo(({ skill, index, isVisible }) => {
-  const [isHovered, setIsHovered] = useState(false);
+const skillHover = {
+  scale: 1.03,
+  y: -2,
+  transition: { duration: duration.instant / 1000 }
+};
 
-  const skillVariants = useMemo(() => ({
-    initial: entrance.scaleUp.initial,
-    animate: {
-      ...entrance.scaleUp.animate,
-      transition: {
-        delay: sequenceDelay(index),
-        duration: duration.quick / 1000,
-        ease: motionTransition.componentEnter.ease
-      }
-    },
-    hover: {
-      scale: 1.03,
-      y: -2,
-      transition: { duration: duration.instant / 1000 }
-    }
-  }), [index]);
+// The chips' entrance is the CSS enter-pop, staggered like sequenceDelay, so it plays from first paint.
+const SkillTag = memo(({ skill, index }) => {
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.span
-      className="skill-tag inline-flex items-center gap-1.5 cursor-default"
-      variants={skillVariants}
-      initial="initial"
-      animate={isVisible ? "animate" : "initial"}
-      whileHover="hover"
+      className="enter-pop skill-tag inline-flex items-center gap-1.5 cursor-default"
+      whileHover={skillHover}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
+        '--enter-delay': `${sequenceDelay(index) * 1000}ms`,
         borderColor: isHovered ? `${skill.color}50` : undefined,
       }}
     >
@@ -359,7 +346,11 @@ const Home = memo(() => {
   const [experienceRef, experienceVisible] = useIntersectionObserver({ threshold: 0.1 });
   const experienceContentRef = useRef(null);
   const projectsContentRef = useRef(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Read the theme on the first client render so the waves' first frame has the right colour. The
+  // pre-render has no document; the colour only reaches the canvas, so hydration is unaffected.
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'),
+  );
 
   const heroCardRef = useRef(null);
   const emailPopoverRef = useRef(null);
@@ -473,16 +464,10 @@ const Home = memo(() => {
     experience: experienceVisible
   }), [projectsVisible, experienceVisible]);
 
-  // Animation variants using Temporal Precision system
-  const containerVariants = useMemo(() => ({
-    hidden: container.hidden,
-    visible: container.visible(stagger.quick)
-  }), []);
-
-  const childVariants = useMemo(() => ({
-    hidden: entrance.fadeUp.initial,
-    visible: entrance.fadeUp.animate
-  }), []);
+  // The hero copy rises in with the CSS enter-rise, 30ms apart like stagger.quick, so it moves from
+  // the pre-rendered first paint. It doesn't fade: it is the page's largest paint, and text that
+  // starts at opacity 0 only counts once the fade has begun.
+  const riseDelay = (index) => ({ '--enter-delay': `${index * stagger.quick.staggerChildren * 1000}ms` });
 
   const skills = skillsData;
   const memoizedProjects = featuredProjects;
@@ -528,7 +513,8 @@ const Home = memo(() => {
             >
               <div className="metal-hero-frame relative block w-full">
               <div className="hero-surface relative z-10 h-full w-full overflow-hidden rounded-xl bg-background/45 py-4 pl-4 pr-2 backdrop-blur-md sm:rounded-2xl sm:p-6 md:p-10">
-              <div className="absolute inset-0 -z-10 pointer-events-none select-none">
+              {/* The text colour is the waves' SVG snapshot colour; keep it in step with lineColor below. */}
+              <div className="absolute inset-0 -z-10 pointer-events-none select-none text-black/5 dark:text-white/[0.06]">
                 <Waves
                   lineColor={isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)'}
                   backgroundColor="transparent"
@@ -560,12 +546,7 @@ const Home = memo(() => {
                 )}
 
                 <HoverPreviewProvider data={heroPreviews} preloadImages={false}>
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="w-full"
-                >
+                <div className="w-full">
                   {sectionsVisible.hero && (
                     <motion.div
                       className="relative mb-4"
@@ -587,9 +568,9 @@ const Home = memo(() => {
                     </motion.div>
                   )}
 
-                  <motion.p
-                    variants={childVariants}
-                    className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
+                  <p
+                    style={riseDelay(0)}
+                    className="enter-rise max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
                   >
                     I’m a full-stack developer at{' '}
                     <span className="whitespace-nowrap">
@@ -599,9 +580,9 @@ const Home = memo(() => {
                         </HoverPreviewLink>
                       </a>,
                     </span>{' '}where I build tools for playful, practical learning.
-                  </motion.p>
+                  </p>
 
-                  <motion.p variants={childVariants} className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg sm:leading-loose">
+                  <p style={riseDelay(1)} className="enter-rise mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg sm:leading-loose">
                     After hours, I build small{' '}
                     <Link to="/projects" className="hero-link">
                       projects
@@ -677,16 +658,16 @@ const Home = memo(() => {
                         GitHub
                       </HoverPreviewLink>
                     </a>.
-                  </motion.p>
-                  <motion.div variants={childVariants} className="mt-4 text-base leading-relaxed sm:mt-6 sm:text-lg lg:flex lg:items-center lg:gap-2">
+                  </p>
+                  <div style={riseDelay(2)} className="enter-rise mt-4 text-base leading-relaxed sm:mt-6 sm:text-lg lg:flex lg:items-center lg:gap-2">
                     <p className="text-muted-foreground">I’ve rebuilt this site a few times.</p>
                     <MotionLink to="/archive" initial="rest" animate="rest" whileHover={motionSafe ? 'hover' : undefined} whileFocus={motionSafe ? 'hover' : undefined} className="group -mt-1 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md lg:mt-0 text-foreground/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
                       <span className="hero-link whitespace-nowrap">Browse earlier versions</span>
                       <ArchiveSticker />
                     </MotionLink>
-                  </motion.div>
+                  </div>
 
-                  <motion.div variants={childVariants} className="mt-5 w-full sm:mt-10">
+                  <div style={riseDelay(3)} className="enter-rise mt-5 w-full sm:mt-10">
                     <h3 className="text-xs sm:text-sm uppercase tracking-widest mb-2 sm:mb-3 text-left text-muted-foreground">Skills</h3>
                     <div className="skill-row sm:hidden">
                       <div className="skill-marquee-track">
@@ -695,7 +676,6 @@ const Home = memo(() => {
                             key={skill.marqueeKey}
                             skill={skill}
                             index={skill.baseIndex}
-                            isVisible={sectionsVisible.hero}
                           />
                         ))}
                       </div>
@@ -707,13 +687,12 @@ const Home = memo(() => {
                             key={skill.marqueeKey}
                             skill={skill}
                             index={skill.baseIndex}
-                            isVisible={sectionsVisible.hero}
                           />
                         ))}
                       </div>
                     </div>
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </div>
                 </HoverPreviewProvider>
               </div>
               </div>

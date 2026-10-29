@@ -1,7 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap');
 @import '@fontsource-variable/syne';
 @import '@fontsource-variable/plus-jakarta-sans';
 @import './utils/animations.css';
+
+/* First-screen entrances run in CSS so they play from the pre-rendered page's first paint instead of
+   waiting for the JavaScript to hydrate. Fill mode stays "backwards" so hover transforms still apply
+   once an entrance ends. Reduced motion shows everything in place. */
+@media (prefers-reduced-motion: no-preference) {
+  .enter-rise {
+    animation: enter-rise 220ms ease-out backwards;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  .enter-pop {
+    animation: enter-pop 160ms ease-out backwards;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  .enter-dock {
+    animation: enter-dock 450ms cubic-bezier(0.22, 1, 0.36, 1) 50ms backwards;
+  }
+}
+
+@keyframes enter-rise {
+  from { transform: translate3d(0, 20px, 0); }
+}
+
+@keyframes enter-pop {
+  from { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes enter-dock {
+  from { opacity: 0; transform: translate3d(0, 60px, 0); }
+}
+
+/* Arial resized to each web font's metrics (from @capsizecss/metrics), so the pre-rendered homepage
+   wraps the same before and after the fonts swap in and nothing below the hero moves. */
+@font-face {
+  font-family: 'Plus Jakarta Sans Fallback';
+  src: local('Arial');
+  size-adjust: 104.98%;
+  ascent-override: 98.88%;
+  descent-override: 21.15%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Syne Fallback';
+  src: local('Arial');
+  size-adjust: 98.47%;
+  ascent-override: 93.93%;
+  descent-override: 27.93%;
+  line-gap-override: 0%;
+}
 
 @tailwind base;
 @tailwind components;
@@ -99,14 +149,14 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Plus Jakarta Sans Variable', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans Fallback', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 1rem;
     line-height: 1.65;
     text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Syne Variable', system-ui, sans-serif;
+    font-family: 'Syne Variable', 'Syne Fallback', system-ui, sans-serif;
     font-weight: 700;
     line-height: 1.2;
     padding-bottom: 0.08em;

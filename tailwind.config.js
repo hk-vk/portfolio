@@ -18,8 +18,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans Variable"', 'system-ui', 'sans-serif'],
-        display: ['"Syne Variable"', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans Variable"', '"Plus Jakarta Sans Fallback"', 'system-ui', 'sans-serif'],
+        display: ['"Syne Variable"', '"Syne Fallback"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
